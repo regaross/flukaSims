@@ -3,25 +3,37 @@ TITLE
 test_oct_22
 * Setting default precision
 DEFAULTS                                                              PRECISIO
-START            300
+START             10
 * Source command needed for deploying source_newgen.f
 SOURCE
 * Setting Beam Position (overidden by source_newgen.f)  NEGATIVE means down in z
 BEAMPOS            0         0     10000                              NEGATIVE
 * Specifying beam by energy in GeV, also overridden by source_newgen.f file  ENERGY ==> Max permissible energy.`
 BEAM        -10000.0                                                  MUON-
-USRTRACK          -1   NEUTRON       -21    tpc_in                 100neuTrack
+USRBDX             1   NEUTRON       -97  od_wtank      rock
+USRBDX            10         0      1000                            50 &
+USRBDX             1   NEUTRON        97  od_wtank      rock
+USRBDX            10         0      1000                            50 &
+USRBDX             1   NEUTRON       -96      rock  od_wtank
+USRBDX            10         0      1000                            50 &
+USRBDX             1   NEUTRON        96      rock  od_wtank
+USRBDX            10         0      1000                            50 &
+USRTRACK           1   NEUTRON       -21    tpc_in                 100neuTrack
 USRTRACK           1                                                   &
-USRTRACK          -1   NEUTRON        21    tpc_in                 100neuTrack
+USRTRACK           1   NEUTRON        21    tpc_in                 100neuTrack
 USRTRACK           1                                                   &
+USRTRACK           1   NEUTRON       -80  od_wtank                 100OD_neut
+USRTRACK         100                                                   &
+USRTRACK           1   NEUTRON        80  od_wtank                 100OD_neut
+USRTRACK         100                                                   &
 * Creating "Collision Tape" of events
-USERDUMP        100.       23.       0.0        1.                    bdmp
+USERDUMP        100.       23.       0.0        1.                    dump
 RESNUCLE           3       -43        72       140    tpc_in          ResNucTPC
 RESNUCLE           3        43        72       140    tpc_in          ResNucTPC
-USRYIELD         133   NEUTRON       -44   tpc_out    tpc_in          UsrYldTPC
-USRYIELD          30                  30        20                     &
-USRYIELD         133   NEUTRON        44   tpc_out    tpc_in          UsrYldTPC
-USRYIELD          30                  30        20                     &
+*USRYIELD         133   NEUTRON       -44   tpc_out    tpc_in          UsrYldTPC
+*USRYIELD          30                  30        20                     &
+*USRYIELD         133   NEUTRON        44   tpc_out    tpc_in          UsrYldTPC
+*USRYIELD          30                  30        20                     &
 LOW-PWXS     5413601                  87    liq-Xe
 * $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
