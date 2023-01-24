@@ -1,0 +1,71 @@
+BootStrap: debootstrap
+OSVersion: bionic
+MirrorURL: http://ch.archive.ubuntu.com/ubuntu/
+
+
+
+
+%files
+    ./fluka_4-3.1.x86-Linux-gfor7_amd64.deb /root
+
+
+
+
+%runscript
+    echo "Welcome to FLUKA on Singularity"
+
+
+
+
+%post
+    echo "Updating repository"
+    sed -i 's/$/ universe/' /etc/apt/sources.list
+    apt update
+    apt -y upgrade
+    apt clean
+
+    echo "Installing software" 
+    apt -y install apt-utils dialog whiptail 
+    apt -y install nano wget gnupg software-properties-common git
+    apt -y install gcc gfortran gawk make cmake libpython3.6
+
+    apt -y install language-pack-en-base locales
+    locale-gen en_US.UTF-8
+    update-locale LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8" LC_ALL="en_US.UTF-8" 
+
+
+    echo "Installing FLUKA" 
+    apt -y install /root/fluka_4-3.1.x86-Linux-gfor7_amd64.deb
+
+    echo "Installing Flair" 
+    wget -q -O - https://cern.ch/flair/download/ubuntu/KEY.gpg | apt-key add -
+    add-apt-repository 'deb [arch=all,amd64] https://cern.ch/flair/download/ubuntu/18.04 /'
+    apt update
+    apt -y install flair
+
+    # Install miniconda 
+    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    bash Miniconda3-latest-Linux-x86_64.sh -b -f -p /miniconda3/
+    rm Miniconda3-latest-Linux-x86_64.sh
+     
+        # Use conda to install pip, numpy
+    /miniconda3/bin/conda install -y -c conda-forge pip numpy h5py pyyaml
+
+    # Help conda resolving Python "import" 
+    /miniconda3/bin/conda update --all 
+
+
+
+%environment
+    export PATH=$PATH:/usr/local/fluka/bin 
+    export PS1='\e[0;35m[\u@\h \W]\$ \e[m'
+    export PYTHONPATH=$APP_DIR/lib:/usr/local/lib/python3.8/dist-packages:$PYTHONPATH
+    #    pull the conda functions in . /miniconda3/etc/profile.d/conda.sh and make pip, etc. available while in %post
+    export PATH="/miniconda3/bin:$PATH"
+
+
+
+
+
+
+
