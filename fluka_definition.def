@@ -27,7 +27,7 @@ MirrorURL: http://ch.archive.ubuntu.com/ubuntu/
     echo "Installing software" 
     apt -y install apt-utils dialog whiptail 
     apt -y install nano wget gnupg software-properties-common git
-    apt -y install gcc gfortran gawk make cmake libpython3.6
+    apt -y install gcc gfortran gawk make cmake libpython3.6 zlib1g-dev
 
     apt -y install language-pack-en-base locales
     locale-gen en_US.UTF-8

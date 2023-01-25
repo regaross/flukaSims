@@ -163,7 +163,7 @@ def store_events(neutron_filename, muon_filename, output_filename):
 
 
 def main():
-    yaml_file = open('simconfig.yaml')
+    yaml_file = open('simconfig_SDF.yaml')
     input_yaml = yaml.safe_load(yaml_file)
 
     os.system('echo RR: Loading in YAML Params')
@@ -178,9 +178,10 @@ def main():
 
     # Input Parameters
     Input = input_yaml.get('Input')
-    input_file = Input.get('InputFile')
-    source_routine = Input.get('SourceFile')
-    mgdraw_file = Input.get('MGDrawFile')
+    input_path = Input.get('InputPath')
+    input_file = input_path + Input.get('InputFile')
+    source_routine = input_path + Input.get('SourceFile')
+    mgdraw_file = input_path + Input.get('MGDrawFile')
 
     # Output Parameters
     Output = input_yaml.get('Output')
@@ -198,7 +199,7 @@ def main():
     space_string = '               '
     num_spaces = len(space_string) - len(str(num_muons))
     num_string = 'START' + space_string[:num_spaces] + str(num_muons)
-    os.system('sed -i \'\' \'s/^START.*/' + num_string + '/g\' ' + input_file)
+    os.system('sed -i \'s/^START.*/' + num_string + '/\' ' + input_file)
 
     ## STEP TWO: MAKE SURE GEOMETRY SCORING GEOMETRY IS RIGHT FOR NEUTRON COUNT
     os.system('echo RR: Making sure scoring region is right')
@@ -211,7 +212,7 @@ def main():
         os.system('echo RR: Counting neutrons in TPC')
 
     mg_string = 'IF (MREG .EQ. ' + str(geo_num)
-    os.system('sed -i \'\' \'s/IF (MREG .EQ. [0-9]/'+ mg_string + '/g\' ' + mgdraw_file)
+    os.system('sed -i \'s/IF (MREG .EQ. [0-9]/'+ mg_string + '/g\' ' + mgdraw_file)
 
     ## STEP THREE: COMPILE THE FILES
     compile_string = source_path + 'fff'
