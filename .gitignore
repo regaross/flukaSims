@@ -17,3 +17,4 @@
 *.hdf5
 .sif
 .simg
+*git*
