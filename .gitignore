@@ -17,3 +17,5 @@
 *.hdf5
 *.sif
 *.simg
+*.pickle
+*~
