@@ -42,12 +42,12 @@ def store_events(neutron_filename, muon_filename, output_filename):
     now = datetime.now()
 
     # Neutron attribute lists
-    muon, generation, energy, xsco, ysco, zsco, cosx, cosy, cosz = [],[],[],[],[],[],[],[],[]
+    muon_numbers, generation, energy, xsco, ysco, zsco, cosx, cosy, cosz = [],[],[],[],[],[],[],[],[]
 
     with open(neutron_filename) as neutron_file:
         for line in neutron_file:
             temp = line.split()
-            muon.append(int(temp[0]))
+            muon_numbers.append(int(temp[0]))
             energy.append(float(temp[1]))
             generation.append(int(temp[2]))
             xsco.append(float(temp[4]))
@@ -61,7 +61,7 @@ def store_events(neutron_filename, muon_filename, output_filename):
     muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
     with open(muon_filename) as muon_file:
         lines = muon_file.readlines()
-        for mu in muon:
+        for mu in muon_numbers:
             # the number in the list "muon" is 1+ the index in the file.
             muon_array = lines[mu-1].split()
 
@@ -111,7 +111,12 @@ def store_events(neutron_filename, muon_filename, output_filename):
         meta.create_dataset("hour",(0,), dtype=int, maxshape=(None,))
         meta.create_dataset("minute",(0,), dtype=int, maxshape=(None,))
         meta.create_dataset("second",(0,), dtype=int, maxshape=(None,))
-        meta.create_dataset("how_many",(0,), dtype=int, maxshape=(None,))
+        # number of neutrons created in file
+        meta.create_dataset("neutrons_counted",(0,), dtype=int, maxshape=(None,))
+        # number of muons simulated
+        meta.create_dataset("muons_simulated",(0,), dtype=int, maxshape=(None,))
+        # number of muons responsible for creating neutrons
+        meta.create_dataset("muon_parents",(0,), dtype=int, maxshape=(None,))
 
 
         file.close()
@@ -124,12 +129,12 @@ def store_events(neutron_filename, muon_filename, output_filename):
 
     # Current length of the data in the file
     current_size = np.size(data['neutron_energy'])
-    n_points = len(muon) # Number of elements to append
+    num_neutrons = len(muon_numbers) # Number of elements to append
     current_meta_size = np.size(meta['year'])
 
     for dset in data:
         # resize the datasets
-        data[dset].resize(current_size + n_points, axis = 0)
+        data[dset].resize(current_size + num_neutrons, axis = 0)
     for dset in meta:
         meta[dset].resize(current_meta_size + 1, axis = 0)
 
@@ -139,12 +144,14 @@ def store_events(neutron_filename, muon_filename, output_filename):
     meta['year'][current_meta_size] = int(now.strftime('%Y'))
     meta['month'][current_meta_size] = int(now.strftime('%m'))
     meta['day'][current_meta_size] = int(now.strftime('%d'))
-    meta['how_many'][current_meta_size] = n_points
+    meta['neutrons_counted'][current_meta_size] = num_neutrons
+    meta['muons_simulated'][current_meta_size] = sum(1 for line in open(muon_filename))
+    meta['muon_parents'][current_meta_size] = len(np.unique(muon_numbers))
 
     # Now that the datasets have been resized, we must append the most recent sim data to the datasets.
 
 
-    for i in range(n_points):
+    for i in range(num_neutrons):
         list_index = i
         dset_index = i + current_size
 
@@ -241,10 +248,11 @@ def main():
 
         ## STEP SEVEN: MOVE DATA TO H5 FILE
         os.system('echo RR: Copying neutron data to h5 file')
+        fort_99_filename = input_file[:-4] + "001_fort.99"
         try:
-            store_events('nEXO_OD001_fort.99', muon_file, neutron_file)
+            store_events(fort_99_filename, muon_file, neutron_file)
         except:
-            os.system('echo RR: The neutron file WAS NOT CREATED\; probably because no neutrons were generated')
+            os.system('echo RR: The neutron hdf5 file WAS NOT CREATED\; probably because no neutrons were generated')
         
 
         ## STEP SIX: MOVING OUTPUT FILES TO SPECIFIED DIRECTORY
