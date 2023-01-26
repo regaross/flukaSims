@@ -16,4 +16,4 @@
 
 cd /gpfs/slac/staas/fs1/g/exo/exo_data8/exo_data/users/rross/flukaSims
 
-singularity exec -B /gpfs fluka_nEXO.sif python runsim.py
+singularity exec -B /gpfs fluka_nEXO.sif python runsim_SDF.py
