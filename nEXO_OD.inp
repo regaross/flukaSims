@@ -3,7 +3,7 @@ TITLE
 test_oct_22
 * Setting default precision
 DEFAULTS                                                              PRECISIO
-START           1000
+START            100
 * Source command needed for deploying source_newgen.f
 SOURCE
 * Setting Beam Position (overidden by source_newgen.f)  NEGATIVE means down in z
@@ -61,11 +61,15 @@ SPH blkhole    0.0 0.0 0.0 100000.0
 * Geometries for rock region
 ZCC rock_cyl   0.0 0.0 10000.0
 XYP rock_top   4000.0
-XYP rock_bot   -1000.0
+XYP rock_bot   -2000.0
 * Geometries for OD Cylinder
 ZCC od_cyl     0.0 0.0 617.22
 XYP od_top     640.0
 XYP od_bot     -640.0
+* Geometries for OD Cylinder Outsides
+ZCC od_cyl1    0.0 0.0 620
+XYP od_top1    642.0
+XYP od_bot1    -642.0
 * Outer Cryostat -> outer
 SPH o_cryo_o   0.0 0.0 40.0 227.0
 * Outer Cryostat -> inner
@@ -76,15 +80,16 @@ SPH i_cryo_o   0.0 0.0 0.0 169.0
 SPH i_cryo_i   0.0 0.0 0.0 167.5
 * nEXO TPC Region
 ZCC tpc_cyl    0 0 64.0
-XYP tpc_top    80
-XYP tpc_bot    -80
+XYP tpc_top    86
+XYP tpc_bot    -86
 * nEXO TPC Region Inside
-ZCC tpc_icyl   0 0 60.0
-XYP tpc_itop   64
-XYP tpc_ibot   -64
+ZCC tpc_icyl   0 0 59.0
+XYP tpc_itop   63.9
+XYP tpc_ibot   -63.9
 END
 blkhole      5 blkhole -(+rock_cyl +rock_top -rock_bot)
-rock         5 (+rock_cyl +rock_top -rock_bot) -(+od_cyl -od_bot +od_top)
+rock         5 (+rock_cyl +rock_top -rock_bot) -(+od_cyl1 -od_bot1 +od_top1)
+od_tank      5 (+od_cyl1 -od_bot1 +od_top1) - (+od_cyl -od_bot +od_top)
 od_wtank     5 (+od_cyl -od_bot +od_top) - o_cryo_o
 ocryo        5 (o_cryo_o - o_cryo_i)
 cryo_vac     5 (o_cryo_i - i_cryo_o)
@@ -102,6 +107,7 @@ ASSIGNMA      Norite      rock
 ASSIGNMA     c_fibre     icryo
 ASSIGNMA     c_fibre     ocryo
 ASSIGNMA       WATER  od_wtank
+ASSIGNMA     stnless   od_tank
 ASSIGNMA    BLCKHOLE   blkhole
 MATERIAL                             2.8                              Norite
 * SNOLAB Norite (Rock)
@@ -115,10 +121,13 @@ MATERIAL           9     18.99  0.001696                              FLUORINE
 MATERIAL           6                0.88                              c_fibre
 MATERIAL          54       136  0.005887                           136Xenon136
 MATERIAL          54       134  0.005887                           134Xenon134
+MATERIAL          24        52      7.19                            52chromium
+MATERIAL                            8.03                              stnless
+COMPOUND       -0.07    NICKEL     -0.17  chromium     -0.76      IRONstnless
 * ### Select the density such that the volume of the TPC encapsulates 5000kg of LXe
-MATERIAL          54       136     3.035                           136liq-Xe
+MATERIAL          54       136      3.58                           136liq-Xe
 COMPOUND         0.9  Xenon136       0.1  Xenon134                    liq-Xe
-MATERIAL                             1.8                              HFE
+MATERIAL                             1.5                              HFE
 COMPOUND         0.2  HYDROGEN     0.067    coldOx     0.267  coldcarbHFE
 COMPOUND       0.466  FLUORINE                                        HFE
 LOW-MAT     Xenon136        54       136       296                    136-XE
