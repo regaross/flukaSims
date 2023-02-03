@@ -249,8 +249,10 @@ def main():
         ## STEP SEVEN: MOVE DATA TO H5 FILE
         os.system('echo RR: Copying neutron data to h5 file')
         fort_99_filename = input_file[:-4] + "001_fort.99"
+        
+        neutron_filename = neutron_file + str(i) + '.hdf5'
         try:
-            store_events(fort_99_filename, muon_file, neutron_file)
+            store_events(fort_99_filename, muon_file, neutron_filename)
         except:
             os.system('echo RR: The neutron hdf5 file WAS NOT CREATED\; probably because no neutrons were generated')
         

@@ -10,7 +10,7 @@ Simulation:
 
 Output:
   OutputDir: './Jan2023/'
-  NeutronFile: 'fluka_data.hdf5'
+  NeutronFile: 'fluka_data'
   ProgressOut: 'fluka_sim_sum.txt'
 
 Input:                        # Not likely to require changing
