@@ -121,9 +121,9 @@ MATERIAL           9     18.99  0.001696                              FLUORINE
 MATERIAL           6                0.88                              c_fibre
 MATERIAL          54       136  0.005887                           136Xenon136
 MATERIAL          54       134  0.005887                           134Xenon134
-MATERIAL          24        52      7.19                            52chromium
+MATERIAL          24        52      7.19                            52CHROMIUM
 MATERIAL                            8.03                              stnless
-COMPOUND       -0.07    NICKEL     -0.17  chromium     -0.76      IRONstnless
+COMPOUND       -0.07    NICKEL     -0.17  CHROMIUM     -0.76      IRONstnless
 * ### Select the density such that the volume of the TPC encapsulates 5000kg of LXe
 MATERIAL          54       136      3.58                           136liq-Xe
 COMPOUND         0.9  Xenon136       0.1  Xenon134                    liq-Xe
