@@ -1,7 +1,7 @@
 #!/bin/bash
 
-for value in {0..100}
-do
+# for value in {0..100}
+# do
 
     #SBATCH --partition=shared
     #
@@ -20,4 +20,4 @@ do
     cd /gpfs/slac/staas/fs1/g/exo/exo_data8/exo_data/users/rross/flukaSims
 
     singularity exec -B /gpfs fluka_nEXO.sif python runsim_SDF.py
-done
+# done
