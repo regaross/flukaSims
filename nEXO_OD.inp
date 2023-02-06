@@ -10,7 +10,7 @@ SOURCE
 * Setting Beam Position (overidden by source_newgen.f)  NEGATIVE means down in z
 BEAMPOS            0         0     10000                              NEGATIVE
 * Specifying beam by energy in GeV, also overridden by source_newgen.f file  ENERGY ==> Max permissible energy.`
-BEAM        -10000.0                                                  MUON-
+BEAM        -50000.0                                                  MUON-
 USRBDX             1   NEUTRON       -97  od_wtank      rock
 USRBDX            10         0      1000                            50 &
 USRBDX             1   NEUTRON        97  od_wtank      rock

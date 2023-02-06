@@ -208,7 +208,16 @@ def main():
     num_string = 'START' + space_string[:num_spaces] + str(num_muons)
     os.system('sed -i \'s/^START.*/' + num_string + '/\' ' + input_file)
 
-    ## STEP TWO: MAKE SURE GEOMETRY SCORING GEOMETRY IS RIGHT FOR NEUTRON COUNT
+    ## STEP TWO: CHANGE SEED IN .inp FILE
+    os.system('echo RR: Changing seed in input file')
+    seed = str(np.random.randint(0,999999))
+    space_string = '                      '
+    num_spaces = len(space_string) - len(str(seed))
+    num_string = 'RANDOMIZ' + space_string[:num_spaces] + seed
+    os.system('sed -i \'s/^RANDOMIZ.*/' + num_string + '/\' ' + input_file)
+    
+
+    ## STEP THREE: MAKE SURE GEOMETRY SCORING GEOMETRY IS RIGHT FOR NEUTRON COUNT
     os.system('echo RR: Making sure scoring region is right')
     if score_od: 
         geo_num = 3  # Region number for OD water tank
@@ -221,13 +230,13 @@ def main():
     mg_string = 'IF (MREG .EQ. ' + str(geo_num)
     os.system('sed -i \'s/IF (MREG .EQ. [0-9]/'+ mg_string + '/g\' ' + mgdraw_file)
 
-    ## STEP THREE: COMPILE THE FILES
+    ## STEP FOUR: COMPILE THE FILES
     compile_string = source_path + 'fff'
     os.system('echo RR: COMPILING FILES >> ' + progress_out)
     os.system(compile_string + ' ' + mgdraw_file + ' >> '+ progress_out)
     os.system(compile_string + ' ' + source_routine + ' >> ' + progress_out)
 
-    ## STEP FOUR: LINK THE COMPILED FILES
+    ## STEP FIVE: LINK THE COMPILED FILES
     os.system('echo RR: Compiling the user routines')
     link_string = source_path + 'ldpmqmd -m fluka -o nEXOsim.exe '
     mgd_compd = mgdraw_file[:-1] + 'o'
@@ -235,18 +244,18 @@ def main():
     os.system('echo RR: Linking the user routines')
     os.system(link_string + mgd_compd + ' ' + source_compd + '>> ' + progress_out)
 
-    ## STEP FIVE (optional): MAKE THE PHASE SPACE FILE
+    ## STEP SIX (optional): MAKE THE PHASE SPACE FILE
     for i in range(reps):
         if make_new or not os.path.exists( muon_file):
             os.system('echo RR: Making the phase space file')
             make_phase_space_file(num_muons = num_muons, filename = muon_file)
         
-        ## STEP SIX: RUN THE SIM
+        ## STEP SEVEN: RUN THE SIM
         os.system('echo RR: Running the simulation')
         run_string = source_path + 'rfluka -M 1 -e ./nEXOsim.exe ' + input_file 
         os.system(run_string)
 
-        ## STEP SEVEN: MOVE DATA TO H5 FILE
+        ## STEP EIGHT: MOVE DATA TO H5 FILE
         os.system('echo RR: Copying neutron data to h5 file')
         fort_99_filename = input_file[:-4] + "001_fort.99"
         
@@ -257,7 +266,7 @@ def main():
             os.system('echo RR: The neutron hdf5 file WAS NOT CREATED\; probably because no neutrons were generated')
         
 
-        ## STEP SIX: MOVING OUTPUT FILES TO SPECIFIED DIRECTORY
+        ## STEP NINE: MOVING OUTPUT FILES TO SPECIFIED DIRECTORY
         os.system('echo RR: Moving output files to output directory: ' + output_dir)
         try:
             os.system('mkdir ' + output_dir)
@@ -273,7 +282,7 @@ def main():
         os.system('echo RR: Copying input file to output dir for future reference')
         os.system('cp ' + input_file + ' ' + last_dir)
 
-    ## STEP SEVEN: REMOVE COMPILED AND UNNECESSARY FILES
+    ## STEP TEN: REMOVE COMPILED AND UNNECESSARY FILES
     os.system('echo RR: Removing unnecessary files')
     os.system('rm *.o *.exe *.mod')
     os.system('echo RR: DONE!')
