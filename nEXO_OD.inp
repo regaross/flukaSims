@@ -3,6 +3,7 @@ TITLE
 test_oct_22
 * Setting default precision
 DEFAULTS                                                              PRECISIO
+RANDOMIZ                    93
 START            100
 * Source command needed for deploying source_newgen.f
 SOURCE
