@@ -221,18 +221,9 @@ def main():
     num_string = 'START' + space_string[:num_spaces] + str(num_muons)
     os.system('sed -i \'s/^START.*/' + num_string + '/\' ' + input_file)
     meta['number_of_muons'] = num_muons
-
-    ## STEP TWO: CHANGE SEED IN .inp FILE
-    seed = str(np.random.randint(0,999999))
-    os.system('echo RR: Changing seed in input file to: ' + seed)
-    space_string = '                      '
-    num_spaces = len(space_string) - len(str(seed))
-    num_string = 'RANDOMIZ' + space_string[:num_spaces] + seed
-    os.system('sed -i \'s/^RANDOMIZ.*/' + num_string + '/\' ' + input_file)
-    meta['seed'] = int(seed)
     
 
-    ## STEP THREE: MAKE SURE GEOMETRY SCORING GEOMETRY IS RIGHT FOR NEUTRON COUNT
+    ## STEP TWO: MAKE SURE GEOMETRY SCORING GEOMETRY IS RIGHT FOR NEUTRON COUNT
     os.system('echo RR: Making sure scoring region is right')
     if score_od: 
         geo_num = 3  # Region number for OD water tank
@@ -247,13 +238,13 @@ def main():
     mg_string = 'IF (MREG .EQ. ' + str(geo_num)
     os.system('sed -i \'s/IF (MREG .EQ. [0-9]/'+ mg_string + '/g\' ' + mgdraw_file)
 
-    ## STEP FOUR: COMPILE THE FILES
+    ## STEP THREE: COMPILE THE FILES
     compile_string = source_path + 'fff'
     os.system('echo RR: COMPILING FILES >> ' + progress_out)
     os.system(compile_string + ' ' + mgdraw_file + ' >> '+ progress_out)
     os.system(compile_string + ' ' + source_routine + ' >> ' + progress_out)
 
-    ## STEP FIVE: LINK THE COMPILED FILES
+    ## STEP FOUR: LINK THE COMPILED FILES
     os.system('echo RR: Compiling the user routines')
     link_string = source_path + 'ldpmqmd -m fluka -o nEXOsim.exe '
     mgd_compd = mgdraw_file[:-1] + 'o'
@@ -261,11 +252,20 @@ def main():
     os.system('echo RR: Linking the user routines')
     os.system(link_string + mgd_compd + ' ' + source_compd + '>> ' + progress_out)
 
-    ## STEP SIX (optional): MAKE THE PHASE SPACE FILE
+    ## STEP FIVE (optional): MAKE THE PHASE SPACE FILE
     for i in range(reps):
         if make_new or not os.path.exists( muon_file):
             os.system('echo RR: Making the phase space file')
             make_phase_space_file(num_muons = num_muons, filename = muon_file)
+
+        ## STEP SIX: CHANGE SEED IN .inp FILE
+        seed = str(np.random.randint(0,999999))
+        os.system('echo RR: Changing seed in input file to: ' + seed)
+        space_string = '                      '
+        num_spaces = len(space_string) - len(str(seed))
+        num_string = 'RANDOMIZ' + space_string[:num_spaces] + seed
+        os.system('sed -i \'s/^RANDOMIZ.*/' + num_string + '/\' ' + input_file)
+        meta['seed'] = int(seed)
         
         ## STEP SEVEN: RUN THE SIM
         os.system('echo RR: Running the simulation')
@@ -276,7 +276,10 @@ def main():
         os.system('echo RR: Copying neutron data to h5 file')
         fort_99_filename = input_file[:-4] + "001_fort.99"
         
-        neutron_filename = neutron_file + str(i) + '.hdf5'
+
+        time_stamp = str(datetime.now())[5:16].replace(' ','').replace('-', '').replace(':', '')
+
+        neutron_filename = neutron_file + time_stamp + '.hdf5'
         try:
             store_events(fort_99_filename, muon_file, neutron_filename, meta)
         except:
@@ -289,11 +292,12 @@ def main():
             os.system('mkdir ' + output_dir)
         except: pass
 
-        sub_dir = str(datetime.now())[:16].replace(' ', '_')
+        sub_dir = neutron_file + time_stamp
         last_dir = output_dir + sub_dir + '/'
         try:
             os.system('mkdir ' + last_dir)
             os.system('mv *fort* ' + last_dir)
+            os.system('mv *.hdf5 ' + output_dir)
             os.system('mv *.log *.err *.out *ran* *dump *fort* *.txt ' + last_dir)
         except: pass
         os.system('echo RR: Copying input file to output dir for future reference')
