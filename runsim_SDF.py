@@ -34,7 +34,7 @@ def make_phase_space_file(num_muons, roi_radius = 0, roi_height = 0, filename = 
     file_stream.close()
 
 
-def store_events(neutron_filename, muon_filename, output_filename):
+def store_events(neutron_filename, muon_filename, output_filename, meta_dict):
     ''' A function to collect the neutrons logged by the MGDRAW.f routine.
         First, the output file is parsed to collect the neutron data. These data are related to their source muons
         The data is appended to an hdf5 file. '''
@@ -117,6 +117,11 @@ def store_events(neutron_filename, muon_filename, output_filename):
         meta.create_dataset("muons_simulated",(0,), dtype=int, maxshape=(None,))
         # number of muons responsible for creating neutrons
         meta.create_dataset("muon_parents",(0,), dtype=int, maxshape=(None,))
+        # the integer seed used in the simulation
+        meta.create_dataset("seed",(0,), dtype=int, maxshape=(None,))
+        # the region scored in the simulation
+        meta.create_dataset("region",(0,), dtype=int, maxshape=(None,))
+        # the 
 
 
         file.close()
@@ -145,8 +150,11 @@ def store_events(neutron_filename, muon_filename, output_filename):
     meta['month'][current_meta_size] = int(now.strftime('%m'))
     meta['day'][current_meta_size] = int(now.strftime('%d'))
     meta['neutrons_counted'][current_meta_size] = num_neutrons
-    meta['muons_simulated'][current_meta_size] = sum(1 for line in open(muon_filename))
+    meta['muons_simulated'] = meta_dict['number_of_muons']
     meta['muon_parents'][current_meta_size] = len(np.unique(muon_numbers))
+
+    meta['seed'] = meta_dict['seed']
+    meta['region'] = meta_dict['region']
 
     # Now that the datasets have been resized, we must append the most recent sim data to the datasets.
 
@@ -201,20 +209,27 @@ def main():
 
     yaml_file.close()
 
+    ## MAKING A DICT TO CONTAIN META_DATA
+    meta = dict()
+
+
+
     ## STEP ONE: CHANGE .inp FILE TO NUMBER OF MUONS
-    os.system('echo RR: Changing number of muons in input file')
+    os.system('echo RR: Changing number of muons in input file to ' + str(num_muons))
     space_string = '               '
     num_spaces = len(space_string) - len(str(num_muons))
     num_string = 'START' + space_string[:num_spaces] + str(num_muons)
     os.system('sed -i \'s/^START.*/' + num_string + '/\' ' + input_file)
+    meta['number_of_muons'] = num_muons
 
     ## STEP TWO: CHANGE SEED IN .inp FILE
-    os.system('echo RR: Changing seed in input file')
     seed = str(np.random.randint(0,999999))
+    os.system('echo RR: Changing seed in input file to: ' + seed)
     space_string = '                      '
     num_spaces = len(space_string) - len(str(seed))
     num_string = 'RANDOMIZ' + space_string[:num_spaces] + seed
     os.system('sed -i \'s/^RANDOMIZ.*/' + num_string + '/\' ' + input_file)
+    meta['seed'] = int(seed)
     
 
     ## STEP THREE: MAKE SURE GEOMETRY SCORING GEOMETRY IS RIGHT FOR NEUTRON COUNT
@@ -226,6 +241,8 @@ def main():
     else: 
         geo_num = 9         # Region number for TPC inside
         os.system('echo RR: Counting neutrons in TPC')
+    
+    meta['scoring'] = geo_num
 
     mg_string = 'IF (MREG .EQ. ' + str(geo_num)
     os.system('sed -i \'s/IF (MREG .EQ. [0-9]/'+ mg_string + '/g\' ' + mgdraw_file)
@@ -261,7 +278,7 @@ def main():
         
         neutron_filename = neutron_file + str(i) + '.hdf5'
         try:
-            store_events(fort_99_filename, muon_file, neutron_filename)
+            store_events(fort_99_filename, muon_file, neutron_filename, meta)
         except:
             os.system('echo RR: The neutron hdf5 file WAS NOT CREATED\; probably because no neutrons were generated')
         
