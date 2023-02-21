@@ -89,6 +89,28 @@ def run_sim(source_path, input_file):
     run_string = source_path + 'rfluka -M 1 -e ./nEXOsim.exe ' + input_file 
     os.system(run_string) 
 
+def store_data(neutron_fort_filename, muon_filename, output_filename, meta_dict):
+    now = datetime.now()
+
+    #  instantiate neutron attribute lists
+    muon_numbers, generation, energy, xsco, ysco, zsco, cosx, cosy, cosz = [],[],[],[],[],[],[],[],[]
+
+    with open(neutron_fort_filename) as neutron_file:
+        for line in neutron_file:
+            temp = line.split()
+            muon_numbers.append(int(temp[0]))
+            energy.append(float(temp[1]))
+            generation.append(int(temp[2]))
+            xsco.append(float(temp[4]))
+            ysco.append(float(temp[5]))
+            zsco.append(float(temp[6]))
+            cosx.append(float(temp[7]))
+            cosy.append(float(temp[8]))
+            cosz.append(float(temp[9]))
+
+    print(muon_numbers)
+    print(cosz)
+
 
 def main():
 
@@ -160,7 +182,7 @@ def main():
         run_sim(source_path, input_file)
 
         # Move the data to the output file
-
+        store_data(neutron_file, muon_file, 'output', meta)
 
 main()
 
