@@ -90,7 +90,6 @@ def run_sim(source_path, input_file):
     os.system(run_string) 
 
 
-
 def main():
 
     # Collect the parameters from the yaml file
@@ -158,7 +157,7 @@ def main():
         meta['seed'] = change_sim_seed(input_file)
 
         # Run the simulation
-        #run_sim(source_path, input_file)
+        run_sim(source_path, input_file)
 
         # Move the data to the output file
 
