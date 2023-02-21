@@ -108,8 +108,111 @@ def store_data(input_filename, muon_filename, output_filename, meta_dict):
             cosy.append(float(temp[8]))
             cosz.append(float(temp[9]))
 
-    print(muon_numbers)
-    print(cosz)
+            # THE DATA ARE HERE; These lists are full.
+
+    # Instantiate muon attribute lists
+    muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
+    with open(muon_filename) as muon_file:
+        lines = muon_file.readlines()
+        for mu in muon_numbers:
+            # the number in the list "muon" is 1+ the index in the file.
+            muon_array = lines[mu-1].split()
+
+            pos_neg.append(int(muon_array[0])) # Whether the muon is positive or negative
+            muenergy.append(float(muon_array[1])) # Muon Energy
+            initx.append(float(muon_array[2]))
+            inity.append(float(muon_array[3]))
+            initz.append(float(muon_array[4]))
+            mucosx.append(float(muon_array[5]))
+            mucosy.append(float(muon_array[6]))
+            mucosz.append(float(muon_array[7]))
+
+            cos_z = float(muon_array[7])
+            cos_x = float(muon_array[5])
+            zenith = np.arccos(cos_z)
+            azimuth = np.arccos(cos_x/(np.sin(zenith)))
+            temp_muon = mf.Muon(zenith, azimuth, initial=(float(muon_array[2]), float(muon_array[3]), float(muon_array[4])))
+            impact.append(temp_muon.impact_param)
+
+    ## WE NOW HAVE THE DATA
+    ## Must put it in a file. 
+    file = h5.File(output_filename,'a')
+    # Create a group for the data
+    data = file.create_group('data')
+    # Create a group for the meta data (to dilineate different simulation data sets)
+    meta = file.create_group('meta')
+
+    # So too must the datasets be created and instantiated with zero size.
+    data.create_dataset("muon_energy", (0,), dtype=float, maxshape=(None,))
+    data.create_dataset("muon_impact", (0,), dtype=float, maxshape=(None,))
+    data.create_dataset("muon_initial", (0,3), dtype=float, maxshape=(None,3))
+    data.create_dataset("muon_direction", (0,3), dtype=float, maxshape=(None,3))
+    data.create_dataset("muon_pn", (0,), dtype=int, maxshape=(None,))
+
+    data.create_dataset("neutron_energy", (0,), dtype=float, maxshape=(None,))
+    data.create_dataset("neutron_generation", (0,), dtype=int, maxshape=(None,))
+    data.create_dataset("neutron_xyz", (0,3), dtype=float, maxshape=(None,3))
+    data.create_dataset("neutron_direction", (0,3), dtype=float, maxshape=(None,3))
+
+    meta.create_dataset("year",(0,), dtype=int, maxshape=(None,))
+    meta.create_dataset("month",(0,), dtype=int, maxshape=(None,))
+    meta.create_dataset("day",(0,), dtype=int, maxshape=(None,))
+    meta.create_dataset("hour",(0,), dtype=int, maxshape=(None,))
+    meta.create_dataset("minute",(0,), dtype=int, maxshape=(None,))
+    meta.create_dataset("second",(0,), dtype=int, maxshape=(None,))
+    # number of neutrons created in file
+    meta.create_dataset("neutrons_counted",(0,), dtype=int, maxshape=(None,))
+    # number of muons simulated
+    meta.create_dataset("muons_simulated",(0,), dtype=int, maxshape=(None,))
+    # number of muons responsible for creating neutrons
+    meta.create_dataset("muon_parents",(0,), dtype=int, maxshape=(None,))
+    # the integer seed used in the simulation
+    meta.create_dataset("seed",(0,), dtype=int, maxshape=(None,))
+    # the region scored in the simulation
+    meta.create_dataset("region",(0,), dtype=int, maxshape=(None,))
+
+    # Current length of the data in the file
+    current_size = len(data['neutron_energy'])
+    num_neutrons = len(muon_numbers) # Number of elements to append
+    current_meta_size = len(meta['year'])
+
+    for dset in data:
+        # resize the datasets
+        data[dset].resize(current_size + num_neutrons, axis = 0)
+    for dset in meta:
+        meta[dset].resize(current_meta_size + 1, axis = 0)
+
+    meta['hour'][current_meta_size] = int(now.strftime('%H'))
+    meta['minute'][current_meta_size] = int(now.strftime('%M'))
+    meta['second'][current_meta_size] = int(now.strftime('%S'))
+    meta['year'][current_meta_size] = int(now.strftime('%Y'))
+    meta['month'][current_meta_size] = int(now.strftime('%m'))
+    meta['day'][current_meta_size] = int(now.strftime('%d'))
+    meta['neutrons_counted'][current_meta_size] = num_neutrons
+    meta['muons_simulated'] = meta_dict['number_of_muons']
+    meta['muon_parents'][current_meta_size] = len(np.unique(muon_numbers))
+
+    meta['seed'] = meta_dict['seed']
+    meta['region'] = meta_dict['scoring']
+
+
+    for i in range(num_neutrons):
+        list_index = i
+        dset_index = i + current_size
+
+        data['muon_energy'][dset_index] = muenergy[list_index]
+        data['muon_impact'][dset_index] = impact[list_index]
+        data['muon_initial'][dset_index] = [initx[list_index], inity[list_index], initz[list_index]]
+        data['muon_direction'][dset_index] = [mucosx[list_index], mucosy[list_index], mucosz[list_index]]
+        data['muon_pn'][dset_index] = pos_neg[list_index]
+        data['neutron_energy'][dset_index] = energy[list_index]
+        data['neutron_generation'][dset_index] = generation[list_index]
+        data['neutron_xyz'][dset_index] = [xsco[list_index], ysco[list_index], zsco[list_index]]
+        data['neutron_direction'][dset_index] = [float(cosx[list_index]), float(cosy[list_index]), float(cosz[list_index])]
+
+    print(data['muon_direction'][0])
+
+    file.close()
 
 
 def main():
