@@ -154,7 +154,7 @@ def store_events(neutron_filename, muon_filename, output_filename, meta_dict):
     meta['muon_parents'][current_meta_size] = len(np.unique(muon_numbers))
 
     meta['seed'] = meta_dict['seed']
-    meta['region'] = meta_dict['region']
+    meta['region'] = meta_dict['scoring']
 
     # Now that the datasets have been resized, we must append the most recent sim data to the datasets.
 
