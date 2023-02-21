@@ -133,9 +133,9 @@ def store_events(neutron_filename, muon_filename, output_filename, meta_dict):
     meta = file['meta']
 
     # Current length of the data in the file
-    current_size = np.size(data['neutron_energy'])
+    current_size = len(data['neutron_energy'])
     num_neutrons = len(muon_numbers) # Number of elements to append
-    current_meta_size = np.size(meta['year'])
+    current_meta_size = len(meta['year'])
 
     for dset in data:
         # resize the datasets
