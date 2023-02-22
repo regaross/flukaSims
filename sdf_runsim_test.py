@@ -189,7 +189,7 @@ def store_data(input_filename, muon_filename, output_filename, meta_dict):
     meta['month'][current_meta_size] = int(now.strftime('%m'))
     meta['day'][current_meta_size] = int(now.strftime('%d'))
     meta['neutrons_counted'][current_meta_size] = num_neutrons
-    meta['muons_simulated'] = meta_dict['number_of_muons']
+    meta['muons_simulated'] = int(meta_dict['number_of_muons'])
     meta['muon_parents'][current_meta_size] = len(np.unique(muon_numbers))
 
     meta['seed'] = meta_dict['seed']
@@ -205,7 +205,7 @@ def store_data(input_filename, muon_filename, output_filename, meta_dict):
         data['muon_initial'][dset_index] = [initx[list_index], inity[list_index], initz[list_index]]
         data['muon_direction'][dset_index] = [mucosx[list_index], mucosy[list_index], mucosz[list_index]]
         data['muon_pn'][dset_index] = pos_neg[list_index]
-        data['neutron_energy'][dset_index] = energy[list_index]
+        data['neutron_energy'][dset_index] = float(energy[list_index])
         data['neutron_generation'][dset_index] = generation[list_index]
         data['neutron_xyz'][dset_index] = [xsco[list_index], ysco[list_index], zsco[list_index]]
         data['neutron_direction'][dset_index] = [float(cosx[list_index]), float(cosy[list_index]), float(cosz[list_index])]
@@ -285,7 +285,7 @@ def main():
         run_sim(source_path, input_file)
 
         # Move the data to the output file
-        store_data(input_file, muon_file, 'output', meta)
+        store_data(input_file, muon_file, 'output.h5', meta)
 
 main()
 
