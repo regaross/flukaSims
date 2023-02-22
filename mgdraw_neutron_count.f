@@ -308,7 +308,7 @@
       END IF
 
       ! REGION 3 = OD WATER TANK AND REGION 9 = TPC INSIDE
-      IF (MREG .EQ. 9 .AND. JTRACK .EQ. 11 .AND. LLOUSE .EQ. 0) THEN 
+      IF (MREG .EQ. 9 .AND. JTRACK .EQ. 8 .AND. LLOUSE .EQ. 0) THEN 
             ! WRITE(99,*) ''
             ! WRITE(99,*) 'Neutron in TPC! NCASE, ETRACK, LTRACK, WTRACK'
             WRITE(99,*) NCASE, ETRACK, LTRACK, WTRACK,
