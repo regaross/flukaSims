@@ -133,9 +133,9 @@ def store_events(neutron_filename, muon_filename, output_filename, meta_dict):
     meta = file['meta']
 
     # Current length of the data in the file
-    current_size = len(data['neutron_energy'])
+    current_size = np.size(data['neutron_energy'])
     num_neutrons = len(muon_numbers) # Number of elements to append
-    current_meta_size = len(meta['year'])
+    current_meta_size = np.size(meta['year'])
 
     for dset in data:
         # resize the datasets
@@ -150,11 +150,11 @@ def store_events(neutron_filename, muon_filename, output_filename, meta_dict):
     meta['month'][current_meta_size] = int(now.strftime('%m'))
     meta['day'][current_meta_size] = int(now.strftime('%d'))
     meta['neutrons_counted'][current_meta_size] = num_neutrons
-    meta['muons_simulated'] = meta_dict['number_of_muons']
+    meta['muons_simulated'][current_meta_size] = meta_dict['number_of_muons']
     meta['muon_parents'][current_meta_size] = len(np.unique(muon_numbers))
 
-    meta['seed'] = meta_dict['seed']
-    meta['region'] = meta_dict['scoring']
+    meta['seed'][current_meta_size] = meta_dict['seed']
+    meta['region'][current_meta_size] = meta_dict['scoring']
 
     # Now that the datasets have been resized, we must append the most recent sim data to the datasets.
 
@@ -165,13 +165,13 @@ def store_events(neutron_filename, muon_filename, output_filename, meta_dict):
 
         data['muon_energy'][dset_index] = muenergy[list_index]
         data['muon_impact'][dset_index] = impact[list_index]
-        data['muon_initial'][dset_index] = [initx[list_index], inity[list_index], initz[list_index]]
-        data['muon_direction'][dset_index] = [mucosx[list_index], mucosy[list_index], mucosz[list_index]]
+        data['muon_initial'][dset_index] = np.array([initx[list_index], inity[list_index], initz[list_index]])
+        data['muon_direction'][dset_index] = np.array([mucosx[list_index], mucosy[list_index], mucosz[list_index]])
         data['muon_pn'][dset_index] = pos_neg[list_index]
         data['neutron_energy'][dset_index] = energy[list_index]
         data['neutron_generation'][dset_index] = generation[list_index]
-        data['neutron_xyz'][dset_index] = [xsco[list_index], ysco[list_index], zsco[list_index]]
-        data['neutron_direction'][dset_index] = [cosx[list_index], cosy[list_index], cosz[list_index]]
+        data['neutron_xyz'][dset_index] = np.array([xsco[list_index], ysco[list_index], zsco[list_index]])
+        data['neutron_direction'][dset_index] = np.array([cosx[list_index], cosy[list_index], cosz[list_index]])
 
     ## MUST CLOSE THE FILE
     file.close()
