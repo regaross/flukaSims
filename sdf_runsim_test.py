@@ -90,6 +90,7 @@ def run_sim(source_path, input_file):
     os.system(run_string) 
 
 def store_data(input_filename, muon_filename, output_filename, meta_dict):
+    '''NOT FUNCTIONING'''
     now = datetime.now()
 
     #  instantiate neutron attribute lists
@@ -214,6 +215,59 @@ def store_data(input_filename, muon_filename, output_filename, meta_dict):
 
     file.close()
 
+def store_data_tsv(input_filename, muon_filename, output_tsv, meta_dict):
+    now = datetime.now()
+
+    fort_99_filename = input_filename[:-4] + "001_fort.99"
+
+    # Neutron attribute lists
+    muon_numbers, generation, energy, xsco, ysco, zsco, cosx, cosy, cosz = [],[],[],[],[],[],[],[],[]
+
+    with open(fort_99_filename) as neutron_file:
+        for line in neutron_file:
+            temp = line.split()
+            muon_numbers.append(int(temp[0]))
+            energy.append(float(temp[1]))
+            generation.append(int(temp[2]))
+            xsco.append(float(temp[4]))
+            ysco.append(float(temp[5]))
+            zsco.append(float(temp[6]))
+            cosx.append(float(temp[7]))
+            cosy.append(float(temp[8]))
+            cosz.append(float(temp[9]))
+
+
+    # Muon Attribute Lists
+    muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
+    with open(muon_filename) as muon_file:
+        lines = muon_file.readlines()
+        for mu in muon_numbers:
+            # the number in the list "muon" is 1+ the index in the file.
+            muon_array = lines[mu-1].split()
+
+            pos_neg.append(int(muon_array[0])) # Whether the muon is positive or negative
+            muenergy.append(float(muon_array[1])) # Muon Energy
+            initx.append(float(muon_array[2]))
+            inity.append(float(muon_array[3]))
+            initz.append(float(muon_array[4]))
+            mucosx.append(float(muon_array[5]))
+            mucosy.append(float(muon_array[6]))
+            mucosz.append(float(muon_array[7]))
+
+            cos_z = float(muon_array[7])
+            cos_x = float(muon_array[5])
+            zenith = np.arccos(cos_z)
+            azimuth = np.arccos(cos_x/(np.sin(zenith)))
+            temp_muon = mf.Muon(zenith, azimuth, initial=(float(muon_array[2]), float(muon_array[3]), float(muon_array[4])))
+            impact.append(temp_muon.impact_param)
+
+
+    ## WE NOW HAVE THE DATA
+    with open(output_tsv) as out:
+        for i in range(len(muon_numbers)):
+            neutron_string = 'N\t{}\t{}\t{}\t{}\n'\
+                .format(energy[i], generation[i], (xsco[i], ysco[i], zsco[i]), (cosx[i], cosy[i], cosz[i]))
+            out.write(neutron_string)
 
 def main():
 
@@ -285,7 +339,8 @@ def main():
         run_sim(source_path, input_file)
 
         # Move the data to the output file
-        store_data(input_file, muon_file, 'output.h5', meta)
+        # store_data(input_file, muon_file, 'output', meta)
+        store_data_tsv(input_file, muon_file, 'test.tsv', meta)
 
 main()
 
