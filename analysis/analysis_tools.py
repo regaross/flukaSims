@@ -39,10 +39,11 @@ def plot_neutron_energy_histogram(h5_file, bins = 100):
     plt.xlabel('Energy [GeV]'); plt.ylabel('Count')
     plt.show()
 
-def plot_impact_hist(h5_file, bins = 20):
+def plot_impact_hist(h5_file, bins = 20, label = ''):
+
     h5_file = h5.File(h5_file)
     data = h5_file['data']
-    plt.hist(np.unique(data['muon_impact']), bins=bins)
+    plt.hist(np.unique(data['muon_impact']), bins=bins, histtype='step', label = label)
     plt.title('Muon Impact Parameters')
     plt.xlabel('Impact Parameter [cm]'); plt.ylabel('Count')
 
@@ -54,6 +55,7 @@ def plot_coz_neutrons(h5_file, bins=50):
     plt.xlabel(r'$\cos \theta$'); plt.ylabel('Count')
 
 def merge_hdf5_files(h5_output, *args):
+
     '''A function to combine multiple h5 neutron files into a larger file (which may already exist).
     Checks for no duplicates by ensuring scoring regions are equivalent and seeds are different'''
 

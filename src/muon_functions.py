@@ -335,7 +335,7 @@ def generate_muons(how_many, detector = OuterDetector(), gen_radius=0, gen_offse
     azimuths = np.random.random(size = how_many)*np.pi*2
 
     # Selecting Energies
-    surface_energy_range = np.linspace(6500, 100000, sampling_size)
+    surface_energy_range = np.linspace(5000, 100000, sampling_size)
     surface_energies = np.random.choice(surface_energy_range, p = gaisser_normed_discrete(surface_energy_range, 0), size = how_many)
 
     # Attenuate based on zenith angles
