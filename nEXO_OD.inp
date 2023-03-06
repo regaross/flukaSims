@@ -35,6 +35,8 @@ RESNUCLE           3        43        72       140    tpc_in          ResNucTPC
 *USRYIELD          30                  30        20                     &
 *USRYIELD         133   NEUTRON        44   tpc_out    tpc_in          UsrYldTPC
 *USRYIELD          30                  30        20                     &
+*  March 6, 2023 TEST
+LOW-NEUT         260
 LOW-PWXS     5413601                  87    liq-Xe
 * $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
@@ -101,6 +103,7 @@ tpc_in       5 (tpc_icyl + tpc_itop -tpc_ibot)
 END
 GEOEND
 ASSIGNMA      liq-Xe    tpc_in
+LOW-MAT       liq-Xe        54       136        87                    136-XE
 ASSIGNMA      COPPER   tpc_out
 ASSIGNMA      VACUUM  cryo_vac
 ASSIGNMA         HFE  cryo_hfe
