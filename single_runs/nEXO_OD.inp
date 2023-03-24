@@ -1,0 +1,142 @@
+* ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+TITLE
+test_oct_22
+* Setting default precision
+DEFAULTS                                                              PRECISIO
+RANDOMIZ                    93
+START              1
+* Source command needed for deploying source_newgen.f
+*SOURCE
+* Setting Beam Position (overidden by source_newgen.f)  NEGATIVE means down in z
+BEAMPOS            0         0      2500                              NEGATIVE
+* Specifying beam by energy in GeV, also overridden by source_newgen.f file  ENERGY ==> Max permissible energy.`
+BEAM         -3000.0                                                  MUON-
+*USRBDX             1   NEUTRON       -97  od_wtank      rock
+*USRBDX            10         0      1000                            50 &
+*USRBDX             1   NEUTRON        97  od_wtank      rock
+*USRBDX            10         0      1000                            50 &
+*USRBDX             1   NEUTRON       -96      rock  od_wtank
+*USRBDX            10         0      1000                            50 &
+*USRBDX             1   NEUTRON        96      rock  od_wtank
+*USRBDX            10         0      1000                            50 &
+*USRTRACK           1   NEUTRON       -21    tpc_in                 100neuTrack
+*USRTRACK           1                                                   &
+*USRTRACK           1   NEUTRON        21    tpc_in                 100neuTrack
+*USRTRACK           1                                                   &
+*USRTRACK           1   NEUTRON       -80  od_wtank                 100OD_neut
+*USRTRACK         100                                                   &
+*USRTRACK           1   NEUTRON        80  od_wtank                 100OD_neut
+*USRTRACK         100                                                   &
+* Creating "Collision Tape" of events
+USERDUMP        100.       23.       0.0        1.                    dump
+*RESNUCLE           3       -43        72       140    tpc_in          ResNucTPC
+*RESNUCLE           3        43        72       140    tpc_in          ResNucTPC
+*USRYIELD         133   NEUTRON       -44   tpc_out    tpc_in          UsrYldTPC
+*USRYIELD          30                  30        20                     &
+*USRYIELD         133   NEUTRON        44   tpc_out    tpc_in          UsrYldTPC
+*USRYIELD          30                  30        20                     &
+*  March 6, 2023 TEST
+*LOW-NEUT         260              0.0196
+*EMFCUT
+*LOW-PWXS     5413601                  87    liq-Xe
+* $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+* ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+* ------------> PHYSICS and PROCESS REGULATORS
+IONTRANS    HEAVYION
+PHYSICS        1000.     1000.     1000.     1000.     1000.     1000.PEATHRES
+PHYSICS           2.                                                  EM-DISSO
+PHOTONUC       1111.                                                  MUMUPAIR
+* Muon-nuclear interactions must be enabled in all materials; hence Hydrogen to LASTMAT
+PHOTONUC          1.                      HYDROGEN  @LASTMAT          MUMUPRIM
+MUPHOTON          1.                      HYDROGEN  @LASTMAT
+* on by default in precision
+PAIRBREM          3.       0.0      3E-4  HYDROGEN  @LASTMAT
+* Engage physics processes that may not be on by default
+PHYSICS            1                                                  COALESCE
+PHYSICS            3                                                  EVAPORAT
+* $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+* ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+* ------------> GEOMETRY DEFINITIONS
+GEOBEGIN                                                              COMBNAME
+    0    0          The nEXO Outer Detector Simplified
+* The outer black body limit of the geometry
+SPH blkhole    0.0 0.0 0.0 100000.0
+* Geometries for rock region
+ZCC rock_cyl   0.0 0.0 10000.0
+XYP rock_top   4000.0
+XYP rock_bot   -2000.0
+* Geometries for OD Cylinder
+ZCC od_cyl     0.0 0.0 617.22
+XYP od_top     640.0
+XYP od_bot     -640.0
+* Geometries for OD Cylinder Outsides
+ZCC od_cyl1    0.0 0.0 620
+XYP od_top1    642.0
+XYP od_bot1    -642.0
+* Outer Cryostat -> outer
+SPH o_cryo_o   0.0 0.0 40.0 227.0
+* Outer Cryostat -> inner
+SPH o_cryo_i   0.0 0.0 40.0 225.0
+* Inner Cryostat -> outer
+SPH i_cryo_o   0.0 0.0 0.0 169.0
+* Inner Cryostat -> inner
+SPH i_cryo_i   0.0 0.0 0.0 167.5
+* nEXO TPC Region
+ZCC tpc_cyl    0 0 64.0
+XYP tpc_top    86
+XYP tpc_bot    -86
+* nEXO TPC Region Inside
+ZCC tpc_icyl   0 0 59.0
+XYP tpc_itop   63.9
+XYP tpc_ibot   -63.9
+END
+blkhole      5 blkhole -(+rock_cyl +rock_top -rock_bot)
+rock         5 (+rock_cyl +rock_top -rock_bot) -(+od_cyl1 -od_bot1 +od_top1)
+od_tank      5 (+od_cyl1 -od_bot1 +od_top1) - (+od_cyl -od_bot +od_top)
+od_wtank     5 (+od_cyl -od_bot +od_top) - o_cryo_o
+ocryo        5 (o_cryo_o - o_cryo_i)
+cryo_vac     5 (o_cryo_i - i_cryo_o)
+icryo        5 (i_cryo_o - i_cryo_i)
+cryo_hfe     5 (i_cryo_i - (tpc_cyl + tpc_top -tpc_bot))
+tpc_out      5 (tpc_cyl + tpc_top -tpc_bot) - (tpc_icyl + tpc_itop -tpc_ibot)
+tpc_in       5 (tpc_icyl + tpc_itop -tpc_ibot)
+END
+GEOEND
+ASSIGNMA      liq-Xe    tpc_in
+*LOW-MAT       liq-Xe        54       136        87                    136-XE
+ASSIGNMA      COPPER   tpc_out
+ASSIGNMA      VACUUM  cryo_vac
+ASSIGNMA         HFE  cryo_hfe
+ASSIGNMA      Norite      rock
+ASSIGNMA     c_fibre     icryo
+ASSIGNMA     c_fibre     ocryo
+ASSIGNMA       WATER  od_wtank
+ASSIGNMA     stnless   od_tank
+ASSIGNMA    BLCKHOLE   blkhole
+MATERIAL                             2.8                              Norite
+* SNOLAB Norite (Rock)
+COMPOUND     -0.0015  HYDROGEN      -.46    OXYGEN     -.022    SODIUMNorite
+COMPOUND       -.033  MAGNESIU      -.09  ALUMINUM     -.262   SILICONNorite
+COMPOUND      -0.012  POTASSIU     -.052   CALCIUM    -0.062      IRONNorite
+MATERIAL         19.               0.862                              POTASSIU
+MATERIAL          6.                2.26                              coldcarb
+MATERIAL          8.           0.0013315                              coldOx
+MATERIAL           9     18.99  0.001696                              FLUORINE
+MATERIAL           6                0.88                              c_fibre
+MATERIAL          54       136  0.005887                           136Xenon136
+MATERIAL          54       134  0.005887                           134Xenon134
+MATERIAL          24        52      7.19                            52CHROMIUM
+MATERIAL                            8.03                              stnless
+COMPOUND       -0.07    NICKEL     -0.17  CHROMIUM     -0.76      IRONstnless
+* ### Select the density such that the volume of the TPC encapsulates 5000kg of LXe
+MATERIAL          54       136      3.58                           136liq-Xe
+COMPOUND         0.9  Xenon136       0.1  Xenon134                    liq-Xe
+MATERIAL                             1.5                              HFE
+COMPOUND         0.2  HYDROGEN     0.067    coldOx     0.267  coldcarbHFE
+COMPOUND       0.466  FLUORINE                                        HFE
+LOW-MAT     Xenon136        54       136       296                    136-XE
+LOW-MAT      c_fibre         6        -3       296                    CARBON
+LOW-MAT     coldcarb         6        -2        87                    CARBON
+LOW-MAT       coldOx         8        16        87                    OXYGEN
+LOW-MAT     Xenon134        54       134        87                    134-XE
+STOP

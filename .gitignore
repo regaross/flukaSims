@@ -12,6 +12,8 @@
 *tab*
 *lis*
 *.dat
+*.h5
+*.hdf5
 *.flair
 .DS_Store
 *.hdf5
