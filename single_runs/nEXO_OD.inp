@@ -3,14 +3,14 @@ TITLE
 test_oct_22
 * Setting default precision
 DEFAULTS                                                              PRECISIO
-RANDOMIZ                    93
+*RANDOMIZ                    93
 START              1
 * Source command needed for deploying source_newgen.f
 *SOURCE
 * Setting Beam Position (overidden by source_newgen.f)  NEGATIVE means down in z
 BEAMPOS            0         0      2500                              NEGATIVE
 * Specifying beam by energy in GeV, also overridden by source_newgen.f file  ENERGY ==> Max permissible energy.`
-BEAM         -3000.0                                                  MUON-
+BEAM          -500.0                                                  MUON-
 *USRBDX             1   NEUTRON       -97  od_wtank      rock
 *USRBDX            10         0      1000                            50 &
 *USRBDX             1   NEUTRON        97  od_wtank      rock
@@ -37,8 +37,8 @@ USERDUMP        100.       23.       0.0        1.                    dump
 *USRYIELD          30                  30        20                     &
 *  March 6, 2023 TEST
 *LOW-NEUT         260              0.0196
-*EMFCUT
-*LOW-PWXS     5413601                  87    liq-Xe
+*LOW-PWXS     5413601                  87  HYDROGEN  @LASTMAT          default
+EMF
 * $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 * ------------> PHYSICS and PROCESS REGULATORS
@@ -47,8 +47,9 @@ PHYSICS        1000.     1000.     1000.     1000.     1000.     1000.PEATHRES
 PHYSICS           2.                                                  EM-DISSO
 PHOTONUC       1111.                                                  MUMUPAIR
 * Muon-nuclear interactions must be enabled in all materials; hence Hydrogen to LASTMAT
-PHOTONUC          1.                      HYDROGEN  @LASTMAT          MUMUPRIM
-MUPHOTON          1.                      HYDROGEN  @LASTMAT
+PHOTONUC           2                      HYDROGEN  @LASTMAT          MUMUPRIM
+PHOTONUC           2                                                  ELECTNUC
+MUPHOTON          1.                        VACUUM  @LASTMAT
 * on by default in precision
 PAIRBREM          3.       0.0      3E-4  HYDROGEN  @LASTMAT
 * Engage physics processes that may not be on by default
