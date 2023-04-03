@@ -16,6 +16,7 @@ rross@laurentian.ca
 
 import numpy as np
 from itertools import islice
+from scipy import constants as sc
 
 #################################################
 #                   CONSTANTS                    }
@@ -119,6 +120,42 @@ jtrack_dictionary = {
     211:    'EM Energy Deposition',
 
     308:    'Low Energy Neutron Kerma'
+
+}
+
+jtrack_rest_energies = { # Expressed in MeV if known, 0 otherwise (for heavy ions for instance)
+    None:   None,
+    -6:     sc.physical_constants['alpha particle mass energy equivalent in MeV'][0],
+    -5:     sc.physical_constants['helion mass energy equivalent in MeV'][0],
+    -4:     sc.physical_constants['triton mass energy equivalent in MeV'][0],
+    -3:     sc.physical_constants['deuteron mass energy equivalent in MeV'][0],
+    -2:     0,
+    -1:     0,
+    0:      0,
+    1:      sc.physical_constants['proton mass energy equivalent in MeV'][0],
+    2:      sc.physical_constants['proton mass energy equivalent in MeV'][0],
+    3:      sc.physical_constants['electron mass energy equivalent in MeV'][0],
+    4:      sc.physical_constants['electron mass energy equivalent in MeV'][0],
+    5:      0,
+    6:      0,
+    7:      0,
+    8:      sc.physical_constants['neutron mass energy equivalent in MeV'][0],
+    9:      sc.physical_constants['neutron mass energy equivalent in MeV'][0],
+    10:     sc.physical_constants['muon mass energy equivalent in MeV'][0],
+    11:     sc.physical_constants['muon mass energy equivalent in MeV'][0],
+    12:     497.611, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+    13:     139.57039, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+    14:     139.57039, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+    15:     493.677, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+    16:     493.677, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+
+    23:     134.9768, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+
+    208:    0,
+
+    211:    0,
+
+    308:    0,
 
 }
 
@@ -528,6 +565,29 @@ def spherical_surface(radius, loc = (0,0,0)):
 
     return x, y, z
 
+def change_energy_unit(energy_gev) -> tuple:
+    '''Changes energy unit to a more reasonable energy and returns the energy with the unit.'''
+    # If the energy is too large for GeV:
+    if energy_gev > 1000:
+        return (energy_gev/1e3, 'TeV')
+    elif energy_gev < 1:
+        # MeV range
+        if energy_gev < 1/1000:
+            # keV range
+            if energy_gev < 1/1e6:
+                # eV range
+                return (energy_gev*1e9, 'eV')
+            return (energy_gev*1e6, 'keV')
+        return (energy_gev*1e3, 'MeV')
+    else:
+        return (energy_gev, 'GeV')
+
+def get_kinetic_energy(jtrack, etrack)-> float:
+    '''Returns the kinetic energy of the particle in question as opposed to Etrack which is the rest + kinetic'''
+    rest_energy_MeV = jtrack_rest_energies[jtrack]
+    rest_energy_GeV = rest_energy_MeV/1000
+    kinetic_energy_GeV = etrack - rest_energy_GeV
+    return kinetic_energy_GeV
 
 def plot_tree_plotly(event_dataframe, show_geometry = True, show_EM = False):
     '''A function to plot the 3D event tree from the simulation'''
@@ -545,7 +605,12 @@ def plot_tree_plotly(event_dataframe, show_geometry = True, show_EM = False):
         is_photon = row['jtrack'] == 7
 
 
-        if not show_EM and (is_edep or is_electron or has_electron_parent or is_photon):
+        if not show_EM and ( is_electron or has_electron_parent or is_photon):
+            pass
+
+        elif is_edep: 
+            # Don't show energy deposition events 
+            # These are for scoring dose and are identical to EM tracks above threshold
             pass
 
         else:
@@ -556,10 +621,11 @@ def plot_tree_plotly(event_dataframe, show_geometry = True, show_EM = False):
             zs.append(row['z']); zs.append(row['pz']);zs.append(None)
             color = particle_colour_dictionary[row['jtrack']]
             colors.append(color);colors.append(color);colors.append('white')
-            energy = format(row['etrack'], '.2E')
-            tags.append((jtrack_labels[row['jtrack']], icode_dictionary[row['icode']], energy))
-            tags.append((jtrack_labels[row['jtrack']], icode_dictionary[row['icode']], energy))
-            tags.append((None, None, None))
+            energy = get_kinetic_energy(row['jtrack'], row['etrack']) #format(row['etrack'], '.2E')
+            energy_tuple = change_energy_unit(energy)
+            tags.append((jtrack_labels[row['jtrack']], icode_dictionary[row['icode']], energy_tuple[0], energy_tuple[1]))
+            tags.append((jtrack_labels[row['jtrack']], icode_dictionary[row['icode']], energy_tuple[0], energy_tuple[1]))
+            tags.append((None, None, None, None))
 
 
         # Maybe add region numbers for clarity after superimposing the geometry
@@ -570,7 +636,8 @@ def plot_tree_plotly(event_dataframe, show_geometry = True, show_EM = False):
     tree = go.Scatter3d(x=xs[3:], y=ys[3:], z=zs[3:],
             marker=dict(size=2, opacity = 0.5),
             line=dict(color=colors[3:], width=2), hovertemplate = '%{text}',
-            text = ['{}<br>{} GeV</br>{}'.format(tag[0], tag[2], tag[1]) for tag in tags[3:]], name='Event Tree')
+            #text = ['{}<br>{} GeV</br>{}'.format(tag[0], tag[2], tag[1]) for tag in tags[3:]], name='Event Tree')
+            text = ['{}<br>{} {}</br>{}'.format(tag[0], tag[2], tag[3], tag[1]) for tag in tags[3:]], name='Event Tree')
     
 
     if show_geometry:
@@ -603,22 +670,3 @@ def plot_tree_plotly(event_dataframe, show_geometry = True, show_EM = False):
     fig.update_layout(paper_bgcolor="slategrey", template = 'plotly_dark', showlegend = True)
 
     fig.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
