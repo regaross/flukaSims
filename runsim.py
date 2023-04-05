@@ -371,7 +371,7 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, muon_filename, o
     file.close()
 
 def main():
-    yaml_file = open('simconfig_SDF.yaml')
+    yaml_file = open('simconfig.yaml')
     input_yaml = yaml.safe_load(yaml_file)
 
     os.system('echo RR: Loading in YAML Params')
