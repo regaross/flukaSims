@@ -188,6 +188,42 @@
          WRITE (IODRAW) ( SNGL (DTQUEN(1, JBK)), JBK = 1, NQEMGD )
       END IF
 *  |  end quenching
+
+      ! ! This is a neutron directly produced by a muon somewhere within the OD.
+      IF (MREG .LE. 8 .AND. JTRACK .EQ. 8 .AND. LTRACK .EQ. 2 .AND. LLOUSE .EQ. 0) THEN
+            WRITE(98, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
+     &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
+     &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
+
+            LLOUSE = 2
+      END IF
+
+      ! This is a neutron detected within the TPC Xenon
+      IF (MREG .EQ. 1 .AND. JTRACK .EQ. 8 .AND. LLOUSE .NE. 1) THEN 
+            WRITE(98, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
+     &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
+     &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
+
+            ! Tagging the particle for ignoring by setting LLOUSE = 1
+            LLOUSE = 1
+      END IF
+
+
+      ! ICODE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
+      ! Setting parent values
+      ! Integer values
+      ISPUSR(1) = ICODE
+      ISPUSR(2) = JTRACK
+      ISPUSR(3) = MREG
+      ISPUSR(4) = LTRACK
+      ! Float values
+      SPAUSR(1) = ETRACK
+      SPAUSR(2) = XSCO
+      SPAUSR(3) = YSCO
+      SPAUSR(4) = ZSCO
+      SPAUSR(5) = CXTRCK
+      SPAUSR(6) = CYTRCK
+      SPAUSR(7) = CZTRCK
 *  +-------------------------------------------------------------------*
       RETURN
 *
@@ -307,16 +343,41 @@
      &          'UNFORMATTED' )
       END IF
 
-      ! REGION 3 = OD WATER TANK AND REGION 9 = TPC INSIDE
-      IF (MREG .EQ. 9 .AND. JTRACK .EQ. 8 .AND. LLOUSE .EQ. 0) THEN 
-            ! WRITE(99,*) ''
-            ! WRITE(99,*) 'Neutron in TPC! NCASE, ETRACK, LTRACK, WTRACK'
-            WRITE(99,*) NCASE, ETRACK, LTRACK, WTRACK,
-     &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
-            ! Tagging the particle for killing by setting LLOUSE = 1
+      ! ! This is a neutron produced by a muon somewhere within the OD.
+      IF (MREG .LE. 8 .AND. JTRACK .EQ. 8 .AND. LLOUSE .EQ. 0) THEN
+            WRITE(70, *) ICODE, NCASE, JTRACK, MREG, LTRACK, ETRACK, 
+     &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
+     &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
+
+            LLOUSE = 2
+      END IF
+
+      ! This is a neutron detected within the TPC Xenon
+      IF (MREG .EQ. 1 .AND. JTRACK .EQ. 8 .AND. LLOUSE .NE. 1) THEN 
+            WRITE(72, *) ICODE, NCASE, JTRACK, MREG, LTRACK, ETRACK, 
+     &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
+     &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
+
+            ! Tagging the particle for ignoring by setting LLOUSE = 1
             LLOUSE = 1
       END IF
       
+      
+      ! ICODE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
+      ! Setting parent values
+      ! Integer values
+      ISPUSR(1) = ICODE
+      ISPUSR(2) = JTRACK
+      ISPUSR(3) = MREG
+      ISPUSR(4) = LTRACK
+      ! Float values
+      SPAUSR(1) = ETRACK
+      SPAUSR(2) = XSCO
+      SPAUSR(3) = YSCO
+      SPAUSR(4) = ZSCO
+      SPAUSR(5) = CXTRCK
+      SPAUSR(6) = CYTRCK
+      SPAUSR(7) = CZTRCK
       
 
 * No output by default:

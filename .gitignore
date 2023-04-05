@@ -21,3 +21,5 @@
 *.simg
 *.pickle
 *~
+*.yie
+*.rnc

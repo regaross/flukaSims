@@ -2,7 +2,7 @@ TITLE
 nEXO Outer Detector
 DEFAULTS                                                              PRECISIO
 BEAM          -500.0                                                  MUON-
-BEAMPOS            0         0      3000                              NEGATIVE
+BEAMPOS            0         0      3000         0         0          NEGATIVE
 * Muon-nuclear interactions must be enabled in all materials; Hydrogen to @LASTMAT
 MUPHOTON           1                      HYDROGEN  @LASTMAT
 * Activates photon interactions with nuclei for all energies
