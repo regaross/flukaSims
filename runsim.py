@@ -460,7 +460,7 @@ def main():
 
         neutron_filename = neutron_file + time_stamp + '.hdf5'
         try:
-            store_events(tpc_filename, od_filename, muon_file, neutron_filename, meta)
+            store_events(tpc_filename, od_filename, res_nuc_filename, muon_file, neutron_filename, meta)
         except:
             os.system('echo RR: The neutron hdf5 file WAS NOT CREATED\; probably because no neutrons were generated')
         
@@ -478,6 +478,7 @@ def main():
             os.system('mv *fort* ' + last_dir)
             os.system('mv *lis* *tab* ' + last_dir)
             os.system('mv *.hdf5 ' + output_dir)
+            os.system('mv *fort.97 ' + output_dir)
             os.system('mv *.log *.err *.out *ran* *dump *fort* *.txt ' + last_dir)
         except: pass
         os.system('echo RR: Copying input file to output dir for future reference')
