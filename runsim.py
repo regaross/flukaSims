@@ -459,10 +459,10 @@ def main():
         time_stamp = str(datetime.now())[5:16].replace(' ','').replace('-', '').replace(':', '')
 
         neutron_filename = neutron_file + time_stamp + '.hdf5'
-        try:
-            store_events(tpc_filename, od_filename, res_nuc_filename, muon_file, neutron_filename, meta)
-        except:
-            os.system('echo RR: The neutron hdf5 file WAS NOT CREATED\; probably because no neutrons were generated')
+        #try:
+        store_events(tpc_filename, od_filename, res_nuc_filename, muon_file, neutron_filename, meta)
+        #except:
+        #os.system('echo RR: The neutron hdf5 file WAS NOT CREATED\; probably because no neutrons were generated')
         
 
         ## STEP NINE: MOVING OUTPUT FILES TO SPECIFIED DIRECTORY
