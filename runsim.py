@@ -236,6 +236,9 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, muon_filename, o
     for dset in tpc_totals:
         if dset != 'resnuclei':
             tpc_totals[dset].resize(current_meta_size + 1, axis = 0)
+    for dset in meta:
+        meta[dset].resize(current_meta_size + 1, axis = 0)
+
 
     ## Residual nuclei data
 
