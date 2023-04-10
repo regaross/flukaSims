@@ -340,9 +340,9 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, muon_filename, o
     od_totals = file['od_totals']
 
     # Current length of the data in the file
-    current_size = np.size(od_data['neutron_energy'])
+    current_size = len(od_data['neutron_energy'])
     num_neutrons = len(ncase) # Number of elements to append
-    current_totals_size = np.size(od_totals['neutrons_counted'])
+    current_totals_size = len(od_totals['neutrons_counted'])
 
     for dset in tpc_data:
         # resize the datasets
