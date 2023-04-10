@@ -23,3 +23,11 @@
 *~
 *.yie
 *.rnc
+*.lof
+*.bbl
+*.fls
+*.blg
+*.synctex*
+*.fdb_latexmk
+*.aux
+*.toc

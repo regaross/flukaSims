@@ -1,0 +1,95 @@
+\documentclass[10pt]{article}
+
+%%%%    FORMATTING    %%%%
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{wasysym}
+\usepackage[version=4]{mhchem}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage[margin=1in]{geometry}
+\usepackage[titletoc, title]{appendix}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks = true,
+    citecolor = red,
+    linkcolor = blue,
+    urlcolor = black,
+}
+%For code in appendix
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color
+  basicstyle=\footnotesize,        % size of fonts used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{mymauve},     % string literal style
+  frame = tb,
+  numbers = left
+}
+
+
+
+
+\title{nEXO OD FLUKA Simulations Manual}
+\author{Regan Ross}
+
+%%%%    BEGIN DOCUMENT    %%%
+\begin{document}
+
+%%%%    Title Page    %%%
+\begin{titlepage}
+    \maketitle
+    \vspace{4cm}
+    \centering
+    % \includegraphics*[scale=0.5, frame]{./figs/muons_det.png}
+\end{titlepage}
+
+\begin{abstract}
+    This document is intented to provide insight into the functioning of the nEXO FLUKA simulations and justifications for choices made in their design. FLUKA can be a daunting software to work with given it is written in FORTRAN77, has sparse documentation, and whose source code, without a specific licence, is veiled behind a curtain. However, this proprietary simulation program is fast and rich with built-in features.
+\end{abstract}
+
+
+\vspace{1.5cm}
+\listoffigures
+
+\newpage
+\tableofcontents
+
+\break
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                           %
+%%%%    INTRODUCTION     %%%%
+%                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Introduction}
+
+% \clearpage
+% % \appendixheaderon
+% % \appendixpage
+% % \begin{appendices}
+    
+
+% % \end{appendices}
+
+
+% \newpage
+
+% \section*{Acknowledgements}
+% \paragraph{}
+
+
+% \bibliographystyle{aip}
+% \bibliography{manual.bib}
+
+\end{document}
