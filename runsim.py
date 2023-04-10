@@ -114,7 +114,7 @@ def initialize_h5_file(h5_filename):
         # number of muons responsible for creating neutrons
         tpc_totals.create_dataset("muon_parents",(0,), dtype=int, maxshape=(None,))
         # a dataset for the resnuclei output
-        tpc_totals.create_dataset("resnuclei",(0,3), dtype=float, maxshape=(None,))
+        tpc_totals.create_dataset("resnuclei",(0,3), dtype=float, maxshape=(None,3))
 
         ## Meta data
 
