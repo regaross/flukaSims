@@ -268,12 +268,20 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, muon_filename, o
         list_index = i
         dset_index = i + current_size
 
+    #     icode, ncase, jtrack, mreg, ltrack, etrack, xsco, ysco, zsco, cxtrck, cytrck, cztrck = [],[],[],[],[],[],[],[],[],[],[],[]
+    # # parent attribute lists
+    #       picode, pjtrack, = [],[]
+
         tpc_data['muon_energy'][dset_index] = muenergy[list_index]
         tpc_data['muon_impact'][dset_index] = impact[list_index]
         tpc_data['muon_initial'][dset_index] = np.array([initx[list_index], inity[list_index], initz[list_index]])
         tpc_data['muon_direction'][dset_index] = np.array([mucosx[list_index], mucosy[list_index], mucosz[list_index]])
         tpc_data['muon_pn'][dset_index] = pos_neg[list_index]
         tpc_data['neutron_energy'][dset_index] = etrack[list_index]
+        tpc_data['neutron_icode'][dset_index] = icode[list_index]
+        tpc_data['neutron_region'][dset_index] = mreg[list_index]
+        tpc_data['parent'][dset_index] = pjtrack[list_index]
+        tpc_data['birth_icode'][dset_index] = picode[list_index]
         tpc_data['neutron_generation'][dset_index] = ltrack[list_index]
         tpc_data['neutron_xyz'][dset_index] = np.array([xsco[list_index], ysco[list_index], zsco[list_index]])
         tpc_data['neutron_direction'][dset_index] = np.array([cxtrck[list_index], cytrck[list_index], cztrck[list_index]])
@@ -366,6 +374,10 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, muon_filename, o
         od_data['muon_direction'][dset_index] = np.array([mucosx[list_index], mucosy[list_index], mucosz[list_index]])
         od_data['muon_pn'][dset_index] = pos_neg[list_index]
         od_data['neutron_energy'][dset_index] = etrack[list_index]
+        od_data['neutron_icode'][dset_index] = icode[list_index]
+        od_data['neutron_region'][dset_index] = mreg[list_index]
+        od_data['parent'][dset_index] = pjtrack[list_index]
+        od_data['birth_icode'][dset_index] = picode[list_index]
         od_data['neutron_generation'][dset_index] = ltrack[list_index]
         od_data['neutron_xyz'][dset_index] = np.array([xsco[list_index], ysco[list_index], zsco[list_index]])
         od_data['neutron_direction'][dset_index] = np.array([cxtrck[list_index], cytrck[list_index], cztrck[list_index]])
