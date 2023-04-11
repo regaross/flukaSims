@@ -190,22 +190,30 @@
 *  |  end quenching
 
       ! ! This is a neutron directly produced by a muon somewhere within the OD.
-      IF (MREG .LE. 8 .AND. JTRACK .EQ. 8 .AND. LTRACK .EQ. 2 .AND. LLOUSE .EQ. 0) THEN
+      IF (MREG .LE. 8 .AND. JTRACK .EQ. 8 .AND. LTRACK .EQ. 2 .AND. LLOUSE .LT. 3) THEN
             WRITE(98, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
      &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
      &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
-
-            LLOUSE = 2
+            IF (LLOUSE .EQ. 1) THEN
+                  ! The neutron was already printed into the TPC file
+                  LLOUSE = 3
+            ELSE
+                  LLOUSE = 2
+            END IF
       END IF
 
       ! This is a neutron detected within the TPC Xenon
-      IF (MREG .EQ. 1 .AND. JTRACK .EQ. 8 .AND. LLOUSE .NE. 1) THEN 
+      IF (MREG .EQ. 1 .AND. JTRACK .EQ. 8 .AND. LLOUSE .LT. 3) THEN 
             WRITE(98, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
      &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
      &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
 
-            ! Tagging the particle for ignoring by setting LLOUSE = 1
-            LLOUSE = 1
+            IF (LLOUSE .EQ. 2) THEN
+                  ! The neutron was already printed into the OD file
+                  LLOUSE = 3
+            ELSE
+                  LLOUSE = 1
+            END IF
       END IF
 
 
