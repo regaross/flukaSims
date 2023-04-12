@@ -178,212 +178,219 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, muon_filename, o
     icode, ncase, jtrack, mreg, ltrack, etrack, xsco, ysco, zsco, cxtrck, cytrck, cztrck = [],[],[],[],[],[],[],[],[],[],[],[]
     # parent attribute lists
     picode, pjtrack, = [],[]
+    try:
+        with open(tpc_filename) as neutron_file:
+            for line in neutron_file:
+                # ICODE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
+                temp = line.split()
 
-    with open(tpc_filename) as neutron_file:
-        for line in neutron_file:
-            # ICODE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
-            temp = line.split()
+                # Load the neutron lists
+                icode.append(int(temp[0])); ncase.append(int(temp[1])); jtrack.append(int(temp[2]))
+                mreg.append(int(temp[3])); ltrack.append(int(temp[4])); etrack.append(float(temp[5]))
+                xsco.append(float(temp[6])); ysco.append(float(temp[7])); zsco.append(float(temp[8]))
+                cxtrck.append(float(temp[9])); cytrck.append(float(temp[10]));  cztrck.append(float(temp[11]))
 
-            # Load the neutron lists
-            icode.append(int(temp[0])); ncase.append(int(temp[1])); jtrack.append(int(temp[2]))
-            mreg.append(int(temp[3])); ltrack.append(int(temp[4])); etrack.append(float(temp[5]))
-            xsco.append(float(temp[6])); ysco.append(float(temp[7])); zsco.append(float(temp[8]))
-            cxtrck.append(float(temp[9])); cytrck.append(float(temp[10]));  cztrck.append(float(temp[11]))
+                # Load the parent lists
+                picode.append(int(temp[12])); pjtrack.append(int(temp[14]))
 
-            # Load the parent lists
-            picode.append(int(temp[12])); pjtrack.append(int(temp[14]))
+        muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
+        with open(muon_filename) as muon_file:
+            lines = muon_file.readlines()
+            for mu in ncase:
+                # the number in the list "muon" is 1+ the index in the file.
+                muon_array = lines[mu-1].split()
 
-    muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
-    with open(muon_filename) as muon_file:
-        lines = muon_file.readlines()
-        for mu in ncase:
-            # the number in the list "muon" is 1+ the index in the file.
-            muon_array = lines[mu-1].split()
+                pos_neg.append(int(muon_array[0])) # Whether the muon is positive or negative
+                muenergy.append(float(muon_array[1])) # Muon Energy
+                initx.append(float(muon_array[2]))
+                inity.append(float(muon_array[3]))
+                initz.append(float(muon_array[4]))
+                mucosx.append(float(muon_array[5]))
+                mucosy.append(float(muon_array[6]))
+                mucosz.append(float(muon_array[7]))
 
-            pos_neg.append(int(muon_array[0])) # Whether the muon is positive or negative
-            muenergy.append(float(muon_array[1])) # Muon Energy
-            initx.append(float(muon_array[2]))
-            inity.append(float(muon_array[3]))
-            initz.append(float(muon_array[4]))
-            mucosx.append(float(muon_array[5]))
-            mucosy.append(float(muon_array[6]))
-            mucosz.append(float(muon_array[7]))
+                cos_z = float(muon_array[7])
+                cos_x = float(muon_array[5])
+                zenith = np.arccos(cos_z)
+                azimuth = np.arccos(cos_x/(np.sin(zenith)))
+                temp_muon = mf.Muon(zenith, azimuth, initial=(float(muon_array[2]), float(muon_array[3]), float(muon_array[4])))
+                impact.append(temp_muon.impact_param)
 
-            cos_z = float(muon_array[7])
-            cos_x = float(muon_array[5])
-            zenith = np.arccos(cos_z)
-            azimuth = np.arccos(cos_x/(np.sin(zenith)))
-            temp_muon = mf.Muon(zenith, azimuth, initial=(float(muon_array[2]), float(muon_array[3]), float(muon_array[4])))
-            impact.append(temp_muon.impact_param)
+        
+        # Grab the file by the groups:
+        file = h5.File(output_filename,'a')
+        tpc_data = file['tpc_data']
+        tpc_totals = file['tpc_totals']
+        meta = file['meta']
 
-    
-    # Grab the file by the groups:
-    file = h5.File(output_filename,'a')
-    tpc_data = file['tpc_data']
-    tpc_totals = file['tpc_totals']
-    meta = file['meta']
-
-    # Current length of the data in the file
-    current_size = np.size(tpc_data['neutron_energy'])
-    num_neutrons = len(ncase) # Number of elements to append
-    current_meta_size = np.size(meta['year'])
-
-
-    # resize the datasets
-
-    for dset in tpc_data:
-        tpc_data[dset].resize(current_size + num_neutrons, axis = 0)
-    for dset in tpc_totals:
-        if dset != 'resnuclei':
-            tpc_totals[dset].resize(current_meta_size + 1, axis = 0)
-    for dset in meta:
-        meta[dset].resize(current_meta_size + 1, axis = 0)
+        # Current length of the data in the file
+        current_size = np.size(tpc_data['neutron_energy'])
+        num_neutrons = len(ncase) # Number of elements to append
+        current_meta_size = np.size(meta['year'])
 
 
-    ## Residual nuclei data
+        # resize the datasets
 
-    res_nuc_data = read_resnuclei_file(resnuclei_filename)
-    current_res_nuc_size = np.size(tpc_totals['resnuclei'])
-    res_nuc_entries = len(res_nuc_data)
-    tpc_totals['resnuclei'].resize(current_res_nuc_size + res_nuc_entries, axis = 0)
-
-    for i in range(res_nuc_entries):
-        tpc_totals['resnuclei'][current_res_nuc_size + i] = res_nuc_data[i]
-
-
-    meta['hour'][current_meta_size] = int(now.strftime('%H'))
-    meta['minute'][current_meta_size] = int(now.strftime('%M'))
-    meta['second'][current_meta_size] = int(now.strftime('%S'))
-    meta['year'][current_meta_size] = int(now.strftime('%Y'))
-    meta['month'][current_meta_size] = int(now.strftime('%m'))
-    meta['day'][current_meta_size] = int(now.strftime('%d'))
-    meta['seed'][current_meta_size] = meta_dict['seed']
-    tpc_totals['neutrons_counted'][current_meta_size] = num_neutrons
-    tpc_totals['muons_simulated'][current_meta_size] = meta_dict['number_of_muons']
-    tpc_totals['muon_parents'][current_meta_size] = len(np.unique(ncase))
-
-    # Now that the datasets have been resized, we must append the most recent sim data to the datasets.
-
-    for i in range(num_neutrons):
-        list_index = i
-        dset_index = i + current_size
-
-    #     icode, ncase, jtrack, mreg, ltrack, etrack, xsco, ysco, zsco, cxtrck, cytrck, cztrck = [],[],[],[],[],[],[],[],[],[],[],[]
-    # # parent attribute lists
-    #       picode, pjtrack, = [],[]
-
-        tpc_data['muon_energy'][dset_index] = muenergy[list_index]
-        tpc_data['muon_impact'][dset_index] = impact[list_index]
-        tpc_data['muon_initial'][dset_index] = np.array([initx[list_index], inity[list_index], initz[list_index]])
-        tpc_data['muon_direction'][dset_index] = np.array([mucosx[list_index], mucosy[list_index], mucosz[list_index]])
-        tpc_data['muon_pn'][dset_index] = pos_neg[list_index]
-        tpc_data['neutron_energy'][dset_index] = etrack[list_index]
-        tpc_data['neutron_icode'][dset_index] = icode[list_index]
-        tpc_data['neutron_region'][dset_index] = mreg[list_index]
-        tpc_data['parent'][dset_index] = pjtrack[list_index]
-        tpc_data['birth_icode'][dset_index] = picode[list_index]
-        tpc_data['neutron_generation'][dset_index] = ltrack[list_index]
-        tpc_data['neutron_xyz'][dset_index] = np.array([xsco[list_index], ysco[list_index], zsco[list_index]])
-        tpc_data['neutron_direction'][dset_index] = np.array([cxtrck[list_index], cytrck[list_index], cztrck[list_index]])
+        for dset in tpc_data:
+            tpc_data[dset].resize(current_size + num_neutrons, axis = 0)
+        for dset in tpc_totals:
+            if dset != 'resnuclei':
+                tpc_totals[dset].resize(current_meta_size + 1, axis = 0)
+        for dset in meta:
+            meta[dset].resize(current_meta_size + 1, axis = 0)
 
 
-    file.close()
+        ## Residual nuclei data
+
+        res_nuc_data = read_resnuclei_file(resnuclei_filename)
+        current_res_nuc_size = np.size(tpc_totals['resnuclei'])
+        res_nuc_entries = len(res_nuc_data)
+        tpc_totals['resnuclei'].resize(current_res_nuc_size + res_nuc_entries, axis = 0)
+
+        for i in range(res_nuc_entries):
+            tpc_totals['resnuclei'][current_res_nuc_size + i] = res_nuc_data[i]
+
+
+        meta['hour'][current_meta_size] = int(now.strftime('%H'))
+        meta['minute'][current_meta_size] = int(now.strftime('%M'))
+        meta['second'][current_meta_size] = int(now.strftime('%S'))
+        meta['year'][current_meta_size] = int(now.strftime('%Y'))
+        meta['month'][current_meta_size] = int(now.strftime('%m'))
+        meta['day'][current_meta_size] = int(now.strftime('%d'))
+        meta['seed'][current_meta_size] = meta_dict['seed']
+        tpc_totals['neutrons_counted'][current_meta_size] = num_neutrons
+        tpc_totals['muons_simulated'][current_meta_size] = meta_dict['number_of_muons']
+        tpc_totals['muon_parents'][current_meta_size] = len(np.unique(ncase))
+
+        # Now that the datasets have been resized, we must append the most recent sim data to the datasets.
+
+        for i in range(num_neutrons):
+            list_index = i
+            dset_index = i + current_size
+
+        #     icode, ncase, jtrack, mreg, ltrack, etrack, xsco, ysco, zsco, cxtrck, cytrck, cztrck = [],[],[],[],[],[],[],[],[],[],[],[]
+        # # parent attribute lists
+        #       picode, pjtrack, = [],[]
+
+            tpc_data['muon_energy'][dset_index] = muenergy[list_index]
+            tpc_data['muon_impact'][dset_index] = impact[list_index]
+            tpc_data['muon_initial'][dset_index] = np.array([initx[list_index], inity[list_index], initz[list_index]])
+            tpc_data['muon_direction'][dset_index] = np.array([mucosx[list_index], mucosy[list_index], mucosz[list_index]])
+            tpc_data['muon_pn'][dset_index] = pos_neg[list_index]
+            tpc_data['neutron_energy'][dset_index] = etrack[list_index]
+            tpc_data['neutron_icode'][dset_index] = icode[list_index]
+            tpc_data['neutron_region'][dset_index] = mreg[list_index]
+            tpc_data['parent'][dset_index] = pjtrack[list_index]
+            tpc_data['birth_icode'][dset_index] = picode[list_index]
+            tpc_data['neutron_generation'][dset_index] = ltrack[list_index]
+            tpc_data['neutron_xyz'][dset_index] = np.array([xsco[list_index], ysco[list_index], zsco[list_index]])
+            tpc_data['neutron_direction'][dset_index] = np.array([cxtrck[list_index], cytrck[list_index], cztrck[list_index]])
+
+
+        file.close()
+    except:
+        print('TPC File does not exist. Checking for OD file.')
+
 
     #                                           #
     #       OD DATA COLLECTION AND FILING       #
     #                                           #
 
-    # Neutron attribute lists (empty from the TPC file)
-    icode, ncase, jtrack, mreg, ltrack, etrack, xsco, ysco, zsco, cxtrck, cytrck, cztrck = [],[],[],[],[],[],[],[],[],[],[],[]
-    # parent attribute lists
-    picode, pjtrack, = [],[]
+    try:
 
-    
-    with open(od_filename) as od_neutrons:
-        for line in od_neutrons:
-            temp = line.split()
+        # Neutron attribute lists (empty from the TPC file)
+        icode, ncase, jtrack, mreg, ltrack, etrack, xsco, ysco, zsco, cxtrck, cytrck, cztrck = [],[],[],[],[],[],[],[],[],[],[],[]
+        # parent attribute lists
+        picode, pjtrack, = [],[]
 
-            # Load the neutron lists
-            icode.append(int(temp[0])); ncase.append(int(temp[1])); jtrack.append(int(temp[2]))
-            mreg.append(int(temp[3])); ltrack.append(int(temp[4])); etrack.append(float(temp[5]))
-            xsco.append(float(temp[6])); ysco.append(float(temp[7])); zsco.append(float(temp[8]))
-            cxtrck.append(float(temp[9])); cytrck.append(float(temp[10]));  cztrck.append(float(temp[11]))
+        
+        with open(od_filename) as od_neutrons:
+            for line in od_neutrons:
+                temp = line.split()
 
-            # Load the parent lists
-            picode.append(int(temp[12])); pjtrack.append(int(temp[14]))
+                # Load the neutron lists
+                icode.append(int(temp[0])); ncase.append(int(temp[1])); jtrack.append(int(temp[2]))
+                mreg.append(int(temp[3])); ltrack.append(int(temp[4])); etrack.append(float(temp[5]))
+                xsco.append(float(temp[6])); ysco.append(float(temp[7])); zsco.append(float(temp[8]))
+                cxtrck.append(float(temp[9])); cytrck.append(float(temp[10]));  cztrck.append(float(temp[11]))
+
+                # Load the parent lists
+                picode.append(int(temp[12])); pjtrack.append(int(temp[14]))
 
 
-    muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
-    with open(muon_filename) as muon_file:
-        lines = muon_file.readlines()
-        for mu in ncase:
-            # the number in the list "muon" is 1+ the index in the file.
-            muon_array = lines[mu-1].split()
+        muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
+        with open(muon_filename) as muon_file:
+            lines = muon_file.readlines()
+            for mu in ncase:
+                # the number in the list "muon" is 1+ the index in the file.
+                muon_array = lines[mu-1].split()
 
-            pos_neg.append(int(muon_array[0])) # Whether the muon is positive or negative
-            muenergy.append(float(muon_array[1])) # Muon Energy
-            initx.append(float(muon_array[2]))
-            inity.append(float(muon_array[3]))
-            initz.append(float(muon_array[4]))
-            mucosx.append(float(muon_array[5]))
-            mucosy.append(float(muon_array[6]))
-            mucosz.append(float(muon_array[7]))
+                pos_neg.append(int(muon_array[0])) # Whether the muon is positive or negative
+                muenergy.append(float(muon_array[1])) # Muon Energy
+                initx.append(float(muon_array[2]))
+                inity.append(float(muon_array[3]))
+                initz.append(float(muon_array[4]))
+                mucosx.append(float(muon_array[5]))
+                mucosy.append(float(muon_array[6]))
+                mucosz.append(float(muon_array[7]))
 
-            cos_z = float(muon_array[7])
-            cos_x = float(muon_array[5])
-            zenith = np.arccos(cos_z)
-            azimuth = np.arccos(cos_x/(np.sin(zenith)))
-            temp_muon = mf.Muon(zenith, azimuth, initial=(float(muon_array[2]), float(muon_array[3]), float(muon_array[4])))
-            impact.append(temp_muon.impact_param)
+                cos_z = float(muon_array[7])
+                cos_x = float(muon_array[5])
+                zenith = np.arccos(cos_z)
+                azimuth = np.arccos(cos_x/(np.sin(zenith)))
+                temp_muon = mf.Muon(zenith, azimuth, initial=(float(muon_array[2]), float(muon_array[3]), float(muon_array[4])))
+                impact.append(temp_muon.impact_param)
 
-    ## WE NOW HAVE THE DATA
-    ## Must put it in an hdf5 file.
-    
+        ## WE NOW HAVE THE DATA
+        ## Must put it in an hdf5 file.
+        
 
-    # Open the h5 file in "append" mode so that it won't erase current data
-    file = h5.File(output_filename,'a')
+        # Open the h5 file in "append" mode so that it won't erase current data
+        file = h5.File(output_filename,'a')
 
-    # grabbing the file by the data groups
-    od_data = file['od_data']
-    od_totals = file['od_totals']
+        # grabbing the file by the data groups
+        od_data = file['od_data']
+        od_totals = file['od_totals']
 
-    # Current length of the data in the file
-    current_size = len(od_data['neutron_energy'])
-    num_neutrons = len(ncase) # Number of elements to append
-    current_totals_size = len(od_totals['neutrons_counted'])
+        # Current length of the data in the file
+        current_size = len(od_data['neutron_energy'])
+        num_neutrons = len(ncase) # Number of elements to append
+        current_totals_size = len(od_totals['neutrons_counted'])
 
-    for dset in od_data:
-        # resize the datasets
-        od_data[dset].resize(current_size + num_neutrons, axis = 0)
-    for dset in od_totals:
-        od_totals[dset].resize(current_totals_size + 1, axis = 0)
+        for dset in od_data:
+            # resize the datasets
+            od_data[dset].resize(current_size + num_neutrons, axis = 0)
+        for dset in od_totals:
+            od_totals[dset].resize(current_totals_size + 1, axis = 0)
 
-    od_totals['neutrons_counted'][current_totals_size] = num_neutrons
-    od_totals['muons_simulated'][current_totals_size] = meta_dict['number_of_muons']
-    od_totals['muon_parents'][current_totals_size] = len(np.unique(ncase))
+        od_totals['neutrons_counted'][current_totals_size] = num_neutrons
+        od_totals['muons_simulated'][current_totals_size] = meta_dict['number_of_muons']
+        od_totals['muon_parents'][current_totals_size] = len(np.unique(ncase))
 
-    # Now that the datasets have been resized, we must append the most recent sim data to the datasets
+        # Now that the datasets have been resized, we must append the most recent sim data to the datasets
 
-    for i in range(num_neutrons):
-        list_index = i
-        dset_index = i + current_size
+        for i in range(num_neutrons):
+            list_index = i
+            dset_index = i + current_size
 
-        od_data['muon_energy'][dset_index] = muenergy[list_index]
-        od_data['muon_impact'][dset_index] = impact[list_index]
-        od_data['muon_initial'][dset_index] = np.array([initx[list_index], inity[list_index], initz[list_index]])
-        od_data['muon_direction'][dset_index] = np.array([mucosx[list_index], mucosy[list_index], mucosz[list_index]])
-        od_data['muon_pn'][dset_index] = pos_neg[list_index]
-        od_data['neutron_energy'][dset_index] = etrack[list_index]
-        od_data['neutron_icode'][dset_index] = icode[list_index]
-        od_data['neutron_region'][dset_index] = mreg[list_index]
-        od_data['parent'][dset_index] = pjtrack[list_index]
-        od_data['birth_icode'][dset_index] = picode[list_index]
-        od_data['neutron_generation'][dset_index] = ltrack[list_index]
-        od_data['neutron_xyz'][dset_index] = np.array([xsco[list_index], ysco[list_index], zsco[list_index]])
-        od_data['neutron_direction'][dset_index] = np.array([cxtrck[list_index], cytrck[list_index], cztrck[list_index]])
+            od_data['muon_energy'][dset_index] = muenergy[list_index]
+            od_data['muon_impact'][dset_index] = impact[list_index]
+            od_data['muon_initial'][dset_index] = np.array([initx[list_index], inity[list_index], initz[list_index]])
+            od_data['muon_direction'][dset_index] = np.array([mucosx[list_index], mucosy[list_index], mucosz[list_index]])
+            od_data['muon_pn'][dset_index] = pos_neg[list_index]
+            od_data['neutron_energy'][dset_index] = etrack[list_index]
+            od_data['neutron_icode'][dset_index] = icode[list_index]
+            od_data['neutron_region'][dset_index] = mreg[list_index]
+            od_data['parent'][dset_index] = pjtrack[list_index]
+            od_data['birth_icode'][dset_index] = picode[list_index]
+            od_data['neutron_generation'][dset_index] = ltrack[list_index]
+            od_data['neutron_xyz'][dset_index] = np.array([xsco[list_index], ysco[list_index], zsco[list_index]])
+            od_data['neutron_direction'][dset_index] = np.array([cxtrck[list_index], cytrck[list_index], cztrck[list_index]])
 
-    ## MUST CLOSE THE FILE
-    file.close()
+        ## MUST CLOSE THE FILE
+        file.close()
+    except:
+        print('OD file also does not exist. No hdf5 file will be produced.')
 
 def main():
     yaml_file = open('simconfig.yaml')
