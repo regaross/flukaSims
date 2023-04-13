@@ -8,9 +8,9 @@
     #
     #SBATCH --ntasks=1
     #SBATCH --cpus-per-task=1
-    #SBATCH --mem=10g
+    #SBATCH --mem=40g
     #
-    #SBATCH --time=0-10:00:00
+    #SBATCH --time=0-40:00:00
     #
     #SBATCH --cpus 1
 
