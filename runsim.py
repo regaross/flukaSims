@@ -115,6 +115,9 @@ def initialize_h5_file(h5_filename):
         tpc_totals.create_dataset("muon_parents",(0,), dtype=int, maxshape=(None,))
         # a dataset for the resnuclei output
         tpc_totals.create_dataset("resnuclei",(0,3), dtype=float, maxshape=(None,3))
+        # a dataset for the resnuclei output scoring the TPC copper
+        tpc_totals.create_dataset("resnuclei_cu",(0,3), dtype=float, maxshape=(None,3))
+
 
         ## Meta data
 
@@ -157,7 +160,7 @@ def initialize_h5_file(h5_filename):
         initialize_h5_file('retry_' + h5_filename)
         ### NEED TO ADD THE MERGE HERE LATER
 
-def store_events(tpc_filename, od_filename, resnuclei_filename, muon_filename, output_filename, meta_dict):
+def store_events(tpc_filename, od_filename, resnuclei_filename, resnuclei_cu_filename, muon_filename, output_filename, meta_dict):
     ''' A function to collect the neutrons logged by the MGDRAW.f routine.
         First, the output file is parsed to collect the neutron data. These data are related to their source muons
         The data is appended to an hdf5 file. '''
@@ -240,7 +243,7 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, muon_filename, o
             meta[dset].resize(current_meta_size + 1, axis = 0)
 
 
-        ## Residual nuclei data
+        ## Residual nuclei data TPC
 
         res_nuc_data = read_resnuclei_file(resnuclei_filename)
         current_res_nuc_size = np.size(tpc_totals['resnuclei'])
@@ -249,6 +252,16 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, muon_filename, o
 
         for i in range(res_nuc_entries):
             tpc_totals['resnuclei'][current_res_nuc_size + i] = res_nuc_data[i]
+
+        ## Residual nuclei data TPC Copper
+
+        res_nuc_data = read_resnuclei_file(resnuclei_cu_filename)
+        current_res_nuc_size = np.size(tpc_totals['resnuclei_cu'])
+        res_nuc_entries = len(res_nuc_data)
+        tpc_totals['resnuclei_cu'].resize(current_res_nuc_size + res_nuc_entries, axis = 0)
+
+        for i in range(res_nuc_entries):
+            tpc_totals['resnuclei_cu'][current_res_nuc_size + i] = res_nuc_data[i]
 
 
         meta['hour'][current_meta_size] = int(now.strftime('%H'))
@@ -476,13 +489,14 @@ def main():
         tpc_filename = input_file[:-4] + "001_fort.72"
         od_filename = input_file[:-4] + "001_fort.70"
         res_nuc_filename = input_file[:-4] + "001_fort.97"
+        res_nuc_cu_filename = input_file[:-4] + "001_fort.94"
         
 
         time_stamp = str(datetime.now())[5:16].replace(' ','').replace('-', '').replace(':', '')
 
         neutron_filename = neutron_file + time_stamp + '.hdf5'
         #try:
-        store_events(tpc_filename, od_filename, res_nuc_filename, muon_file, neutron_filename, meta)
+        store_events(tpc_filename, od_filename, res_nuc_filename, res_nuc_cu_filename , muon_file, neutron_filename, meta)
         #except:
         #os.system('echo RR: The neutron hdf5 file WAS NOT CREATED\; probably because no neutrons were generated')
         
