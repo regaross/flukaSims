@@ -19,6 +19,8 @@ USRYIELD         133   NEUTRON       -96       tpc    tpc_in          UsrYldTPC
 USRYIELD          30                  30        20                     &
 USRYIELD         133   NEUTRON        95       tpc    tpc_in          UsrYldTPC
 USRYIELD          30                  30        20                     &
+* For scoring activation of copper isotopes in the tpc shell
+RESNUCLE           3        94        90       190       tpc          CuActivtn
 * $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 * ------------> PHYSICS and PROCESS REGULATORS

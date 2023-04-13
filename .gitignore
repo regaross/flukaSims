@@ -31,3 +31,4 @@
 *.fdb_latexmk
 *.aux
 *.toc
+*test*
