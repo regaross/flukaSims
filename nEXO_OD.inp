@@ -11,7 +11,7 @@ SOURCE
 BEAMPOS            0         0      2000                              NEGATIVE
 * Specifying beam by energy in GeV, also overridden by source_newgen.f file  ENERGY ==> Max permissible energy.`
 BEAM        -50000.0                                                  MUON-
-* Creating "Collision Tape" of events
+* Creating "Collision Tape" of events: CAUTION, This can produce a huge file > 100gb
 USERDUMP        100.        99       0.0        1.                    dump
 *RESNUCLE           3       -98        90       190    tpc_in          ResNucTPC
 RESNUCLE           3        97        90       190    tpc_in          ResNucTPC
