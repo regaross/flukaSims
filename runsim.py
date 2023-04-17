@@ -164,8 +164,6 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, resnuclei_cu_fil
     ''' A function to collect the neutrons logged by the MGDRAW.f routine.
         First, the output file is parsed to collect the neutron data. These data are related to their source muons
         The data is appended to an hdf5 file. '''
-    
-    initialize_h5_file(output_filename)
 
     # Collect the time and date
     now = datetime.now()
@@ -176,6 +174,9 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, resnuclei_cu_fil
     
     # Order of output data in the simulation files:
     # ICODE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
+
+    initialize_h5_file(output_filename)
+    datacheck = 1 # Assuming there are some data to add to the file
 
     # Neutron attribute lists
     icode, ncase, jtrack, mreg, ltrack, etrack, xsco, ysco, zsco, cxtrck, cytrck, cztrck = [],[],[],[],[],[],[],[],[],[],[],[]
@@ -302,6 +303,7 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, resnuclei_cu_fil
 
         file.close()
     except:
+        datacheck = 0
         print('TPC File does not exist. Checking for OD file.')
 
 
@@ -403,7 +405,11 @@ def store_events(tpc_filename, od_filename, resnuclei_filename, resnuclei_cu_fil
         ## MUST CLOSE THE FILE
         file.close()
     except:
+        datacheck = 0
         print('OD file also does not exist. No hdf5 file will be produced.')
+
+    if not datacheck:
+        os.system('rm ' + output_filename)
 
 def main():
     yaml_file = open('simconfig.yaml')
