@@ -93,10 +93,11 @@ blkhole      5 blkhole - (rock_col + rock_top - rock_bot)
 END
 GEOEND
 MATERIAL                             2.8        26                    NORITE
-* SNOLAB Norite (Rock)
-COMPOUND     -0.0015  HYDROGEN      -.46    OXYGEN     -.022    SODIUMNORITE
-COMPOUND       -.033  MAGNESIU      -.09  ALUMINUM     -.262   SILICONNORITE
-COMPOUND      -0.012  POTASSIU     -.052   CALCIUM    -0.062      IRONNORITE
+* SNOLAB Norite (Rock)- See O. Scallon PhD Thesis
+COMPOUND     -0.0015  HYDROGEN     -0.46    OXYGEN    -0.022    SODIUMNORITE
+COMPOUND      -0.033  MAGNESIU     -0.09  ALUMINUM    -0.262   SILICONNORITE
+COMPOUND      -0.012  POTASSIU    -0.052   CALCIUM    -0.062      IRONNORITE
+COMPOUND      -0.005  TITANIUM   -0.0004    CARBON                    NORITE
 * Ordinary Potassium - Not in the FLUKA default materials
 MATERIAL         19.        39     0.862        27                    POTASSIU
 MATERIAL          24        52      7.19        28                    CHROMIUM
