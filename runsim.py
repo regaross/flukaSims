@@ -457,13 +457,13 @@ def main():
     
 
     ## STEP THREE: COMPILE THE FILES
+    os.system('echo RR: Compiling the user routines')
     compile_string = source_path + 'fff'
     os.system('echo RR: COMPILING FILES >> ' + progress_out)
     os.system(compile_string + ' ' + mgdraw_file + ' >> '+ progress_out)
     os.system(compile_string + ' ' + source_routine + ' >> ' + progress_out)
 
     ## STEP FOUR: LINK THE COMPILED FILES
-    os.system('echo RR: Compiling the user routines')
     link_string = source_path + 'ldpmqmd -m fluka -o nEXOsim.exe '
     mgd_compd = mgdraw_file[:-1] + 'o'
     source_compd = source_routine[:-1] + 'o'
