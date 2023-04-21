@@ -42,10 +42,10 @@ PHOTONUC        1111                      HYDROGEN  @LASTMAT          MUMUPAIR
 * Allow for pair production and bremsstrahlung from 0 ev for e- and 1 ev for photons
 PAIRBREM           3       0.0      1E-9  HYDROGEN  @LASTMAT
 PHYSICS            1                                                  COALESCE
-PHYSICS      1809003                                                  EVAPORAT
+PHYSICS            3                                                  EVAPORAT
 PHYSICS            2                                                  EM-DISSO
 * Allow decay of muons
-PHYSICS          203                         MUON+     MUON-          DECAYS
+PHYSICS          202                        PROTON     MUON-          DECAYS
 * $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 * ------------> GEOMETRY DEFINITIONS

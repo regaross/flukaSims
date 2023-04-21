@@ -191,7 +191,7 @@
 
       ! ! This is a neutron directly produced by a muon somewhere within the OD.
       IF (MREG .LE. 8 .AND. JTRACK .EQ. 8 .AND. LTRACK .EQ. 2 .AND. LLOUSE .LT. 3) THEN
-            WRITE(98, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
+            WRITE(70, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
      &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
      &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
             IF (LLOUSE .EQ. 1) THEN
@@ -204,7 +204,7 @@
 
       ! This is a neutron detected within the TPC Xenon
       IF (MREG .EQ. 1 .AND. JTRACK .EQ. 8 .AND. LLOUSE .LT. 3) THEN 
-            WRITE(98, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
+            WRITE(72, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
      &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
      &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
 
@@ -353,7 +353,7 @@
 
       ! ! This is a neutron directly produced by a muon somewhere within the OD.
       IF (MREG .LE. 8 .AND. JTRACK .EQ. 8 .AND. LTRACK .EQ. 2 .AND. LLOUSE .LT. 3 .AND. LLOUSE .NE. 2) THEN
-            WRITE(98, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
+            WRITE(70, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
      &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
      &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
             IF (LLOUSE .EQ. 1) THEN
@@ -366,7 +366,7 @@
 
       ! This is a neutron detected within the TPC Xenon
       IF (MREG .EQ. 1 .AND. JTRACK .EQ. 8 .AND. LLOUSE .LT. 3 .AND. LLOUSE .NE. 1) THEN 
-            WRITE(98, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
+            WRITE(72, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
      &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
      &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
 

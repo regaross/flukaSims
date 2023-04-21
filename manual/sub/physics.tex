@@ -19,3 +19,6 @@ These cards are used to activate gamma interactions with nuclei. The first in th
 
 \paragraph{\textcolor{Maroon}{PAIRBREM}}
 This card controls simulation of pair production and bremsstrahlung by high-energy muons, charged hadrons and light ions (up to alpha's). Here, both bremsstrahlung and pair production are activated with the electron energy threshold set to 0 which corresponds to the lowest FLUKA limits, and the $\gamma$ threshold set to 1 eV.
+
+\paragraph{\textcolor{Maroon}{PHYSICS}}
+There are four physics cards here. The first of which enables coalescence; high energy light fragments can be produced by a mechanism joining together nucleons that are near in the phase space. This card ensures this feature of the simulation is enabled. It is important for when residual nuclei are being scored like the activation of Xe-136 for instance. The second \textcolor{Maroon}{PHYSICS} card enables the emission of heavy nuclear fragments (also important for residucl nuclei scoring). Next, there is the EM-DISSO card. When a photon in the range of a nuclear resonance impinges upon a nucleus, it can create an excitation known as a giant dipole resonance. This decays with the emission of a nucleon— this process is activated by EM-DISSO. Finally, the decay of hadrons is permitted with the DECAY card.
