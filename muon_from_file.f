@@ -132,14 +132,14 @@
 
       ! Function declarations
 
-      double precision sample_flat_momentum_energy
-      double precision sample_gaussian_momentum_energy
-      double precision sample_maxwell_boltzmann_energy
-      double precision sample_histogram_momentum_energy
-      double precision sample_spectrum_momentum_energy
+      ! double precision sample_flat_momentum_energy
+      ! double precision sample_gaussian_momentum_energy
+      ! double precision sample_maxwell_boltzmann_energy
+      ! double precision sample_histogram_momentum_energy
+      ! double precision sample_spectrum_momentum_energy
 
-      double precision sample_gaussian_distribution
-      double precision sample_flat_distribution
+      ! double precision sample_gaussian_distribution
+      ! double precision sample_flat_distribution
 
       double precision FLRNDM
 
@@ -545,12 +545,6 @@
       direction_cosx = phase_space_entry%u
       direction_cosy = phase_space_entry%v
       direction_cosz = phase_space_entry%w
-
-      ! WRITE(72,*) ''
-      ! WRITE(72,*) 'NEW MUON'
-      ! WRITE(72,*) 'Energy:', momentum_energy
-      ! WRITE(72,*) 'Start:', coordinate_x, coordinate_y, coordinate_z
-      ! WRITE(72,*) 'Direction:', direction_cosx, direction_cosy, direction_cosz
 
       particle_weight = phase_space_entry%wei
 
