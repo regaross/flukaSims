@@ -28,9 +28,9 @@ IONTRANS    HEAVYION
 *RADDECAY           1         1
 * Empty LOW-PWXS card to enable pointwise treatment in "all materials"
 LOW-PWXS                                                              ENDF-VIII0
-* Linking to external JEFF files for low-E neutron data (POSSIBLY REDUNDANT)
-*LOW-PWXS       10010   h_water               WATER
-*LOW-PWXS       10010     h_zrh            HYDROGEN
+* Linking to external ENDF files for low-E neutron data (POSSIBLY REDUNDANT)
+LOW-PWXS                              85     XE136                    ENDF-VIII0
+*LOW-PWXS       10010     h_zrh            HYDROGEN                    ENDF-VIII0
 * Muon-nuclear interactions must be enabled in all materials; Hydrogen to @LASTMAT
 MUPHOTON           1                      HYDROGEN  @LASTMAT
 * Activates photon interactions with nuclei for all energies
