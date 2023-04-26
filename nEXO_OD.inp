@@ -27,7 +27,7 @@ IONTRANS    HEAVYION
 * Decays permitted but biasing not enabled (for analyses outside FLUKA)
 *RADDECAY           1         1
 * Empty LOW-PWXS card to enable pointwise treatment in "all materials"
-*LOW-PWXS
+LOW-PWXS                                                              ENDF-VIII0
 * Linking to external JEFF files for low-E neutron data (POSSIBLY REDUNDANT)
 *LOW-PWXS       10010   h_water               WATER
 *LOW-PWXS       10010     h_zrh            HYDROGEN
