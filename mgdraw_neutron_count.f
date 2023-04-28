@@ -352,7 +352,7 @@
       END IF
 
       ! ! This is a neutron directly produced by a muon somewhere within the OD.
-      IF (MREG .LE. 8 .AND. JTRACK .EQ. 8 .AND. LTRACK .EQ. 2 .AND. LLOUSE .LT. 3 .AND. LLOUSE .NE. 2) THEN
+      IF (MREG .LE. 8 .AND. JTRACK .EQ. 8 .AND. LLOUSE .LT. 3 .AND. LLOUSE .NE. 2) THEN
             WRITE(70, *) ICODE, JTRACK, MREG, LTRACK, ETRACK, 
      &       XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK,
      &      (ISPUSR(I),I=1,4), (SPAUSR(I),I=1,7) ! Parent data
