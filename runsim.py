@@ -45,22 +45,27 @@ def read_resnuclei_file(resnuclei_file):
 
     return np.array(arr_list)
     
-def make_phase_space_file(num_muons, roi_radius = 0, roi_height = 0, filename = 'src/muon_file.txt'):
+def make_phase_space_file(num_muons, roi_radius = 0, roi_height = 0, filename = 'src/muon_file.txt', intersecting = True):
     '''A function to make a phase space file for a number of muons. 
         This file is used by the larger simulation as the source for each particle.
         NOTE: if the filename is changed, it must also be changed in the .inp file for the sim.'''
 
     from random import random
 
-    if roi_radius == 0:
-        roi_radius = mf.OD_RADIUS + 2
-        roi_height = mf.OD_HEIGHT + 2
-
-    roi = mf.OuterDetector(roi_radius, roi_height)
-
     file_stream = open(filename, 'w')
+    
+    if intersecting:
+        if roi_radius == 0:
+            roi_radius = mf.OD_RADIUS + 2
+            roi_height = mf.OD_HEIGHT + 2
 
-    muarray = mf.intersecting_muons(num_muons, roi)
+        roi = mf.OuterDetector(roi_radius, roi_height)
+
+        muarray = mf.intersecting_muons(num_muons, roi)
+    else:
+        roi = mf.OuterDetector(mf.OD_RADIUS, mf.OD_HEIGHT)
+        muarray = mf.non_intersecting_muons(num_muons, roi)
+
 
     for muon in muarray:
         particle_code = 10
@@ -427,6 +432,7 @@ def main():
     # Input Parameters
     Input = input_yaml.get('Input')
     input_path = Input.get('InputPath')
+    intersecting = Input.get('Intersecting')
     input_file = input_path + Input.get('InputFile')
     source_routine = input_path + Input.get('SourceFile')
     mgdraw_file = input_path + Input.get('MGDrawFile')
@@ -472,9 +478,9 @@ def main():
 
     ## STEP FIVE (optional): MAKE THE PHASE SPACE FILE
     for i in range(reps):
-        if make_new or not os.path.exists( muon_file):
+        if make_new or not os.path.exists(muon_file):
             os.system('echo RR: Making the phase space file')
-            make_phase_space_file(num_muons = num_muons, filename = muon_file)
+            make_phase_space_file(num_muons = num_muons, filename = muon_file, intersecting=intersecting)
 
         ## STEP SIX: CHANGE SEED IN .inp FILE
         seed = str(np.random.randint(0,999999))

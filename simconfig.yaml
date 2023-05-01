@@ -16,6 +16,7 @@ Input:                        # Not likely to require changing
   InputPath: '/gpfs/slac/staas/fs1/g/exo/exo_data8/exo_data/users/rross/flukaSims/'
   InputFile: 'nEXO_OD.inp'
   SourceFile: 'muon_from_file.f'
+  Intersecting : True ### MUST BE SET TO TRUE FOR MUONS HITTING ROI
   MGDrawFile: 'mgdraw_neutron_count.f'
 
 Source: # (DON'T CHANGE -unless running locally) For FLUKA binaries in the singularity image 

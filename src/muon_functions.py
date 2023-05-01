@@ -497,9 +497,25 @@ def intersecting_muons(how_many, detector = OuterDetector(), gen_radius=0, gen_o
 
     return np.array(muon_list)[:how_many]
 
+def non_intersecting_muons(how_many, detector = OuterDetector(), gen_radius=0, gen_offset=0) -> np.ndarray:
+    ''' Does the same as generate_muons, but returns only muons that do not intersect the provided outer detector'''
+
+    at_a_time = int(how_many/2)+1
+    muon_list = []
+
+    while len(muon_list) < how_many:
+        temp_muons = generate_muons(at_a_time, detector, gen_radius, gen_offset)
+        for mu in temp_muons:
+            if not hits_detector(mu, detector):
+                muon_list.append(mu)
+                mu.path_length = path_length(mu, detector, labels=False)
+
+    return np.array(muon_list)[:how_many]
+
 def hits_detector(muon, detector) -> bool:
     ''' Returns True if the muon intersects the detector, False otherwise'''
     return (type(intersection_points(muon, detector, labels= False)) is not bool)
+
 
 
 def path_length(muon, detector = OuterDetector(), labels=True, ignore_cover_gas=True, ignore_cryostat=True):
