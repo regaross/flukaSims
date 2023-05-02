@@ -34,11 +34,14 @@ import yaml
 
 
 fluka_files = {
-    'tpc_neutron_file' :    'nEXO_OD001_fort.72',
-    'od_neutron_file' :     'nEXO_OD001_fort.70',
-    'res_nuclei_file' :     'nEXO_OD001_fort.97',
-    'res_nuclei_cu_file' :  'nEXO_OD001_fort.94',
-    'muon_source_file' :    'src/muon_file.txt',  
+    'tpc_neutron_file'      :   'nEXO_OD001_fort.72',
+    'od_neutron_file'       :   'nEXO_OD001_fort.70',
+    'res_nuclei_file'       :   'nEXO_OD001_fort.97',
+    'res_nuclei_cu_file'    :   'nEXO_OD001_fort.94',
+    'muon_source_file'      :   'src/muon_file.txt',
+    'mgdraw_file'           :   'mgdraw_neutron_count.f',
+    'source_file'           :   'muon_from_file.f',  
+    'input_file'            :   'nEXO_OD.inp',
 }
 
 hdf5_structure = {
@@ -207,7 +210,7 @@ def move_fluka_files(path):
     for ext in file_list:
         os.system('mv ' + ext + path)
 
-def change_seed(input_file):
+def change_seed(input_file = fluka_files['input_file']):
     '''Changes the seed to the simulation in a given input file'''
 
     seed = str(np.random.randint(0,999999))
@@ -219,6 +222,32 @@ def change_seed(input_file):
 
     return seed
 
+def link_and_compile(path_to_fluka, mgdraw_file = fluka_files['mgdraw_file'], 
+                     source_routine = fluka_files['muon_source_file'], 
+                     progress_out = 'compile_summary.txt',
+                     executable = 'nEXOsim.exe'):
+    '''Links and compiles the fluka routines for the fluka executable'''
+
+    if path_to_fluka[-1] == '/':
+        path_to_fluka = path_to_fluka[:-1]
+    
+    compile_string = path_to_fluka + 'fff'
+
+    os.system(compile_string + ' ' + mgdraw_file + ' >> '+ progress_out)
+    os.system(compile_string + ' ' + source_routine + ' >> ' + progress_out)
+
+    link_string = path_to_fluka + 'ldpmqmd -m fluka -o ' + executable + ' '
+    mgd_compd = mgdraw_file[:-1] + 'o'
+    source_compd = source_routine[:-1] + 'o'
+    os.system(link_string + mgd_compd + ' ' + source_compd + '>> ' + progress_out)
+
+def change_number_of_muons(num_muons, input_filename = fluka_files['input_file']):
+    '''Changes the number of muons in the input file for a given simulation'''
+
+    space_string = '               '
+    num_spaces = len(space_string) - len(str(num_muons))
+    num_string = 'START' + space_string[:num_spaces] + str(num_muons)
+    os.system('sed -i \'s/^START.*/' + num_string + '/\' ' + input_filename)
 
 def read_neutron_file(neutron_filename) -> dict:
     '''Reads in a file of neutron entries with the anticipated format following:
@@ -306,7 +335,9 @@ def resize_output_file(h5_filename, tpc_data_length, od_data_length, resnuc, res
         'od_data'       :   od_data_current,
         'od_totals'     :   od_tot_current,
         'tpc_totals'    :   tpc_tot_current,
-        'meta'          :   meta_current
+        'meta'          :   meta_current,
+        'resnuclei'     :   current_resnuc_len,
+        'resnuclei_cu'  :   current_resnuc_cu_len
     }
 
     return indices
@@ -418,6 +449,12 @@ def store_data_in_h5(output_filename, seed):
         output_file['od_totals']['neutrons_counted'][indices['od_totals']]   = od_neutrons['total']
         output_file['od_totals']['muons_simulated'][indices['od_totals']]    = od_muons['total']
         output_file['od_totals']['muon_parents'][indices['od_totals']]       = len(np.unique(od_muons['muon_energy']))
+
+
+        #   RESNUCLEI DATASET
+
+        output_file['resnuclei']['resnuclei'][indices['resnuclei']:]         = resnuclei_data
+        output_file['resnuclei']['resnuclei_cu'][indices['resnuclei_cu']:]   = resnuclei_cu_data
 
 
         #   META DATASET
