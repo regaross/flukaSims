@@ -71,7 +71,7 @@ fluka_files = {
     'od_neutron_file'       :   yaml_card['input_file'][:-4] + '001_fort.70',
     'res_nuclei_file'       :   yaml_card['input_file'][:-4] + '001_fort.97',
     'res_nuclei_cu_file'    :   yaml_card['input_file'][:-4] + '001_fort.94',
-    'muon_source_file'      :   'src/muon_file.txt',
+    'muon_file'      :   'src/muon_file.txt',
     'mgdraw_file'           :   'mgdraw_neutron_count.f',
     'source_file'           :   'muon_from_file.f',  
     'input_file'            :   yaml_card['input_file'],
@@ -278,7 +278,7 @@ def change_seed(input_file = fluka_files['input_file']):
     return seed
 
 def link_and_compile(path_to_fluka, mgdraw_file = fluka_files['mgdraw_file'], 
-                     source_routine = fluka_files['muon_source_file'], 
+                     source_routine = fluka_files['source_file'], 
                      progress_out = 'compile_summary.txt',
                      executable = 'nEXOsim.exe'):
     '''Links and compiles the fluka routines for the fluka executable'''
