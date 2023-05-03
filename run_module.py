@@ -228,7 +228,7 @@ def initialize_h5_file(h5_filename):
         group = hdf5_structure[group]
         for dset in group:
             data_set = group[dset]
-            file.create_dataset(dset, shape = data_set['shape'], dtype = data_set['dtype'], maxshape = data_set['maxshape'])
+            group.create_dataset(dset, shape = data_set['shape'], dtype = data_set['dtype'], maxshape = data_set['maxshape'])
 
     file.close()
 
@@ -329,6 +329,7 @@ def read_neutron_file(neutron_filename) -> dict:
             count += 1
 
             # Load the neutron lists
+            # ICODE, NCASE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
             icode.append(int(temp[0])); ncase.append(int(temp[1])); jtrack.append(int(temp[2]))
             mreg.append(int(temp[3])); ltrack.append(int(temp[4])); etrack.append(float(temp[5]))
             xsco.append(float(temp[6])); ysco.append(float(temp[7])); zsco.append(float(temp[8]))
