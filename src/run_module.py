@@ -43,7 +43,7 @@ with open('simconfig.yaml') as yaml_file:
     Simulation = input_yaml.get('Simulation')
     Input = input_yaml.get('Input')
     Output = input_yaml.get('Output')
-    input_path : Input.get('InputPath')
+    input_path = Input.get('InputPath')
 
     yaml_card = {
         # Simulation Parameters
