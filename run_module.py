@@ -471,8 +471,8 @@ def store_data_in_h5(output_filename, seed) -> bool:
     indices = resize_output_file(output_filename, tpc_length, od_length, resnuc_length, resnuc_cu_length)
 
     # Collect the muon data
-    tpc_muons = retrieve_muons(fluka_files['muon_source_file'], tpc_neutrons['ncase'])
-    od_muons = retrieve_muons(fluka_files['muon_source_file'], od_neutrons['ncase'])
+    tpc_muons = retrieve_muons(fluka_files['muon_file'], tpc_neutrons['ncase'])
+    od_muons = retrieve_muons(fluka_files['muon_file'], od_neutrons['ncase'])
 
     if tpc_check or od_check:
 
