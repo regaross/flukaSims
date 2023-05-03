@@ -223,9 +223,9 @@ def initialize_h5_file(h5_filename):
     
     file = h5.File(h5_filename, 'a')
 
-    for group in hdf5_structure:
-        group = file.create_group(group)
-        group_dict = hdf5_structure[group]
+    for group_name in hdf5_structure:
+        group = file.create_group(group_name)
+        group_dict = hdf5_structure[group_name]
         for dset in group_dict:
             data_set = group_dict[dset]
             group.create_dataset(dset, shape = data_set['shape'], dtype = data_set['dtype'], maxshape = data_set['maxshape'])
@@ -407,7 +407,7 @@ def resize_output_file(h5_filename, tpc_data_length, od_data_length, resnuc, res
 def retrieve_muons(muon_filename, ncase_list):
     '''Retrieves the list of muons that correspond to the list of ncase values. Don't forget, the ncase variable doesn't directly correspond to the muon number in the file. They are different by 1 as FORTRAN indices begin at 1, python indices begin at 0.'''
 
-    with open(muon_filename) as muons:
+    with open(muon_filename) as muons: 
         muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
         lines = muons.readlines()
         total = len(lines)
