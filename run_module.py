@@ -71,7 +71,7 @@ fluka_files = {
     'od_neutron_file'       :   yaml_card['input_file'][:-4] + '001_fort.70',
     'res_nuclei_file'       :   yaml_card['input_file'][:-4] + '001_fort.97',
     'res_nuclei_cu_file'    :   yaml_card['input_file'][:-4] + '001_fort.94',
-    'muon_file'      :   'src/muon_file.txt',
+    'muon_file'             :   'src/muon_file.txt',
     'mgdraw_file'           :   'mgdraw_neutron_count.f',
     'source_file'           :   'muon_from_file.f',  
     'input_file'            :   yaml_card['input_file'],
@@ -546,7 +546,7 @@ def runsim():
 
     ###     Step two: Compile and link the fluka files:
 
-    link_and_compile(yaml_card['source_path'], fluka_files['mgdraw_file'], fluka_files['muon_source_file'])
+    link_and_compile(yaml_card['source_path'], fluka_files['mgdraw_file'], fluka_files['source_file'])
 
     ###     Step three: Looping from here on for however many repititions are demanded
 
