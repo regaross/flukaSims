@@ -33,15 +33,48 @@ import yaml
 #################################################
 
 
+
+## Loading in the parameters from the simconfig.yaml file
+
+with open('simconfig.yaml') as yaml_file:
+
+    input_yaml = yaml.safe_load(yaml_file)
+
+    Simulation = input_yaml.get('Simulation')
+    Input = input_yaml.get('Input')
+    Output = input_yaml.get('Output')
+    input_path : Input.get('InputPath')
+
+    yaml_card = {
+        # Simulation Parameters
+        'num_muons' : Simulation.get('Muons'),
+        'intersecting' : Simulation.get('Intersecting'),
+        'make_new' : Simulation.get('MakeNewFile'),
+        'reps' : Simulation.get('Repititions'),
+
+        # Input Parameters
+        'input_file' : input_path + Input.get('InputFile'),
+        'source_routine' : input_path + Input.get('SourceFile'),
+        'mgdraw_file' : input_path + Input.get('MGDrawFile'),
+
+        # Output Parameters
+        'output_dir' : Output.get('OutputDir'),
+        'neutron_file' : Output.get('NeutronFile'),
+        'progress_out' : Output.get('ProgressOut'),
+
+        # Source Parameters
+        'source_path' : input_yaml.get('Source').get('FlukaPath'),
+    }
+
 fluka_files = {
-    'tpc_neutron_file'      :   'nEXO_OD001_fort.72',
-    'od_neutron_file'       :   'nEXO_OD001_fort.70',
-    'res_nuclei_file'       :   'nEXO_OD001_fort.97',
-    'res_nuclei_cu_file'    :   'nEXO_OD001_fort.94',
+    'tpc_neutron_file'      :   yaml_card['input_file'][:-4] + '001_fort.72',
+    'od_neutron_file'       :   yaml_card['input_file'][:-4] + '001_fort.70',
+    'res_nuclei_file'       :   yaml_card['input_file'][:-4] + '001_fort.97',
+    'res_nuclei_cu_file'    :   yaml_card['input_file'][:-4] + '001_fort.94',
     'muon_source_file'      :   'src/muon_file.txt',
     'mgdraw_file'           :   'mgdraw_neutron_count.f',
     'source_file'           :   'muon_from_file.f',  
-    'input_file'            :   'nEXO_OD.inp',
+    'input_file'            :   yaml_card['input_file'],
 }
 
 hdf5_structure = {
@@ -201,8 +234,30 @@ def initialize_h5_file(h5_filename):
 
     return h5_filename
     
-def remove_junk_files():
-    junk_list = ['.o', '.exe', '.mod', '~']
+def move_output_files(path):
+    '''Moves simulation output files to a specified path'''
+
+    try:
+        os.system('mkdir ' + path)
+    except: pass
+
+    time_stamp = str(datetime.now())[10:16].replace(' ','').replace('-', '').replace(':', '')
+    sub_dir = yaml_card['neutron_file'] + time_stamp
+    last_dir = path + sub_dir + '/'
+
+    try:
+        os.system('mkdir ' + last_dir)
+        os.system('mv *fort* ' + last_dir)
+        os.system('mv *lis* *tab* ' + last_dir)
+        os.system('mv *.hdf5 ' + path)
+        os.system('mv *fort.97 ' + path)
+        os.system('mv *.log *.err *.out *ran* *dump *fort* *.txt ' + last_dir)
+    except: pass
+
+    os.system('cp ' + fluka_files['input_file'] + ' ' + last_dir)
+
+    ## STEP TEN: REMOVE COMPILED AND UNNECESSARY FILES
+    os.system('rm *.o *.exe *.mod')
 
 def move_fluka_files(path):
     file_list = ['*fort*', '*lis*', '*tab*', '*.h5', '*.hdf5', '*fort*', '*.log', '*.inp', '*.err', '*.out', '*dump']
@@ -469,6 +524,56 @@ def store_data_in_h5(output_filename, seed):
         output_file['meta']['day'][indices['meta']] = int(now.strftime('%d'))
 
         output_file['meta']['seed'][indices['meta']] = seed
+
+def run_fluka():
+    ''' Executes the command to run the simulation given everything else has been done'''
+
+    run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./nEXOsim.exe ' + fluka_files['input_file'] 
+    os.system(run_string)
+    
+
+def runsim():
+    ''' The function for running the simulation from beginning to end'''
+    
+    ###     Step one: Make changes to the input file— Number of Muons
+
+    change_number_of_muons(yaml_card['num_muons'], fluka_files['input_file'])
+
+    ###     Step two: Compile and link the fluka files:
+
+    link_and_compile(yaml_card['source_path'], fluka_files['mgdraw_file'], fluka_files['muon_source_file'])
+
+    ###     Step three: Looping from here on for however many repititions are demanded
+
+    for i in range(yaml_card['reps']):
+
+        ###     Make the phase space file
+
+        make_phase_space_file(yaml_card['num_muons'])
+
+        ###     Change the simulation seed
+
+        seed = change_seed(fluka_files['input_file'])
+
+        ###     Run the simulation
+
+        run_fluka()
+
+        ###     Deal with the output
+        
+        time_stamp = str(datetime.now())[10:16].replace(' ','').replace('-', '').replace(':', '')
+        h5_filename = yaml_card['neutron_file'] + time_stamp + '.hdf5'
+
+        store_data_in_h5(h5_filename, seed)
+
+        move_fluka_files(yaml_card['output_dir'])
+
+
+
+runsim()
+
+
+
 
 
 
