@@ -315,7 +315,7 @@ def read_neutron_file(neutron_filename) -> dict:
 
     if not os.path.exists(neutron_filename):
         print('Neutron file not found.')
-        return 
+        return None
 
     # Neutron attribute lists
     icode, ncase, jtrack, mreg, ltrack, etrack, xsco, ysco, zsco, cxtrck, cytrck, cztrck = [],[],[],[],[],[],[],[],[],[],[],[]
@@ -441,15 +441,23 @@ def retrieve_muons(muon_filename, ncase_list):
 
     return muon_dict
 
-def store_data_in_h5(output_filename, seed):
+def store_data_in_h5(output_filename, seed) -> bool:
     '''Takes the data from the FLUKA output files and builds it into an hdf5 file.'''
 
     ### First we gather the data ###
 
     tpc_neutrons = read_neutron_file(fluka_files['tpc_neutron_file'])
-    tpc_length = len(tpc_neutrons['etrack'])
+
+    if tpc_neutrons is not None:
+        tpc_length = len(tpc_neutrons['etrack'])
+        tpc_check = True
+    
     od_neutrons = read_neutron_file(fluka_files['od_neutron_file'])
-    od_length = len(od_neutrons['etrack'])
+
+    if od_neutrons is not None:
+        od_length = len(od_neutrons['etrack'])
+        od_check = True
+
     resnuclei_data = read_resnuclei_file(fluka_files['res_nuclei_file'])
     resnuc_length = len(resnuclei_data)
     resnuclei_cu_data = read_resnuclei_file(fluka_files['res_nuclei_cu_file'])
@@ -465,71 +473,80 @@ def store_data_in_h5(output_filename, seed):
     tpc_muons = retrieve_muons(fluka_files['muon_source_file'], tpc_neutrons['ncase'])
     od_muons = retrieve_muons(fluka_files['muon_source_file'], od_neutrons['ncase'])
 
+    if tpc_check or od_check:
 
-    with h5.File(output_filename, 'a') as output_file:
-        
-        #   TPC DATASETS
+        with h5.File(output_filename, 'a') as output_file:
+            
+            #   TPC DATASETS
+            if tpc_check:
 
-        output_file['tpc_data']['neutron_energy'][indices['tpc_data']:]       = tpc_neutrons['etrack']
-        output_file['tpc_data']['neutron_generation'][indices['tpc_data']:]   = tpc_neutrons['ltrack']
-        output_file['tpc_data']['neutron_icode'][indices['tpc_data']:]        = tpc_neutrons['icode']
-        output_file['tpc_data']['neutron_region'][indices['tpc_data']:]       = tpc_neutrons['mreg']
-        output_file['tpc_data']['neutron_xyz'][indices['tpc_data']:]          = [tpc_neutrons['xsco'], tpc_neutrons['ysco'], tpc_neutrons['zsco']]
-        output_file['tpc_data']['neutron_direction'][indices['tpc_data']:]    = [tpc_neutrons['cxtrck'], tpc_neutrons['cytrck'], tpc_neutrons['cztrck']]
-        output_file['tpc_data']['neutron_parent'][indices['tpc_data']:]       = tpc_neutrons['pjtrack']
-        output_file['tpc_data']['neutron_birth_icode'][indices['tpc_data']:]  = tpc_neutrons['picode']
+                output_file['tpc_data']['neutron_energy'][indices['tpc_data']:]       = tpc_neutrons['etrack']
+                output_file['tpc_data']['neutron_generation'][indices['tpc_data']:]   = tpc_neutrons['ltrack']
+                output_file['tpc_data']['neutron_icode'][indices['tpc_data']:]        = tpc_neutrons['icode']
+                output_file['tpc_data']['neutron_region'][indices['tpc_data']:]       = tpc_neutrons['mreg']
+                output_file['tpc_data']['neutron_xyz'][indices['tpc_data']:]          = [tpc_neutrons['xsco'], tpc_neutrons['ysco'], tpc_neutrons['zsco']]
+                output_file['tpc_data']['neutron_direction'][indices['tpc_data']:]    = [tpc_neutrons['cxtrck'], tpc_neutrons['cytrck'], tpc_neutrons['cztrck']]
+                output_file['tpc_data']['neutron_parent'][indices['tpc_data']:]       = tpc_neutrons['pjtrack']
+                output_file['tpc_data']['neutron_birth_icode'][indices['tpc_data']:]  = tpc_neutrons['picode']
 
-        output_file['tpc_data']['muon_pn'][indices['tpc_data']:]              = tpc_muons['muon_pn']
-        output_file['tpc_data']['muon_impact'][indices['tpc_data']:]          = tpc_muons['muon_impact']
-        output_file['tpc_data']['muon_energy'][indices['tpc_data']:]          = tpc_muons['muon_energy']
-        output_file['tpc_data']['muon_initial'][indices['tpc_data']:]         = tpc_muons['muon_initial']
-        output_file['tpc_data']['muon_direction'][indices['tpc_data']:]       = tpc_muons['muon_direction']
+                output_file['tpc_data']['muon_pn'][indices['tpc_data']:]              = tpc_muons['muon_pn']
+                output_file['tpc_data']['muon_impact'][indices['tpc_data']:]          = tpc_muons['muon_impact']
+                output_file['tpc_data']['muon_energy'][indices['tpc_data']:]          = tpc_muons['muon_energy']
+                output_file['tpc_data']['muon_initial'][indices['tpc_data']:]         = tpc_muons['muon_initial']
+                output_file['tpc_data']['muon_direction'][indices['tpc_data']:]       = tpc_muons['muon_direction']
 
-        output_file['tpc_totals']['neutrons_counted'][indices['tpc_totals']]   = tpc_neutrons['total']
-        output_file['tpc_totals']['muons_simulated'][indices['tpc_totals']]    = tpc_muons['total']
-        output_file['tpc_totals']['muon_parents'][indices['tpc_totals']]       = len(np.unique(tpc_muons['muon_energy']))
-
-
-        #   OD DATASETS
-
-        output_file['od_data']['neutron_energy'][indices['od_data']:]       = od_neutrons['etrack']
-        output_file['od_data']['neutron_generation'][indices['od_data']:]   = od_neutrons['ltrack']
-        output_file['od_data']['neutron_icode'][indices['od_data']:]        = od_neutrons['icode']
-        output_file['od_data']['neutron_region'][indices['od_data']:]       = od_neutrons['mreg']
-        output_file['od_data']['neutron_xyz'][indices['od_data']:]          = [od_neutrons['xsco'], od_neutrons['ysco'], od_neutrons['zsco']]
-        output_file['od_data']['neutron_direction'][indices['od_data']:]    = [od_neutrons['cxtrck'], od_neutrons['cytrck'], od_neutrons['cztrck']]
-        output_file['od_data']['neutron_parent'][indices['od_data']:]       = od_neutrons['pjtrack']
-        output_file['od_data']['neutron_birth_icode'][indices['od_data']:]  = od_neutrons['picode']
-
-        output_file['od_data']['muon_pn'][indices['od_data']:]              = od_muons['muon_pn']
-        output_file['od_data']['muon_impact'][indices['od_data']:]          = od_muons['muon_impact']
-        output_file['od_data']['muon_energy'][indices['od_data']:]          = od_muons['muon_energy']
-        output_file['od_data']['muon_initial'][indices['od_data']:]         = od_muons['muon_initial']
-        output_file['od_data']['muon_direction'][indices['od_data']:]       = od_muons['muon_direction']
-
-        output_file['od_totals']['neutrons_counted'][indices['od_totals']]   = od_neutrons['total']
-        output_file['od_totals']['muons_simulated'][indices['od_totals']]    = od_muons['total']
-        output_file['od_totals']['muon_parents'][indices['od_totals']]       = len(np.unique(od_muons['muon_energy']))
+                output_file['tpc_totals']['neutrons_counted'][indices['tpc_totals']]   = tpc_neutrons['total']
+                output_file['tpc_totals']['muons_simulated'][indices['tpc_totals']]    = tpc_muons['total']
+                output_file['tpc_totals']['muon_parents'][indices['tpc_totals']]       = len(np.unique(tpc_muons['muon_energy']))
 
 
-        #   RESNUCLEI DATASET
+            #   OD DATASETS
 
-        output_file['resnuclei']['resnuclei'][indices['resnuclei']:]         = resnuclei_data
-        output_file['resnuclei']['resnuclei_cu'][indices['resnuclei_cu']:]   = resnuclei_cu_data
+            if od_check:
+
+                output_file['od_data']['neutron_energy'][indices['od_data']:]       = od_neutrons['etrack']
+                output_file['od_data']['neutron_generation'][indices['od_data']:]   = od_neutrons['ltrack']
+                output_file['od_data']['neutron_icode'][indices['od_data']:]        = od_neutrons['icode']
+                output_file['od_data']['neutron_region'][indices['od_data']:]       = od_neutrons['mreg']
+                output_file['od_data']['neutron_xyz'][indices['od_data']:]          = [od_neutrons['xsco'], od_neutrons['ysco'], od_neutrons['zsco']]
+                output_file['od_data']['neutron_direction'][indices['od_data']:]    = [od_neutrons['cxtrck'], od_neutrons['cytrck'], od_neutrons['cztrck']]
+                output_file['od_data']['neutron_parent'][indices['od_data']:]       = od_neutrons['pjtrack']
+                output_file['od_data']['neutron_birth_icode'][indices['od_data']:]  = od_neutrons['picode']
+
+                output_file['od_data']['muon_pn'][indices['od_data']:]              = od_muons['muon_pn']
+                output_file['od_data']['muon_impact'][indices['od_data']:]          = od_muons['muon_impact']
+                output_file['od_data']['muon_energy'][indices['od_data']:]          = od_muons['muon_energy']
+                output_file['od_data']['muon_initial'][indices['od_data']:]         = od_muons['muon_initial']
+                output_file['od_data']['muon_direction'][indices['od_data']:]       = od_muons['muon_direction']
+
+                output_file['od_totals']['neutrons_counted'][indices['od_totals']]   = od_neutrons['total']
+                output_file['od_totals']['muons_simulated'][indices['od_totals']]    = od_muons['total']
+                output_file['od_totals']['muon_parents'][indices['od_totals']]       = len(np.unique(od_muons['muon_energy']))
 
 
-        #   META DATASET
+            #   RESNUCLEI DATASET
 
-        now = datetime.now()
+            output_file['resnuclei']['resnuclei'][indices['resnuclei']:]         = resnuclei_data
+            output_file['resnuclei']['resnuclei_cu'][indices['resnuclei_cu']:]   = resnuclei_cu_data
 
-        output_file['meta']['hour'][indices['meta']] = int(now.strftime('%H'))
-        output_file['meta']['minute'][indices['meta']] = int(now.strftime('%M'))
-        output_file['meta']['second'][indices['meta']] = int(now.strftime('%S'))
-        output_file['meta']['year'][indices['meta']] = int(now.strftime('%Y'))
-        output_file['meta']['month'][indices['meta']] = int(now.strftime('%m'))
-        output_file['meta']['day'][indices['meta']] = int(now.strftime('%d'))
 
-        output_file['meta']['seed'][indices['meta']] = seed
+            #   META DATASET
+
+            now = datetime.now()
+
+            output_file['meta']['hour'][indices['meta']] = int(now.strftime('%H'))
+            output_file['meta']['minute'][indices['meta']] = int(now.strftime('%M'))
+            output_file['meta']['second'][indices['meta']] = int(now.strftime('%S'))
+            output_file['meta']['year'][indices['meta']] = int(now.strftime('%Y'))
+            output_file['meta']['month'][indices['meta']] = int(now.strftime('%m'))
+            output_file['meta']['day'][indices['meta']] = int(now.strftime('%d'))
+
+            output_file['meta']['seed'][indices['meta']] = seed
+
+        return True
+
+    else:
+        return False
 
 def run_fluka():
     ''' Executes the command to run the simulation given everything else has been done'''
@@ -569,7 +586,10 @@ def runsim():
         time_stamp = str(datetime.now())[10:16].replace(' ','').replace('-', '').replace(':', '')
         h5_filename = yaml_card['neutron_file'] + time_stamp + '.hdf5'
 
-        store_data_in_h5(h5_filename, seed)
+        if store_data_in_h5(h5_filename, seed):
+            print('A neutron file was created')
+        else:
+            print('No neutron file was created')
 
         move_fluka_files(yaml_card['output_dir'])
 
