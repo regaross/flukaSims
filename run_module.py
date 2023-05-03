@@ -464,9 +464,6 @@ def store_data_in_h5(output_filename, seed) -> bool:
     resnuclei_cu_data = read_resnuclei_file(fluka_files['res_nuclei_cu_file'])
     resnuc_cu_length = len(resnuclei_cu_data)
 
-    # Make sure we have a file to put the data into
-    output_filename = initialize_h5_file(output_filename)
-
     # Resize the datasets of the newly initialized file
     indices = resize_output_file(output_filename, tpc_length, od_length, resnuc_length, resnuc_cu_length)
 
@@ -475,6 +472,9 @@ def store_data_in_h5(output_filename, seed) -> bool:
     od_muons = retrieve_muons(fluka_files['muon_file'], od_neutrons['ncase'])
 
     if tpc_check or od_check:
+
+        # Make sure we have a file to put the data into
+        output_filename = initialize_h5_file(output_filename)
 
         with h5.File(output_filename, 'a') as output_file:
             
@@ -485,8 +485,8 @@ def store_data_in_h5(output_filename, seed) -> bool:
                 output_file['tpc_data']['neutron_generation'][indices['tpc_data']:]   = tpc_neutrons['ltrack']
                 output_file['tpc_data']['neutron_icode'][indices['tpc_data']:]        = tpc_neutrons['icode']
                 output_file['tpc_data']['neutron_region'][indices['tpc_data']:]       = tpc_neutrons['mreg']
-                output_file['tpc_data']['neutron_xyz'][indices['tpc_data']:]          = [tpc_neutrons['xsco'], tpc_neutrons['ysco'], tpc_neutrons['zsco']]
-                output_file['tpc_data']['neutron_direction'][indices['tpc_data']:]    = [tpc_neutrons['cxtrck'], tpc_neutrons['cytrck'], tpc_neutrons['cztrck']]
+                output_file['tpc_data']['neutron_xyz'][indices['tpc_data']:]          = np.array([tpc_neutrons['xsco'], tpc_neutrons['ysco'], tpc_neutrons['zsco']])
+                output_file['tpc_data']['neutron_direction'][indices['tpc_data']:]    = np.array([tpc_neutrons['cxtrck'], tpc_neutrons['cytrck'], tpc_neutrons['cztrck']])
                 output_file['tpc_data']['neutron_parent'][indices['tpc_data']:]       = tpc_neutrons['pjtrack']
                 output_file['tpc_data']['neutron_birth_icode'][indices['tpc_data']:]  = tpc_neutrons['picode']
 
@@ -509,8 +509,8 @@ def store_data_in_h5(output_filename, seed) -> bool:
                 output_file['od_data']['neutron_generation'][indices['od_data']:]   = od_neutrons['ltrack']
                 output_file['od_data']['neutron_icode'][indices['od_data']:]        = od_neutrons['icode']
                 output_file['od_data']['neutron_region'][indices['od_data']:]       = od_neutrons['mreg']
-                output_file['od_data']['neutron_xyz'][indices['od_data']:]          = [od_neutrons['xsco'], od_neutrons['ysco'], od_neutrons['zsco']]
-                output_file['od_data']['neutron_direction'][indices['od_data']:]    = [od_neutrons['cxtrck'], od_neutrons['cytrck'], od_neutrons['cztrck']]
+                output_file['od_data']['neutron_xyz'][indices['od_data']:]          = np.array([od_neutrons['xsco'], od_neutrons['ysco'], od_neutrons['zsco']])
+                output_file['od_data']['neutron_direction'][indices['od_data']:]    = np.array([od_neutrons['cxtrck'], od_neutrons['cytrck'], od_neutrons['cztrck']])
                 output_file['od_data']['neutron_parent'][indices['od_data']:]       = od_neutrons['pjtrack']
                 output_file['od_data']['neutron_birth_icode'][indices['od_data']:]  = od_neutrons['picode']
 
