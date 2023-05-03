@@ -283,8 +283,8 @@ def link_and_compile(path_to_fluka, mgdraw_file = fluka_files['mgdraw_file'],
                      executable = 'nEXOsim.exe'):
     '''Links and compiles the fluka routines for the fluka executable'''
 
-    if path_to_fluka[-1] == '/':
-        path_to_fluka = path_to_fluka[:-1]
+    if not path_to_fluka[-1] == '/':
+        path_to_fluka = path_to_fluka + '/'
     
     compile_string = path_to_fluka + 'fff'
 
