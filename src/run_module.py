@@ -310,11 +310,17 @@ def read_neutron_file(neutron_filename) -> dict:
 
     Returns a dictionary of lists (one per type of entry)
     '''
+
+    # Make sure file exists!!! If it doesn't print file not found
+
+    if not os.path.exists(neutron_filename):
+        print('Neutron file not found.')
+        return 
+
     # Neutron attribute lists
     icode, ncase, jtrack, mreg, ltrack, etrack, xsco, ysco, zsco, cxtrck, cytrck, cztrck = [],[],[],[],[],[],[],[],[],[],[],[]
     # parent attribute lists
     picode, pjtrack, = [],[]
-
     
     with open(neutron_filename, 'r') as neutrons:
         count = 0
@@ -531,7 +537,6 @@ def run_fluka():
     run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./nEXOsim.exe ' + fluka_files['input_file'] 
     os.system(run_string)
     
-
 def runsim():
     ''' The function for running the simulation from beginning to end'''
     
