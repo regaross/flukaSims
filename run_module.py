@@ -224,10 +224,10 @@ def initialize_h5_file(h5_filename):
     file = h5.File(h5_filename, 'a')
 
     for group in hdf5_structure:
-        file.create_group(group)
-        group = hdf5_structure[group]
-        for dset in group:
-            data_set = group[dset]
+        group = file.create_group(group)
+        group_dict = hdf5_structure[group]
+        for dset in group_dict:
+            data_set = group_dict[dset]
             group.create_dataset(dset, shape = data_set['shape'], dtype = data_set['dtype'], maxshape = data_set['maxshape'])
 
     file.close()
