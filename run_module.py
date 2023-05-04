@@ -182,22 +182,29 @@ def read_resnuclei_file(resnuclei_file):
 
     return np.array(arr_list)
 
-def make_phase_space_file(num_muons, roi_radius = 0, roi_height = 0, filename = 'src/muon_file.txt'):
+def make_phase_space_file(num_muons, roi_radius = 0, roi_height = 0, filename = 'src/muon_file.txt', intersecting = True):
     '''A function to make a phase space file for a number of muons. 
         This file is used by the larger simulation as the source for each particle.
-        NOTE: if the filename is changed, it must also be changed in the .inp file for the sim.'''
+        NOTE: if the filename is changed, it must also be changed in the .inp file for the sim.
+        
+        Muon initial units are to be METRES. This is converted to FLUKA native cm in the read_phase_space_file routine'''
 
     from random import random
 
-    if roi_radius == 0:
-        roi_radius = mf.OD_RADIUS + 2
-        roi_height = mf.OD_HEIGHT + 2
-
-    roi = mf.OuterDetector(roi_radius, roi_height)
-
     file_stream = open(filename, 'w')
+    
+    if intersecting:
+        if roi_radius == 0:
+            roi_radius = mf.OD_RADIUS + 2
+            roi_height = mf.OD_HEIGHT + 2
 
-    muarray = mf.intersecting_muons(num_muons, roi)
+        roi = mf.OuterDetector(roi_radius, roi_height)
+
+        muarray = mf.intersecting_muons(num_muons, roi)
+    else:
+        roi = mf.OuterDetector(mf.OD_RADIUS, mf.OD_HEIGHT)
+        muarray = mf.non_intersecting_muons(num_muons, roi)
+
 
     for muon in muarray:
         particle_code = 10
@@ -262,6 +269,10 @@ def move_output_files(path):
 def move_fluka_files(path):
     file_list = ['*fort*', '*lis*', '*tab*', '*.h5', '*.hdf5', '*fort*', '*.log', '*.inp', '*.err', '*.out', '*dump']
 
+    if not path[-1] == '/':
+        path = path + '/'
+
+    os.system('mkdir ' + path)
     for ext in file_list:
         os.system('mv ' + ext + ' ' + path)
 
@@ -442,7 +453,7 @@ def retrieve_muons(muon_filename, ncase_list):
 
     return muon_dict
 
-def store_data_in_h5(output_filename, seed) -> bool:
+def store_data_in_h5(output_filename, seed, muon_filename) -> bool:
     '''Takes the data from the FLUKA output files and builds it into an hdf5 file.'''
 
     ### First we gather the data ###
@@ -457,7 +468,7 @@ def store_data_in_h5(output_filename, seed) -> bool:
         tpc_length = len(tpc_neutrons['etrack'])
         tpc_check = True
         # Collect the muon data
-        tpc_muons = retrieve_muons(fluka_files['muon_file'], tpc_neutrons['ncase'])
+        tpc_muons = retrieve_muons(muon_filename, tpc_neutrons['ncase'])
     
     od_neutrons = read_neutron_file(fluka_files['od_neutron_file'])
     od_length = 0
@@ -465,7 +476,7 @@ def store_data_in_h5(output_filename, seed) -> bool:
     if od_neutrons is not None:
         od_length = len(od_neutrons['etrack'])
         od_check = True
-        od_muons = retrieve_muons(fluka_files['muon_file'], od_neutrons['ncase'])
+        od_muons = retrieve_muons(muon_filename, od_neutrons['ncase'])
 
     resnuclei_data = read_resnuclei_file(fluka_files['res_nuclei_file'])
     resnuc_length = len(resnuclei_data)
@@ -562,6 +573,9 @@ def run_fluka():
     
 def runsim():
     ''' The function for running the simulation from beginning to end'''
+
+    ###     STEP ZERO: Make unique timecode for simulation (for muon file, and everything)
+    time_stamp = str(datetime.now())[10:19]
     
     ###     Step one: Make changes to the input file— Number of Muons
 
@@ -576,8 +590,8 @@ def runsim():
     for i in range(yaml_card['reps']):
 
         ###     Make the phase space file
-
-        make_phase_space_file(yaml_card['num_muons'])
+        muon_filename = 'muons_' + time_stamp + '.txt'
+        make_phase_space_file(yaml_card['num_muons'], filename = muon_filename)
 
         ###     Change the simulation seed
 
@@ -589,10 +603,9 @@ def runsim():
 
         ###     Deal with the output
         
-        time_stamp = str(datetime.now())[10:19]
         h5_filename = yaml_card['neutron_file'] + time_stamp + '.hdf5'
 
-        if store_data_in_h5(h5_filename, seed):
+        if store_data_in_h5(h5_filename, seed, muon_filename):
             print('A neutron file was created')
         else:
             print('No neutron file was created')
