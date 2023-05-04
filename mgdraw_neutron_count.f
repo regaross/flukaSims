@@ -52,32 +52,32 @@
 *                                                                      *
 *----------------------------------------------------------------------*
 *                                                                      *
-      IF ( .NOT. LFCOPE ) THEN
-         LFCOPE = .TRUE.
-         IF ( KOMPUT .EQ. 2 ) THEN
-            FILNAM = '/'//CFDRAW(1:8)//' DUMP A'
-         ELSE
-            FILNAM = CFDRAW
-         END IF
-         OPEN ( UNIT = IODRAW, FILE = FILNAM, STATUS = 'NEW', FORM =
-     &          'UNFORMATTED' )
-      END IF
-      WRITE (IODRAW) NTRACK, MTRACK, JTRACK, SNGL (ETRACK),
-     &               SNGL (WTRACK)
-      WRITE (IODRAW) ( SNGL (XTRACK (I)), SNGL (YTRACK (I)),
-     &                 SNGL (ZTRACK (I)), I = 0, NTRACK ),
-     &               ( SNGL (DTRACK (I)), I = 1, MTRACK ),
-     &                 SNGL (CTRACK)
-*  +-------------------------------------------------------------------*
-*  |  Quenching is activated
-      IF ( LQEMGD ) THEN
-         IF ( MTRACK .GT. 0 ) THEN
-            RULLL  = ZERZER
-            CALL QUENMG ( ICODE, MREG, RULLL, DTQUEN )
-            WRITE (IODRAW) ( ( SNGL (DTQUEN (I,JBK)), I = 1, MTRACK ),
-     &                         JBK = 1, NQEMGD )
-         END IF
-      END IF
+!       IF ( .NOT. LFCOPE ) THEN
+!          LFCOPE = .TRUE.
+!          IF ( KOMPUT .EQ. 2 ) THEN
+!             FILNAM = '/'//CFDRAW(1:8)//' DUMP A'
+!          ELSE
+!             FILNAM = CFDRAW
+!          END IF
+!          OPEN ( UNIT = IODRAW, FILE = FILNAM, STATUS = 'NEW', FORM =
+!      &          'UNFORMATTED' )
+!       END IF
+!       WRITE (IODRAW) NTRACK, MTRACK, JTRACK, SNGL (ETRACK),
+!      &               SNGL (WTRACK)
+!       WRITE (IODRAW) ( SNGL (XTRACK (I)), SNGL (YTRACK (I)),
+!      &                 SNGL (ZTRACK (I)), I = 0, NTRACK ),
+!      &               ( SNGL (DTRACK (I)), I = 1, MTRACK ),
+!      &                 SNGL (CTRACK)
+! *  +-------------------------------------------------------------------*
+! *  |  Quenching is activated
+!       IF ( LQEMGD ) THEN
+!          IF ( MTRACK .GT. 0 ) THEN
+!             RULLL  = ZERZER
+!             CALL QUENMG ( ICODE, MREG, RULLL, DTQUEN )
+!             WRITE (IODRAW) ( ( SNGL (DTQUEN (I,JBK)), I = 1, MTRACK ),
+!      &                         JBK = 1, NQEMGD )
+!          END IF
+!       END IF
 *  |  End of quenching
 *  +-------------------------------------------------------------------*
       RETURN
@@ -167,26 +167,26 @@
 *======================================================================*
 *                                                                      *
       ENTRY ENDRAW ( ICODE, MREG, RULL, XSCO, YSCO, ZSCO )
-      IF ( .NOT. LFCOPE ) THEN
-         LFCOPE = .TRUE.
-         IF ( KOMPUT .EQ. 2 ) THEN
-            FILNAM = '/'//CFDRAW(1:8)//' DUMP A'
-         ELSE
-            FILNAM = CFDRAW
-         END IF
-         OPEN ( UNIT = IODRAW, FILE = FILNAM, STATUS = 'NEW', FORM =
-     &          'UNFORMATTED' )
-      END IF
-      WRITE (IODRAW)  0, ICODE, JTRACK, SNGL (ETRACK), SNGL (WTRACK)
-      WRITE (IODRAW)  SNGL (XSCO), SNGL (YSCO), SNGL (ZSCO), SNGL (RULL)
-*  +-------------------------------------------------------------------*
-*  |  Quenching is activated : calculate quenching factor
-*  |  and store quenched energy in DTQUEN(1, jbk)
-      IF ( LQEMGD ) THEN
-         RULLL = RULL
-         CALL QUENMG ( ICODE, MREG, RULLL, DTQUEN )
-         WRITE (IODRAW) ( SNGL (DTQUEN(1, JBK)), JBK = 1, NQEMGD )
-      END IF
+!       IF ( .NOT. LFCOPE ) THEN
+!          LFCOPE = .TRUE.
+!          IF ( KOMPUT .EQ. 2 ) THEN
+!             FILNAM = '/'//CFDRAW(1:8)//' DUMP A'
+!          ELSE
+!             FILNAM = CFDRAW
+!          END IF
+!          OPEN ( UNIT = IODRAW, FILE = FILNAM, STATUS = 'NEW', FORM =
+!      &          'UNFORMATTED' )
+!       END IF
+!       WRITE (IODRAW)  0, ICODE, JTRACK, SNGL (ETRACK), SNGL (WTRACK)
+!       WRITE (IODRAW)  SNGL (XSCO), SNGL (YSCO), SNGL (ZSCO), SNGL (RULL)
+! *  +-------------------------------------------------------------------*
+! *  |  Quenching is activated : calculate quenching factor
+! *  |  and store quenched energy in DTQUEN(1, jbk)
+!       IF ( LQEMGD ) THEN
+!          RULLL = RULL
+!          CALL QUENMG ( ICODE, MREG, RULLL, DTQUEN )
+!          WRITE (IODRAW) ( SNGL (DTQUEN(1, JBK)), JBK = 1, NQEMGD )
+!       END IF
 *  |  end quenching
 
       ! ! This is a neutron directly produced by a muon somewhere within the OD.
@@ -217,7 +217,7 @@
       END IF
       
       
-      ! ICODE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
+      ! ICODE, NCASE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
       ! Setting parent values
       ! Integer values
       ISPUSR(1) = ICODE
@@ -243,63 +243,63 @@
 *======================================================================*
 *
       ENTRY SODRAW
-      IF ( .NOT. LFCOPE ) THEN
-         LFCOPE = .TRUE.
-         IF ( KOMPUT .EQ. 2 ) THEN
-            FILNAM = '/'//CFDRAW(1:8)//' DUMP A'
-         ELSE
-            FILNAM = CFDRAW
-         END IF
-         OPEN ( UNIT = IODRAW, FILE = FILNAM, STATUS = 'NEW', FORM =
-     &          'UNFORMATTED' )
-      END IF
-      WRITE (IODRAW) -NCASE, NPFLKA, NSTMAX, SNGL (TKESUM),
-     &                SNGL (WEIPRI)
-*  +-------------------------------------------------------------------*
-*  |  (Radioactive) isotope: it works only for 1 source particle on
-*  |  the stack for the time being
-      IF ( ILOFLK (NPFLKA) .GE. 100000 .AND. LRADDC (NPFLKA) ) THEN
-         IARES  = MOD ( ILOFLK (NPFLKA), 100000  )  / 100
-         IZRES  = MOD ( ILOFLK (NPFLKA), 10000000 ) / 100000
-         IISRES = ILOFLK (NPFLKA) / 10000000
-         IONID  = ILOFLK (NPFLKA)
-         WRITE (IODRAW) ( IONID,SNGL(-TKEFLK(I)),
-     &                    SNGL (WTFLK(I)), SNGL (XFLK (I)),
-     &                    SNGL (YFLK (I)), SNGL (ZFLK (I)),
-     &                    SNGL (TXFLK(I)), SNGL (TYFLK(I)),
-     &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
-*  |
-*  +-------------------------------------------------------------------*
-*  |  Patch for heavy ions: it works only for 1 source particle on
-*  |  the stack for the time being
-      ELSE IF ( ABS (ILOFLK (NPFLKA)) .GE. 10000 ) THEN
-         IONID = ILOFLK (NPFLKA)
-         CALL DCDION ( IONID )
-         WRITE (IODRAW) ( IONID,SNGL(TKEFLK(I)+AMNHEA(-IONID)),
-     &                    SNGL (WTFLK(I)), SNGL (XFLK (I)),
-     &                    SNGL (YFLK (I)), SNGL (ZFLK (I)),
-     &                    SNGL (TXFLK(I)), SNGL (TYFLK(I)),
-     &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
-*  |
-*  +-------------------------------------------------------------------*
-*  |  Patch for heavy ions: ???
-      ELSE IF ( ILOFLK (NPFLKA) .LT. -6 ) THEN
-         WRITE (IODRAW) ( IONID,SNGL(TKEFLK(I)+AMNHEA(-ILOFLK(NPFLKA))),
-     &                    SNGL (WTFLK(I)), SNGL (XFLK (I)),
-     &                    SNGL (YFLK (I)), SNGL (ZFLK (I)),
-     &                    SNGL (TXFLK(I)), SNGL (TYFLK(I)),
-     &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
-*  |
-*  +-------------------------------------------------------------------*
-*  |
-      ELSE
-         WRITE (IODRAW) ( ILOFLK(I), SNGL (TKEFLK(I)+AM(ILOFLK(I))),
-     &                    SNGL (WTFLK(I)), SNGL (XFLK (I)),
-     &                    SNGL (YFLK (I)), SNGL (ZFLK (I)),
-     &                    SNGL (TXFLK(I)), SNGL (TYFLK(I)),
-     &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
-      END IF
-*  |
+!       IF ( .NOT. LFCOPE ) THEN
+!          LFCOPE = .TRUE.
+!          IF ( KOMPUT .EQ. 2 ) THEN
+!             FILNAM = '/'//CFDRAW(1:8)//' DUMP A'
+!          ELSE
+!             FILNAM = CFDRAW
+!          END IF
+!          OPEN ( UNIT = IODRAW, FILE = FILNAM, STATUS = 'NEW', FORM =
+!      &          'UNFORMATTED' )
+!       END IF
+!       WRITE (IODRAW) -NCASE, NPFLKA, NSTMAX, SNGL (TKESUM),
+!      &                SNGL (WEIPRI)
+! *  +-------------------------------------------------------------------*
+! *  |  (Radioactive) isotope: it works only for 1 source particle on
+! *  |  the stack for the time being
+!       IF ( ILOFLK (NPFLKA) .GE. 100000 .AND. LRADDC (NPFLKA) ) THEN
+!          IARES  = MOD ( ILOFLK (NPFLKA), 100000  )  / 100
+!          IZRES  = MOD ( ILOFLK (NPFLKA), 10000000 ) / 100000
+!          IISRES = ILOFLK (NPFLKA) / 10000000
+!          IONID  = ILOFLK (NPFLKA)
+!          WRITE (IODRAW) ( IONID,SNGL(-TKEFLK(I)),
+!      &                    SNGL (WTFLK(I)), SNGL (XFLK (I)),
+!      &                    SNGL (YFLK (I)), SNGL (ZFLK (I)),
+!      &                    SNGL (TXFLK(I)), SNGL (TYFLK(I)),
+!      &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
+! *  |
+! *  +-------------------------------------------------------------------*
+! *  |  Patch for heavy ions: it works only for 1 source particle on
+! *  |  the stack for the time being
+!       ELSE IF ( ABS (ILOFLK (NPFLKA)) .GE. 10000 ) THEN
+!          IONID = ILOFLK (NPFLKA)
+!          CALL DCDION ( IONID )
+!          WRITE (IODRAW) ( IONID,SNGL(TKEFLK(I)+AMNHEA(-IONID)),
+!      &                    SNGL (WTFLK(I)), SNGL (XFLK (I)),
+!      &                    SNGL (YFLK (I)), SNGL (ZFLK (I)),
+!      &                    SNGL (TXFLK(I)), SNGL (TYFLK(I)),
+!      &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
+! *  |
+! *  +-------------------------------------------------------------------*
+! *  |  Patch for heavy ions: ???
+!       ELSE IF ( ILOFLK (NPFLKA) .LT. -6 ) THEN
+!          WRITE (IODRAW) ( IONID,SNGL(TKEFLK(I)+AMNHEA(-ILOFLK(NPFLKA))),
+!      &                    SNGL (WTFLK(I)), SNGL (XFLK (I)),
+!      &                    SNGL (YFLK (I)), SNGL (ZFLK (I)),
+!      &                    SNGL (TXFLK(I)), SNGL (TYFLK(I)),
+!      &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
+! *  |
+! *  +-------------------------------------------------------------------*
+! *  |
+!       ELSE
+!          WRITE (IODRAW) ( ILOFLK(I), SNGL (TKEFLK(I)+AM(ILOFLK(I))),
+!      &                    SNGL (WTFLK(I)), SNGL (XFLK (I)),
+!      &                    SNGL (YFLK (I)), SNGL (ZFLK (I)),
+!      &                    SNGL (TXFLK(I)), SNGL (TYFLK(I)),
+!      &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
+!       END IF
+! *  |
 *  +-------------------------------------------------------------------*
       RETURN
 *
@@ -341,16 +341,16 @@
 *======================================================================*
 *
       ENTRY USDRAW ( ICODE, MREG, XSCO, YSCO, ZSCO )
-      IF ( .NOT. LFCOPE ) THEN
-         LFCOPE = .TRUE.
-         IF ( KOMPUT .EQ. 2 ) THEN
-            FILNAM = '/'//CFDRAW(1:8)//' DUMP A'
-         ELSE
-            FILNAM = CFDRAW
-         END IF
-         OPEN ( UNIT = IODRAW, FILE = FILNAM, STATUS = 'NEW', FORM =
-     &          'UNFORMATTED' )
-      END IF
+!       IF ( .NOT. LFCOPE ) THEN
+!          LFCOPE = .TRUE.
+!          IF ( KOMPUT .EQ. 2 ) THEN
+!             FILNAM = '/'//CFDRAW(1:8)//' DUMP A'
+!          ELSE
+!             FILNAM = CFDRAW
+!          END IF
+!          OPEN ( UNIT = IODRAW, FILE = FILNAM, STATUS = 'NEW', FORM =
+!      &          'UNFORMATTED' )
+!       END IF
 
       ! ! This is a neutron directly produced by a muon somewhere within the OD.
       IF (MREG .LE. 8 .AND. JTRACK .EQ. 8 .AND. LLOUSE .LT. 3 .AND. LLOUSE .NE. 2) THEN
