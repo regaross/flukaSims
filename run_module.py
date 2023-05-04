@@ -549,6 +549,7 @@ def store_data_in_h5(output_filename, seed) -> bool:
         return True
 
     else:
+        os.system('rm ' + output_filename)
         return False
 
 def run_fluka():
