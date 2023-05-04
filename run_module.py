@@ -266,15 +266,21 @@ def move_output_files(path):
     ## STEP TEN: REMOVE COMPILED AND UNNECESSARY FILES
     os.system('rm *.o *.exe *.mod')
 
-def move_fluka_files(path):
+def move_fluka_files(path, subdir):
     file_list = ['*fort*', '*lis*', '*tab*', '*.h5', '*.hdf5', '*fort*', '*.log', '*.err', '*.out', '*dump']
 
     if not path[-1] == '/':
         path = path + '/'
 
+    if not subdir[-1] == '/':
+        subdir = subdir + '/'
+
     os.system('mkdir ' + path)
+    os.system('mkdir ' + path + subdir)
     for ext in file_list:
         os.system('mv ' + ext + ' ' + path)
+        if not ext == '*.hdf5' or not ext == '*.h5':
+            os.system('mv ' + ext + ' ' + path + subdir)
 
 def change_seed(input_file = fluka_files['input_file']):
     '''Changes the seed to the simulation in a given input file'''
@@ -611,7 +617,7 @@ def runsim():
         else:
             print('No neutron file was created')
 
-        move_fluka_files(yaml_card['output_dir'])
+        move_fluka_files(yaml_card['output_dir'], subdir = time_stamp)
 
 
 
