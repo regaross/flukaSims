@@ -573,9 +573,6 @@ def run_fluka():
     
 def runsim():
     ''' The function for running the simulation from beginning to end'''
-
-    ###     STEP ZERO: Make unique timecode for simulation (for muon file, and everything)
-    time_stamp = str(datetime.now())[10:19]
     
     ###     Step one: Make changes to the input file— Number of Muons
 
@@ -588,6 +585,8 @@ def runsim():
     ###     Step three: Looping from here on for however many repititions are demanded
 
     for i in range(yaml_card['reps']):
+        ###     STEP ZERO: Make unique timecode for simulation (for muon file, and everything)
+        time_stamp = str(datetime.now())[10:19]
 
         ###     Make the phase space file
         muon_filename = 'muons_' + time_stamp + '.txt'
