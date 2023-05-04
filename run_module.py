@@ -434,8 +434,8 @@ def retrieve_muons(muon_filename, ncase_list):
     muon_dict = {
         'muon_energy'       :   muenergy,
         'muon_impact'       :   impact,
-        'muon_initial'      :   [initx, inity, initz],
-        'muon_direction'    :   [mucosx, mucosy, mucosz],
+        'muon_initial'      :   np.array([initx, inity, initz]).transpose(),
+        'muon_direction'    :   np.array([mucosx, mucosy, mucosz]).transpose(),
         'muon_pn'           :   pos_neg,
         'total'             :   total
     }
