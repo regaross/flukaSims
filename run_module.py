@@ -267,7 +267,7 @@ def move_output_files(path):
     os.system('rm *.o *.exe *.mod')
 
 def move_fluka_files(path):
-    file_list = ['*fort*', '*lis*', '*tab*', '*.h5', '*.hdf5', '*fort*', '*.log', '*.inp', '*.err', '*.out', '*dump']
+    file_list = ['*fort*', '*lis*', '*tab*', '*.h5', '*.hdf5', '*fort*', '*.log', '*.err', '*.out', '*dump']
 
     if not path[-1] == '/':
         path = path + '/'
@@ -591,7 +591,7 @@ def runsim():
         time_stamp = str(datetime.now())[10:19]
 
         ###     Make the phase space file
-        muon_filename = 'muons_' + time_stamp + '.txt'
+        muon_filename = 'src/muons_' + time_stamp + '.txt'
         make_phase_space_file(yaml_card['num_muons'], filename = muon_filename)
 
         ###     Change the simulation seed
