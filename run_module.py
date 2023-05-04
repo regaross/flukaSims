@@ -448,13 +448,15 @@ def store_data_in_h5(output_filename, seed) -> bool:
     ### First we gather the data ###
 
     tpc_neutrons = read_neutron_file(fluka_files['tpc_neutron_file'])
+    tpc_length = 0
 
     if tpc_neutrons is not None:
         tpc_length = len(tpc_neutrons['etrack'])
         tpc_check = True
     
     od_neutrons = read_neutron_file(fluka_files['od_neutron_file'])
-
+    od_length = 0
+    
     if od_neutrons is not None:
         od_length = len(od_neutrons['etrack'])
         od_check = True
