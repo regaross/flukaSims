@@ -453,6 +453,8 @@ def store_data_in_h5(output_filename, seed) -> bool:
     if tpc_neutrons is not None:
         tpc_length = len(tpc_neutrons['etrack'])
         tpc_check = True
+        # Collect the muon data
+        tpc_muons = retrieve_muons(fluka_files['muon_file'], tpc_neutrons['ncase'])
     
     od_neutrons = read_neutron_file(fluka_files['od_neutron_file'])
     od_length = 0
@@ -460,6 +462,7 @@ def store_data_in_h5(output_filename, seed) -> bool:
     if od_neutrons is not None:
         od_length = len(od_neutrons['etrack'])
         od_check = True
+        od_muons = retrieve_muons(fluka_files['muon_file'], od_neutrons['ncase'])
 
     resnuclei_data = read_resnuclei_file(fluka_files['res_nuclei_file'])
     resnuc_length = len(resnuclei_data)
@@ -471,10 +474,6 @@ def store_data_in_h5(output_filename, seed) -> bool:
 
     # Resize the datasets of the newly initialized file
     indices = resize_output_file(output_filename, tpc_length, od_length, resnuc_length, resnuc_cu_length)
-
-    # Collect the muon data
-    tpc_muons = retrieve_muons(fluka_files['muon_file'], tpc_neutrons['ncase'])
-    od_muons = retrieve_muons(fluka_files['muon_file'], od_neutrons['ncase'])
 
     if tpc_check or od_check:
 
