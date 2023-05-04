@@ -589,7 +589,7 @@ def runsim():
 
         ###     Deal with the output
         
-        time_stamp = str(datetime.now())[10:16].replace(' ','').replace('-', '').replace(':', '')
+        time_stamp = str(datetime.now())[10:19]
         h5_filename = yaml_card['neutron_file'] + time_stamp + '.hdf5'
 
         if store_data_in_h5(h5_filename, seed):
