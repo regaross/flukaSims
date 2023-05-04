@@ -263,7 +263,7 @@ def move_fluka_files(path):
     file_list = ['*fort*', '*lis*', '*tab*', '*.h5', '*.hdf5', '*fort*', '*.log', '*.inp', '*.err', '*.out', '*dump']
 
     for ext in file_list:
-        os.system('mv ' + ext + path)
+        os.system('mv ' + ext + ' ' + path)
 
 def change_seed(input_file = fluka_files['input_file']):
     '''Changes the seed to the simulation in a given input file'''
