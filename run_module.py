@@ -450,6 +450,9 @@ def store_data_in_h5(output_filename, seed) -> bool:
     tpc_neutrons = read_neutron_file(fluka_files['tpc_neutron_file'])
     tpc_length = 0
 
+    od_check = False
+    tpc_check = False
+
     if tpc_neutrons is not None:
         tpc_length = len(tpc_neutrons['etrack'])
         tpc_check = True
