@@ -248,10 +248,11 @@ def move_output_files(path):
         os.system('mkdir ' + path)
     except: pass
 
-    time_stamp = str(datetime.now())[10:16].replace(' ','').replace('-', '').replace(':', '')
+    time_stamp = str(datetime.now())[11:19]
     sub_dir = yaml_card['neutron_file'] + time_stamp
     last_dir = path + sub_dir + '/'
-
+    os.system('mkdir ' + last_dir)
+ 
     try:
         os.system('mkdir ' + last_dir)
         os.system('mv *fort* ' + last_dir)
@@ -576,7 +577,135 @@ def run_fluka():
 
     run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./nEXOsim.exe ' + fluka_files['input_file'] 
     os.system(run_string)
+
+def merge_hdf5_files(h5_output, *args):
+
+    '''A function to combine multiple h5 neutron files into a larger file (which may already exist).
+    Checks for no duplicates by ensuring seeds are different'''
+
+    # Load in the h5 files in read-only mode
+    file_list = [h5.File(arg, 'r') for arg in args]
+
+    # Must first confirm these files can be merged. Namely, we need to know that they are not identical.
+    meta_list = [file['meta'] for file in file_list]
+
+    # Checking seeds
+    seeds = [int(m['seed'][0]) for m in meta_list]
+
+    # Check if the output file already exists and append its attributes to the lists for uniqueness checks
+
+    if not os.path.isfile(h5_output): # The file must be created.
+        initialize_h5_file(h5_output)
+
+    else:
+        file = h5.File(h5_output, 'a')
+        for seed in file['meta']['seed']:
+            seeds.append(seed)
     
+        file.close()
+
+    # Make sure the input files are unique simulations with the same region number
+    if len(np.unique(seeds)) < len(seeds):
+        print('INCOMPATIBLE SCORING REGIONS or SAME SEED!')
+        return None
+
+    
+    # We should be safe to add the attributes of all the other files to the output h5 file now.
+
+    # How much longer does 'data' have to be?
+    tpc_data_length = 0
+    od_data_length = 0
+    tpc_totals_length = 0
+    od_totals_length = 0
+
+    for file in file_list:
+        tpc_data_length = tpc_data_length + len(file['tpc_data']['neutron_energy'])
+        od_data_length = od_data_length + len(file['od_data']['neutron_energy'])
+        tpc_totals_length = tpc_totals_length + len(file['tpc_totals']['neutrons_counted'])
+        od_totals_length = od_totals_length + len(file['od_totals']['neutrons_counted'])
+
+    # How much longer does 'meta' have to be?
+    meta_length = 0
+    for meta in meta_list:
+        meta_length = meta_length + len(meta['seed'])
+
+    # Now we can re-open the output file and resize it as appropriate.
+
+    file = h5.File(h5_output,'a')
+
+    # grabbing the file by the data groups
+    tpc_data = file['tpc_data']
+    od_data = file['od_data']
+    tpc_totals = file['tpc_totals']
+    od_totals = file['od_totals']
+
+    meta = file['meta']
+
+    # Current length of the data in the file
+    current_od_data_size = len(od_data['neutron_energy'])
+    current_tpc_data_size = len(tpc_data['neutron_energy'])
+    current_od_tot_data_size = len(od_totals['neutrons_counted'])
+    current_tpc_tot_data_size = len(tpc_totals['neutrons_counted'])
+
+    current_meta_size = len(meta['year'])
+
+    # Resizing the datasets in the file by the number of elements we need to append therein.
+    for dset in tpc_data:
+        tpc_data[dset].resize(current_tpc_data_size + tpc_data_length, axis = 0)
+    for dset in od_data:
+        od_data[dset].resize(current_od_data_size + od_data_length, axis = 0)
+    for dset in od_totals:
+        od_totals[dset].resize(current_od_tot_data_size + od_totals_length, axis = 0)
+    for dset in tpc_totals:
+        tpc_totals[dset].resize(current_tpc_tot_data_size + tpc_totals_length, axis = 0)
+
+    for dset in meta:
+        meta[dset].resize(current_meta_size + meta_length, axis = 0)
+
+    meta_index = 0
+
+    for temp_file in file_list:
+        temp_tpc_data = temp_file['tpc_data']
+        temp_od_data = temp_file['od_data']
+        temp_tpc_totals = temp_file['tpc_totals']
+        temp_od_totals = temp_file['od_totals']
+        temp_meta = temp_file['meta']
+
+
+        for key in tpc_data.keys():
+            for i in range(len(temp_tpc_data['neutron_energy'])):
+                tpc_data[key][current_tpc_data_size + i] = temp_tpc_data[key][i]
+
+        for key in tpc_totals.keys():
+            for i in range(len(temp_tpc_totals['neutron_energy'])):
+                tpc_totals[key][current_tpc_tot_data_size + i] = temp_tpc_totals[key][i]
+        
+        for key in od_data.keys():
+            for i in range(len(temp_od_data['neutron_energy'])):
+                od_data[key][current_od_data_size + i] = temp_od_data[key][i]
+
+        for key in od_totals.keys():
+            for i in range(len(temp_od_totals['neutron_energy'])):
+                od_totals[key][current_od_tot_data_size + i] = temp_od_totals[key][i]
+
+        for key in meta.keys():
+            meta[key][current_meta_size + meta_index] = temp_meta[key][0]
+
+        meta_index += 1 # Goes up by one for every file
+        current_od_data_size += len(temp_od_data['neutron_energy'])
+        current_tpc_data_size += len(temp_tpc_data['neutron_energy'])
+        current_od_tot_data_size += len(temp_od_totals['neutrons_counted'])
+        current_tpc_tot_data_size += len(temp_tpc_totals['neutrons_counted'])
+    
+    for temp_file in file_list:
+        temp_file.close()
+
+    file.close()
+
+    # Return the string name of the file
+    return h5_output
+
+
 def runsim():
     ''' The function for running the simulation from beginning to end'''
     ###     STEP ZERO: Make unique timecode for simulation (for muon file, and everything)
@@ -617,7 +746,7 @@ def runsim():
         else:
             print('No neutron file was created')
 
-        move_fluka_files(yaml_card['output_dir'], subdir = time_stamp)
+        move_output_files(yaml_card['output_dir'])
 
 
 
