@@ -196,7 +196,7 @@ def make_phase_space_file(num_muons, roi_radius = 0, roi_height = 0, filename = 
     if intersecting:
         if roi_radius == 0:
             roi_radius = mf.OD_RADIUS + 2
-            roi_height = mf.OD_HEIGHT + 2
+            roi_height = mf.OD_HEIGHT + 4
 
         roi = mf.OuterDetector(roi_radius, roi_height)
 
@@ -260,9 +260,6 @@ def move_output_files(path):
     except: pass
 
     os.system('cp ' + fluka_files['input_file'] + ' ' + last_dir)
-
-    ## STEP TEN: REMOVE COMPILED AND UNNECESSARY FILES
-    os.system('rm *.o *.exe *.mod')
 
 def move_fluka_files(path, subdir):
     file_list = ['*fort*', '*lis*', '*tab*', '*.h5', '*.hdf5', '*fort*', '*.log', '*.err', '*.out', '*dump']
