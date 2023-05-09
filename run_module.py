@@ -207,14 +207,11 @@ def make_phase_space_file(num_muons, roi_radius = 0, roi_height = 0, filename = 
 
 
     for muon in muarray:
-        particle_code = 10
-    
-        if random() > 0.5:
-            particle_code = 11
-            
-        file_stream.write(str(particle_code) + ' ' + str(muon) + '\n')
+        file_stream.write(str(muon) + '\n')
 
     file_stream.close()
+
+    return muarray
 
 def initialize_h5_file(h5_filename):
     '''Creates an empty hdf5 file with the structure equivalent to the above dictionary. Renames the file if it already exists.'''
@@ -422,32 +419,27 @@ def resize_output_file(h5_filename, tpc_data_length, od_data_length, resnuc, res
 
     return indices
 
-def retrieve_muons(muon_filename, ncase_list):
+def retrieve_muons(muon_array, ncase_list) -> dict:
     '''Retrieves the list of muons that correspond to the list of ncase values. Don't forget, the ncase variable doesn't directly correspond to the muon number in the file. They are different by 1 as FORTRAN indices begin at 1, python indices begin at 0.'''
 
-    with open(muon_filename) as muons: 
-        muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
-        lines = muons.readlines()
-        total = len(lines)
-        for mu in ncase_list:
-            # the number in the list "muon" is 1+ the index in the file.
-            muon_array = lines[mu-1].split()
+    muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
+    total = len(muon_array)
+    for mu in ncase_list:
 
-            pos_neg.append(int(muon_array[0])) # Whether the muon is positive or negative
-            muenergy.append(float(muon_array[1])) # Muon Energy
-            initx.append(float(muon_array[2]))
-            inity.append(float(muon_array[3]))
-            initz.append(float(muon_array[4]))
-            mucosx.append(float(muon_array[5]))
-            mucosy.append(float(muon_array[6]))
-            mucosz.append(float(muon_array[7]))
+        pos_neg.append(int(muon_array[mu].pos_neg)) # Whether the muon is positive or negative
+        muenergy.append(float(muon_array[mu].energy)) # Muon Energy
+        initx.append(float(muon_array[mu].initial[0]))
+        inity.append(float(muon_array[mu].initial[1]))
+        initz.append(float(muon_array[mu].initial[2]))
 
-            cos_z = float(muon_array[7])
-            cos_x = float(muon_array[5])
-            zenith = np.arccos(cos_z)
-            azimuth = np.arccos(cos_x/(np.sin(zenith)))
-            temp_muon = mf.Muon(zenith, azimuth, initial=(float(muon_array[2]), float(muon_array[3]), float(muon_array[4])))
-            impact.append(temp_muon.impact_param)
+        cos_x, cos_y, cos_z = muon_array[mu].direction_cosines()
+
+        mucosx.append(float(cos_x))
+        mucosy.append(float(cos_y))
+        mucosz.append(float(cos_z))
+
+        impact.append(muon_array[mu].impact_param)
+
 
     muon_dict = {
         'muon_energy'       :   muenergy,
@@ -460,7 +452,7 @@ def retrieve_muons(muon_filename, ncase_list):
 
     return muon_dict
 
-def store_data_in_h5(output_filename, seed, muon_filename) -> bool:
+def store_data_in_h5(output_filename, seed, muon_list) -> bool:
     '''Takes the data from the FLUKA output files and builds it into an hdf5 file.'''
 
     ### First we gather the data ###
@@ -475,7 +467,7 @@ def store_data_in_h5(output_filename, seed, muon_filename) -> bool:
         tpc_length = len(tpc_neutrons['etrack'])
         tpc_check = True
         # Collect the muon data
-        tpc_muons = retrieve_muons(muon_filename, tpc_neutrons['ncase'])
+        tpc_muons = retrieve_muons(muon_list, tpc_neutrons['ncase'])
     
     od_neutrons = read_neutron_file(fluka_files['od_neutron_file'])
     od_length = 0
@@ -483,7 +475,7 @@ def store_data_in_h5(output_filename, seed, muon_filename) -> bool:
     if od_neutrons is not None:
         od_length = len(od_neutrons['etrack'])
         od_check = True
-        od_muons = retrieve_muons(muon_filename, od_neutrons['ncase'])
+        od_muons = retrieve_muons(muon_list, od_neutrons['ncase'])
 
     resnuclei_data = read_resnuclei_file(fluka_files['res_nuclei_file'])
     resnuc_length = len(resnuclei_data)
@@ -581,7 +573,12 @@ def run_fluka():
 def merge_hdf5_files(h5_output, *args):
 
     '''A function to combine multiple h5 neutron files into a larger file (which may already exist).
-    Checks for no duplicates by ensuring seeds are different'''
+    Checks for no duplicates by ensuring seeds are different
+    
+    
+    NEEDS TO BE FIXED 
+    
+    '''
 
     # Load in the h5 files in read-only mode
     file_list = [h5.File(arg, 'r') for arg in args]
@@ -727,7 +724,7 @@ def runsim():
 
         ###     Make the phase space file
         muon_filename = 'src/muons_' + time_stamp + '.txt'
-        make_phase_space_file(yaml_card['num_muons'], filename = muon_filename)
+        muon_list = make_phase_space_file(yaml_card['num_muons'], filename = muon_filename)
 
         ###     Change the simulation seed
 
@@ -741,7 +738,7 @@ def runsim():
         
         h5_filename = yaml_card['neutron_file'] + time_stamp + '.hdf5'
 
-        if store_data_in_h5(h5_filename, seed, muon_filename):
+        if store_data_in_h5(h5_filename, seed, muon_list):
             print('A neutron file was created')
         else:
             print('No neutron file was created')

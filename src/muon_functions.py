@@ -143,7 +143,7 @@ class Muon:
     charge = 1.60218e-19        # [C]
     
 
-    def __init__(self, zenith=0, azimuth=0, energy=SNOLAB_MU_E_AVG, initial=(0,0,0)) -> 'Muon':
+    def __init__(self, zenith=0, azimuth=0, energy=SNOLAB_MU_E_AVG, initial=(0,0,0), pos_neg = np.random.random() > 0.5) -> 'Muon':
         ''' A constructor for the muon. Defaults to vertical muon at average SNOLAB energy'''
 
         self.zenith = zenith
@@ -154,6 +154,12 @@ class Muon:
         self.path_length = 0
         self.impact_param = self.closest_approach((0,0,0))
         self.hits_cryostat = False
+        self.pos_neg = pos_neg
+
+        if pos_neg:
+            self.fluka_number = 10
+        else:
+            self.fluka_number = 11
 
 
     ### Instance Functions
@@ -208,15 +214,16 @@ class Muon:
         return (cos_x, cos_y, cos_z)
 
     def __str__(self):
-        '''returns a string of the particle'''
+        '''Returns a string of the particle fit for a phase space file for a FLUKA Source'''
 
         cos_x, cos_y, cos_z = self.direction_cosines()
 
         energy = self.energy
         initial = self.initial
         weight = 1
+        fnumber = self.fluka_number
 
-        return '{} {} {} {} {} {} {} {}'.format(energy, initial[0], initial[1], initial[2], cos_x, cos_y, -cos_z, weight)
+        return '{} {} {} {} {} {} {} {} {}'.format(fnumber, energy, initial[0], initial[1], initial[2], cos_x, cos_y, -cos_z, weight)
 
 
 
