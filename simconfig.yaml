@@ -6,7 +6,7 @@ Simulation:
   Muons: 5                    # Number of muons to run for simulation // rewrites the input file
   Intersecting : True         ### MUST BE SET TO TRUE FOR MUONS HITTING ROI
   MakeNewFile: True           # Generate a new batch of muons for the sim? False -> Use the previous batch
-  Repititions: 12              # How many times should we repeat this sim? (new muons if MakeNewFile == True)
+  Repititions: 12             # How many times should we repeat this sim? (new muons if MakeNewFile == True)
   ROI_Radius:  4              # How many meters larger than the OD radius?
   ROI_Height:  8              # How many meters larger than the OD height?
 

@@ -1,5 +1,6 @@
 #!/bin/bash
-
+for i in {0..$1}
+do
     #SBATCH --partition=shared
     #
     #SBATCH --job-name=fluka_simulation
@@ -16,4 +17,7 @@
 
     cd /gpfs/slac/staas/fs1/g/exo/exo_data8/exo_data/users/rross/flukaSims
 
-    singularity exec -B /gpfs fluka_nEXO.sif python runsim.py
+    singularity exec -B /gpfs fluka_nEXO.sif python run_module.py
+
+    sleep 4
+done
