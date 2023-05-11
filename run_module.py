@@ -261,7 +261,7 @@ def move_output_files(path):
         os.system('mv *lis* *tab* ' + last_dir)
         os.system('mv *.hdf5 ' + path)
         os.system('mv *fort.97 ' + path)
-        os.system('mv *.log *.err *.out *ran* *dump *fort* *.txt ' + last_dir)
+        os.system('mv *.log *.err *1.out *ran* *dump *fort* *.txt ' + last_dir)
     except: pass
 
     os.system('cp ' + fluka_files['input_file'] + ' ' + last_dir)
