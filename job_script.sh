@@ -1,5 +1,5 @@
 #!/bin/bash
-for i in {0..$1}
+for ((i=0; i<$1; i++))
 do
     #SBATCH --partition=shared
     #
