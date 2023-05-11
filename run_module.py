@@ -718,39 +718,34 @@ def runsim():
 
     link_and_compile(yaml_card['source_path'], fluka_files['mgdraw_file'], fluka_files['source_file'], progress_out='compiled'+time_stamp+'.txt')
 
-    ###     Step three: Looping from here on for however many repititions are demanded
 
-    for i in range(yaml_card['reps']):
-        ###     REmake timestamp
-        time_stamp = str(datetime.now())[11:19]
+    ###     Make the phase space file
+    muon_filename = 'src/muons_' + time_stamp + '.txt'
 
-        ###     Make the phase space file
-        muon_filename = 'src/muons_' + time_stamp + '.txt'
+    roi_radius = yaml_card['roi_radius']
+    roi_height = yaml_card['roi_height']
 
-        roi_radius = yaml_card['roi_radius']
-        roi_height = yaml_card['roi_height']
+    muon_list = make_phase_space_file(yaml_card['num_muons'], filename = muon_filename,\
+                                        roi_radius = roi_radius, roi_height = roi_height, intersecting=yaml_card['intersecting'])
 
-        muon_list = make_phase_space_file(yaml_card['num_muons'], filename = muon_filename,\
-                                           roi_radius = roi_radius, roi_height = roi_height, intersecting=yaml_card['intersecting'])
+    ###     Change the simulation seed
 
-        ###     Change the simulation seed
+    seed = change_seed(fluka_files['input_file'])
 
-        seed = change_seed(fluka_files['input_file'])
+    ###     Run the simulation
 
-        ###     Run the simulation
+    run_fluka()
 
-        run_fluka()
+    ###     Deal with the output
+    
+    h5_filename = yaml_card['neutron_file'] + time_stamp + '.hdf5'
 
-        ###     Deal with the output
-        
-        h5_filename = yaml_card['neutron_file'] + time_stamp + '.hdf5'
+    if store_data_in_h5(h5_filename, seed, muon_list):
+        print('A neutron file was created')
+    else:
+        print('No neutron file was created')
 
-        if store_data_in_h5(h5_filename, seed, muon_list):
-            print('A neutron file was created')
-        else:
-            print('No neutron file was created')
-
-        move_output_files(yaml_card['output_dir'])
+    move_output_files(yaml_card['output_dir'])
 
 
 
