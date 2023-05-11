@@ -263,6 +263,72 @@ particle_colors_capitalized = {
     308:    'Honeydew',     #Low energy neutron kerma
 }
 
+hdf5_structure = {
+    ###---->  Meta data about the respective simulation
+    'meta' : {   
+        'seed':     {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'year':     {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'month':    {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'day':      {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'hour':     {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'minute':   {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'second':   {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        },
+
+    ###----> Data points for each neutron counted in the TPC
+    'tpc_data' : {   
+        'muon_energy':          {'shape' :   (0,),   'dtype' : float,    'maxshape': (None,)},
+        'muon_impact':          {'shape' :   (0,),   'dtype' : float,    'maxshape': (None,)},
+        'muon_initial':         {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},
+        'muon_direction':       {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},
+        'muon_pn':              {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+
+        'neutron_icode':        {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'neutron_generation':   {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'neutron_region':       {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'neutron_energy':       {'shape' :   (0,),   'dtype' : float,    'maxshape': (None,)},
+        'neutron_xyz':          {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},
+        'neutron_direction':    {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},
+        'neutron_parent':       {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'neutron_birth_icode':  {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        },
+
+    ###----> Total data points for after each run tabulated in the TPC
+    'tpc_totals' : {   
+        'neutrons_counted':     {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'muons_simulated':      {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'muon_parents':         {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        },
+
+    ###----> Data points for each neutron counted in the OD or somewhere within
+    'od_data' : {   
+        'muon_energy':          {'shape' :   (0,),   'dtype' : float,    'maxshape': (None,)},
+        'muon_impact':          {'shape' :   (0,),   'dtype' : float,    'maxshape': (None,)},
+        'muon_initial':         {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},
+        'muon_direction':       {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},
+        'muon_pn':              {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+
+        'neutron_icode':        {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'neutron_generation':   {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'neutron_region':       {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'neutron_energy':       {'shape' :   (0,),   'dtype' : float,    'maxshape': (None,)},
+        'neutron_xyz':          {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},
+        'neutron_direction':    {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},
+        'neutron_parent':       {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'neutron_birth_icode':  {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        },
+    ###----> Total data points for the entire OD set of events
+    'od_totals' : {   
+        'neutrons_counted':     {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'muons_simulated':      {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        'muon_parents':         {'shape' :   (0,),   'dtype' : int,      'maxshape': (None,)},
+        },
+
+    'resnuclei': {
+        'resnuclei':        {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},
+        'resnuclei_cu':     {'shape' :   (0,3),  'dtype' : float,    'maxshape': (None,3)},}
+                     
+                    }
 
 #################################################
 #             Analyses of H5 Files              }
@@ -270,12 +336,32 @@ particle_colors_capitalized = {
 #################################################
 
 
-def plot_e_vs_e(h5_file):
+def get_hdf5_files(path, with_path = False)-> list:
+    ''' Given a particular path, this returns a list of hdf5 files found at that location
+    if with_path, the path to the file will be prepended '''
+
+    from os import listdir
+    from os.path import isfile, join
+
+    h5_files = [f for f in listdir(path) if (isfile(join(path, f)) and f[-5:] == '.hdf5')]
+
+    if with_path:
+        h5_files = [path + file for file in h5_files]
+
+        return h5_files
+    else:
+        return h5_files
+
+def plot_e_vs_e(h5_file, tpc = False):
     ''' A simple scatter plot of muon vs neutron energies'''
 
     h5_file = h5.File(h5_file)
 
-    data = h5_file['data']
+    if tpc:
+        data = h5_file['tpc_data']
+    else:
+        data = h5.file['od_data']
+
     meta = h5_file['meta']
 
     muon_energies = data['muon_energy']
@@ -290,10 +376,14 @@ def plot_e_vs_e(h5_file):
     #sum_string = str(parents) + ' unique parent muons\nproducing ' + str(len(neutron_energies)) +  ' neutrons'
     #plt.text(3000,10, sum_string)
 
-def plot_neutron_energy_histogram(h5_file, bins = 100):
+def plot_neutron_energy_histogram(h5_file, bins = 100, tpc = False):
     ''' A simple histogram of the neutron energies from the file'''
-    h5_file = h5.File(h5_file)
-    data = h5_file['data']
+
+    if tpc:
+        data = h5_file['tpc_data']
+    else:
+        data = h5_file['od_data']
+
     neutron_energies = data['neutron_energy']
     logbins = np.logspace(-1, 1, bins)
     plt.hist(neutron_energies, bins = logbins)
@@ -302,232 +392,186 @@ def plot_neutron_energy_histogram(h5_file, bins = 100):
     plt.xlabel('Energy [GeV]'); plt.ylabel('Count')
     plt.show()
 
-def plot_impact_hist(h5_file, bins = 20, label = ''):
+def get_total_muons(h5_file):
 
-    h5_file = h5.File(h5_file)
-    data = h5_file['data']
+    summary =  {'muons_simulated'           :       np.sum(h5_file['od_totals']['muons_simulated']),
+                'neutrons_counted_od'        :       np.sum(h5_file['od_totals']['neutrons_counted']),
+                'neutrons_counted_tpc'       :       np.sum(h5_file['tpc_totals']['neutrons_counted']),
+                'muon_parents_od'           :       np.sum(h5_file['od_totals']['muon_parents']),
+                'muon_parents_tpc'          :       np.sum(h5_file['tpc_totals']['muon_parents'])                          
+                }
+    
+    return summary
+
+def plot_impact_hist(h5_file_path, bins = 20, label = '', tpc = False):
+
+    h5_file = h5.File(h5_file_path)
+
+    if tpc:
+        data = h5_file['tpc_data']
+    else:
+        data = h5_file['od_data']
+
     plt.hist(np.unique(data['muon_impact']), bins=bins, histtype='step', label = label)
     plt.title('Muon Impact Parameters')
     plt.xlabel('Impact Parameter [cm]'); plt.ylabel('Count')
 
-def plot_coz_neutrons(h5_file, bins=50):
+def plot_both_impact_hist(h5_file, bins = 20, label = ''):
+
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (10,5))
+
+    tpc_data = h5_file['tpc_data']
+
+    od_data = h5_file['od_data']
+
+    totals = get_total_muons(h5_file)
+
+    ax1.hist(np.unique(od_data['muon_impact']), bins=bins, histtype='step', label = 'OD')
+    ax1.set_title('OD Muon Impact Parameters N = ' + str(totals['muon_parents_od']) + ' muons \n making ' + str(totals['neutrons_counted_od']) + ' neutrons')
+    ax1.set_xlabel('Impact Parameter [m]')
+
+    ax2.hist(np.unique(tpc_data['muon_impact']), bins=bins, histtype='step', label = 'TPC')
+    ax2.set_title('TPC Muon Impact Parameters N = ' + str(totals['muon_parents_tpc'])+ ' muons \n making ' + str(totals['neutrons_counted_tpc']) + ' neutrons')
+    ax2.set_xlabel('Impact Parameter [m]')
+    ax1.set_ylabel('Count'); ax2.set_ylabel('Count')
+
+def plot_both_energy_hist(h5_file, bins = 20, label = ''):
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (10,5))
+
+    tpc_data = np.array(h5_file['tpc_data']['neutron_energy']) 
+    tpc_data = tpc_data - np.ones(len(tpc_data))*jtrack_rest_energies[8]/1000
+
+    od_data = np.array(h5_file['od_data']['neutron_energy'])
+    od_data = od_data - np.ones(len(od_data))*jtrack_rest_energies[8]/1000
+
+    totals = get_total_muons(h5_file)
+
+    logbins = np.logspace(-9, 1, bins)
+
+    ax1.hist(np.unique(od_data), bins=logbins, histtype='step', label = 'OD')
+    ax1.set_yscale('log'); ax1.set_xscale('log')
+    ax1.set_title('OD Neutron Energies N = ' + str(totals['neutrons_counted_od']))
+    ax1.set_xlabel('Neutron Energy [GeV]')
+
+    ax2.hist(np.unique(tpc_data), bins=logbins, histtype='step', label = 'TPC')
+    ax2.set_title('TPC Muon Impact Parameters N = ' + str(totals['neutrons_counted_tpc']))
+    ax2.set_xlabel('Neutron Energy [GeV]')
+    ax2.set_yscale('log'); ax2.set_xscale('log')
+    ax1.set_ylabel('Count'); ax2.set_ylabel('Count')
+
+def plot_coz_neutrons(h5_file, bins=50, tpc = False):
     h5_file = h5.File(h5_file)
-    data = h5_file['data']
+    if tpc:
+        data = h5_file['tpc_data']
+    else:
+        data = h5.file['od_data']
     plt.hist(data['neutron_direction'][:,2], bins=bins)
     plt.title('Neutron Zenith Angles')
     plt.xlabel(r'$\cos \theta$'); plt.ylabel('Count')
 
-def initialize_h5_file(h5_filename):
-    '''Creates an h5 file with the correct datasets and group names and layouts for storing neutron data from a FLUKA run'''
+def initialize_h5_file(h5_filename) -> str:
+    '''Creates an empty hdf5 file with the structure equivalent to the above dictionary. Renames the file if it already exists.'''
 
-# If the file does not exist
-    if not os.path.isfile(h5_filename): # The file must be created.
-        file = h5.File(h5_filename,'a')
-
-        # Create groups for the data
-        tpc_data = file.create_group('tpc_data')
-        od_data = file.create_group('od_data')
-        tpc_totals = file.create_group('tpc_totals')
-        od_totals = file.create_group('od_totals')
-        # Create a group for the meta data (to dilineate different simulation data sets)
-        meta = file.create_group('meta')
-
-        # TPC Data
-
-        # So too must the datasets be created and instantiated with zero size.
-        tpc_data.create_dataset("muon_energy", (0,), dtype=float, maxshape=(None,))
-        tpc_data.create_dataset("muon_impact", (0,), dtype=float, maxshape=(None,))
-        tpc_data.create_dataset("muon_initial", (0,3), dtype=float, maxshape=(None,3))
-        tpc_data.create_dataset("muon_direction", (0,3), dtype=float, maxshape=(None,3))
-        tpc_data.create_dataset("muon_pn", (0,), dtype=int, maxshape=(None,))
-
-        # ICODE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
-        tpc_data.create_dataset("neutron_icode", (0,), dtype=int, maxshape=(None,))
-        tpc_data.create_dataset("neutron_region", (0,), dtype=int, maxshape=(None,))
-        tpc_data.create_dataset("neutron_generation", (0,), dtype=int, maxshape=(None,))
-        tpc_data.create_dataset("neutron_energy", (0,), dtype=float, maxshape=(None,))
-        tpc_data.create_dataset("neutron_xyz", (0,3), dtype=float, maxshape=(None,3))
-        tpc_data.create_dataset("neutron_direction", (0,3), dtype=float, maxshape=(None,3))
-        tpc_data.create_dataset("parent", (0,), dtype=int, maxshape=(None,))
-        tpc_data.create_dataset("birth_icode", (0,), dtype=int, maxshape=(None,))
-
-        # TPC Totals
-
-        tpc_totals.create_dataset("neutrons_counted",(0,), dtype=int, maxshape=(None,))
-        # number of muons simulated
-        tpc_totals.create_dataset("muons_simulated",(0,), dtype=int, maxshape=(None,))
-        # number of muons responsible for creating neutrons
-        tpc_totals.create_dataset("muon_parents",(0,), dtype=int, maxshape=(None,))
-        # a dataset for the resnuclei output
-        tpc_totals.create_dataset("resnuclei",(0,3), dtype=float, maxshape=(None,3))
-        # a dataset for the resnuclei output scoring the TPC copper
-        tpc_totals.create_dataset("resnuclei_cu",(0,3), dtype=float, maxshape=(None,3))
-
-
-        ## Meta data
-
-        # The integer seed used in the simulation
-        meta.create_dataset("seed",(0,), dtype=int, maxshape=(None,))
-        meta.create_dataset("year",(0,), dtype=int, maxshape=(None,))
-        meta.create_dataset("month",(0,), dtype=int, maxshape=(None,))
-        meta.create_dataset("day",(0,), dtype=int, maxshape=(None,))
-        meta.create_dataset("hour",(0,), dtype=int, maxshape=(None,))
-        meta.create_dataset("minute",(0,), dtype=int, maxshape=(None,))
-        meta.create_dataset("second",(0,), dtype=int, maxshape=(None,))
-
-        # OD Data
-
-        od_data.create_dataset("muon_energy", (0,), dtype=float, maxshape=(None,))
-        od_data.create_dataset("muon_impact", (0,), dtype=float, maxshape=(None,))
-        od_data.create_dataset("muon_initial", (0,3), dtype=float, maxshape=(None,3))
-        od_data.create_dataset("muon_direction", (0,3), dtype=float, maxshape=(None,3))
-        od_data.create_dataset("muon_pn", (0,), dtype=int, maxshape=(None,))
-
-        # ICODE, JTRACK, MREG, LTRACK, ETRACK, XSCO, YSCO, ZSCO, CXTRCK, CYTRCK, CZTRCK
-        od_data.create_dataset("neutron_icode", (0,), dtype=int, maxshape=(None,))
-        od_data.create_dataset("neutron_region", (0,), dtype=int, maxshape=(None,))
-        od_data.create_dataset("neutron_generation", (0,), dtype=int, maxshape=(None,))
-        od_data.create_dataset("neutron_energy", (0,), dtype=float, maxshape=(None,))
-        od_data.create_dataset("neutron_xyz", (0,3), dtype=float, maxshape=(None,3))
-        od_data.create_dataset("neutron_direction", (0,3), dtype=float, maxshape=(None,3))
-        od_data.create_dataset("parent", (0,), dtype=int, maxshape=(None,))
-        od_data.create_dataset("birth_icode", (0,), dtype=int, maxshape=(None,))
-
-        od_totals.create_dataset("neutrons_counted",(0,), dtype=int, maxshape=(None,))
-        # number of muons simulated
-        od_totals.create_dataset("muons_simulated",(0,), dtype=int, maxshape=(None,))
-        # number of muons responsible for creating neutrons
-        od_totals.create_dataset("muon_parents",(0,), dtype=int, maxshape=(None,))
-
-        file.close()
-    else:
-        # send the data to an hdf5 file with a different name, and merge them with the merge function
-        initialize_h5_file('retry_' + h5_filename)
-        ### NEED TO ADD THE MERGE HERE LATER
-
-def merge_hdf5_files(h5_output, *args):
-
-    '''A function to combine multiple h5 neutron files into a larger file (which may already exist).
-    Checks for no duplicates by ensuring seeds are different'''
-
-    # Load in the h5 files in read-only mode
-    file_list = [h5.File(arg, 'r') for arg in args]
-
-    # Must first confirm these files can be merged. Namely, we need to know that they are not identical.
-    meta_list = [file['meta'] for file in file_list]
-
-    # Checking seeds
-    seeds = [int(m['seed'][0]) for m in meta_list]
-
-    # Check if the output file already exists and append its attributes to the lists for uniqueness checks
-
-    if not os.path.isfile(h5_output): # The file must be created.
-        initialize_h5_file(h5_output)
-
-    else:
-        file = h5.File(h5_output, 'a')
-        for seed in file['meta']['seed']:
-            seeds.append(seed)
-    
-        file.close()
-
-    # Make sure the input files are unique simulations with the same region number
-    if len(np.unique(seeds)) < len(seeds):
-        print('INCOMPATIBLE SCORING REGIONS or SAME SEED!')
-        return None
-
-    
-    # We should be safe to add the attributes of all the other files to the output h5 file now.
-
-    # How much longer does 'data' have to be?
-    tpc_data_length = 0
-    od_data_length = 0
-    tpc_totals_length = 0
-    od_totals_length = 0
-
-    for file in file_list:
-        tpc_data_length = tpc_data_length + len(file['tpc_data']['neutron_energy'])
-        od_data_length = od_data_length + len(file['od_data']['neutron_energy'])
-        tpc_totals_length = tpc_totals_length + len(file['tpc_totals']['neutrons_counted'])
-        od_totals_length = od_totals_length + len(file['od_totals']['neutrons_counted'])
-
-    # How much longer does 'meta' have to be?
-    meta_length = 0
-    for meta in meta_list:
-        meta_length = meta_length + len(meta['seed'])
-
-    # Now we can re-open the output file and resize it as appropriate.
-
-    file = h5.File(h5_output,'a')
-
-    # grabbing the file by the data groups
-    tpc_data = file['tpc_data']
-    od_data = file['od_data']
-    tpc_totals = file['tpc_totals']
-    od_totals = file['od_totals']
-
-    meta = file['meta']
-
-    # Current length of the data in the file
-    current_od_data_size = len(od_data['neutron_energy'])
-    current_tpc_data_size = len(tpc_data['neutron_energy'])
-    current_od_tot_data_size = len(od_totals['neutrons_counted'])
-    current_tpc_tot_data_size = len(tpc_totals['neutrons_counted'])
-
-    current_meta_size = len(meta['year'])
-
-    # Resizing the datasets in the file by the number of elements we need to append therein.
-    for dset in tpc_data:
-        tpc_data[dset].resize(current_tpc_data_size + tpc_data_length, axis = 0)
-    for dset in od_data:
-        od_data[dset].resize(current_od_data_size + od_data_length, axis = 0)
-    for dset in od_totals:
-        od_totals[dset].resize(current_od_tot_data_size + od_totals_length, axis = 0)
-    for dset in tpc_totals:
-        tpc_totals[dset].resize(current_tpc_tot_data_size + tpc_totals_length, axis = 0)
-
-    for dset in meta:
-        meta[dset].resize(current_meta_size + meta_length, axis = 0)
-
-    meta_index = 0
-
-    for temp_file in file_list:
-        temp_tpc_data = temp_file['tpc_data']
-        temp_od_data = temp_file['od_data']
-        temp_tpc_totals = temp_file['tpc_totals']
-        temp_od_totals = temp_file['od_totals']
-        temp_meta = temp_file['meta']
-
-
-        for key in tpc_data.keys():
-            for i in range(len(temp_tpc_data['neutron_energy'])):
-                tpc_data[key][current_tpc_data_size + i] = temp_tpc_data[key][i]
-
-        for key in tpc_totals.keys():
-            for i in range(len(temp_tpc_totals['neutron_energy'])):
-                tpc_totals[key][current_tpc_tot_data_size + i] = temp_tpc_totals[key][i]
+    # Some bare bones error correction
+    if os.path.isfile(h5_filename):
+        h5_filename = os.path.splitext(h5_filename)[0] + '_new.hdf5'
         
-        for key in od_data.keys():
-            for i in range(len(temp_od_data['neutron_energy'])):
-                od_data[key][current_od_data_size + i] = temp_od_data[key][i]
-
-        for key in od_totals.keys():
-            for i in range(len(temp_od_totals['neutron_energy'])):
-                od_totals[key][current_od_tot_data_size + i] = temp_od_totals[key][i]
-
-        for key in meta.keys():
-            meta[key][current_meta_size + meta_index] = temp_meta[key][0]
-
-        meta_index += 1 # Goes up by one for every file
-        current_od_data_size += len(temp_od_data['neutron_energy'])
-        current_tpc_data_size += len(temp_tpc_data['neutron_energy'])
-        current_od_tot_data_size += len(temp_od_totals['neutrons_counted'])
-        current_tpc_tot_data_size += len(temp_tpc_totals['neutrons_counted'])
+        # If this doesn't work...
+        if os.path.isfile(h5_filename):
+            print('CANNOT INITIALIZE HDF5 FILE: DUPLICATES!!!')
+            return None
     
-    for temp_file in file_list:
-        temp_file.close()
+    file = h5.File(h5_filename, 'a')
+
+    for group_name in hdf5_structure:
+        group = file.create_group(group_name)
+        group_dict = hdf5_structure[group_name]
+        for dset in group_dict:
+            data_set = group_dict[dset]
+            group.create_dataset(dset, shape = data_set['shape'], dtype = data_set['dtype'], maxshape = data_set['maxshape'])
 
     file.close()
 
-    # Return the string name of the file
-    return h5_output
+    return h5_filename
+
+def different_seeds(file_paths) -> bool:
+    ### PROBLEM
+    seeds = []
+    for path in file_paths:
+        with h5.File(path, 'r') as file:
+            for seed in file['meta']['seed']:
+                seeds.append(seed)
+
+    if len(np.unique(seeds)) == len(seeds):
+        return True
+    # The seeds are different
+
+    else:
+        return False
+
+def merge_hdf5_files(file_paths, output_path):
+
+    import h5py as h5
+
+    # A quick safety check to make sure the seeds for each simulation are different
+    # if not different_seeds(file_paths):
+    #     return
+
+    output_path = initialize_h5_file(output_path)
+
+    # Open the output file in write mode
+    with h5.File(output_path, 'a') as output:
+
+        # Cycle through each of the given files
+        for path in file_paths:
+            file = h5.File(path, 'r')
+
+            # Cycle through the groups of the file
+            for groupname, group in file.items():
+                
+                output_group = output[groupname]
+
+                # Cycle through the datasets in the file
+                for dsetname, dset in group.items():
+                    output_dset = output_group[dsetname]
+
+                    current_size = output_dset.shape[0]
+
+                    new_data = np.array(dset)
+
+                    output_dset.resize(size = current_size + dset.shape[0], axis = 0)
+
+                    output_dset[current_size:] = new_data
+
+###
+ # Not necessarily functional for this module yet _ salvaged from another notebook
+ # Must be converted from tsv neutron file (fort.70) to pulling from hdf5
+###
+
+def event_pi_plot(neutron_list, title = '', creation = False):
+    if creation: index = 11
+    else: index = 0
+    icode_list = [int(neutron[index]) for neutron in neutron_list]
+    unique, counts = np.unique(icode_list, return_counts=True)
+    labels = [icode_dictionary[icode] for icode in unique]
+
+    fig, ax = plt.subplots()
+    plt.title(title + ' N = ' + str(len(icode_list)))
+    ax.pie(counts, labels=labels)
+
+def plot_energy_spectrum(neutrons, title = '', bins = 0, logscale=True):
+    if bins == 0:
+        nbins = int(len(neutrons)/20)
+    else:
+        nbins = bins
+
+    energies = [entry[4] - jtrack_rest_energies[8]/1000 for entry in neutrons]
+    bins = np.linspace(np.min(energies),np.max(energies), nbins)
+    logbins = np.logspace(np.log10(bins[0]),np.log10(bins[-1]),nbins)
+    plt.hist(energies, log=logscale, histtype='step', bins = logbins)
+    plt.title(title)
+    plt.ylabel('Count'); plt.xlabel('Energy [GeV]')
+    plt.xscale('log')
+    plt.show()
