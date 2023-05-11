@@ -51,6 +51,9 @@ with open('simconfig.yaml') as yaml_file:
         'intersecting' : Simulation.get('Intersecting'),
         'make_new' : Simulation.get('MakeNewFile'),
         'reps' : Simulation.get('Repititions'),
+        'roi_radius' : Simulation.get('ROI_Radius'),
+        'roi_height' : Simulation.get('ROI_Height'),
+
 
         # Input Parameters
         'input_file' : input_path + Input.get('InputFile'),
@@ -192,17 +195,19 @@ def make_phase_space_file(num_muons, roi_radius = 0, roi_height = 0, filename = 
     from random import random
 
     file_stream = open(filename, 'w')
+
+    if roi_radius <= 0:
+            roi_radius = mf.OD_RADIUS
+            roi_height = mf.OD_HEIGHT
+    else:
+        roi_radius = roi_radius + mf.OD_RADIUS
+        roi_height = roi_height + mf.OD_HEIGHT
+
+    roi = mf.OuterDetector(roi_radius, roi_height)
     
     if intersecting:
-        if roi_radius == 0:
-            roi_radius = mf.OD_RADIUS + 2
-            roi_height = mf.OD_HEIGHT + 4
-
-        roi = mf.OuterDetector(roi_radius, roi_height)
-
         muarray = mf.intersecting_muons(num_muons, roi)
     else:
-        roi = mf.OuterDetector(mf.OD_RADIUS, mf.OD_HEIGHT)
         muarray = mf.non_intersecting_muons(num_muons, roi)
 
 
@@ -721,7 +726,12 @@ def runsim():
 
         ###     Make the phase space file
         muon_filename = 'src/muons_' + time_stamp + '.txt'
-        muon_list = make_phase_space_file(yaml_card['num_muons'], filename = muon_filename)
+
+        roi_radius = yaml_card['roi_radius']
+        roi_height = yaml_card['roi_height']
+
+        muon_list = make_phase_space_file(yaml_card['num_muons'], filename = muon_filename,\
+                                           roi_radius = roi_radius, roi_height = roi_height, intersecting=yaml_card['intersecting'])
 
         ###     Change the simulation seed
 
