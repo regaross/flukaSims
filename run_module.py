@@ -37,7 +37,7 @@ import argparse
 ### From SLURM environment variables
 slurm_job_id = int(os.environ["SLURM_ARRAY_JOB_ID"])
 slurm_task_id = int(os.environ["SLURM_ARRAY_TASK_ID"])
-slurm_prefix = 'slurm-' + str(os.environ["SLURM_ARRAY_JOB_ID"]) + '-' + str(os.environ["SLURM_ARRAY_TASK_ID"])
+slurm_prefix = 'simrun-' + str(os.environ["SLURM_ARRAY_JOB_ID"]) + '-' + str(os.environ["SLURM_ARRAY_TASK_ID"])
 
 
 parser = argparse.ArgumentParser()
@@ -448,6 +448,8 @@ def retrieve_muons(muon_array, ncase_list) -> dict:
     total = len(muon_array)
     for mu in ncase_list:
 
+        mu = mu - 1 # ncase doesn't correspond exactly to the index
+        
         pos_neg.append(int(muon_array[mu].pos_neg)) # Whether the muon is positive or negative
         muenergy.append(float(muon_array[mu].energy)) # Muon Energy
         initx.append(float(muon_array[mu].initial[0]))
