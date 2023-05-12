@@ -13,8 +13,8 @@
 
 #SBATCH --partition=shared
 #SBATCH --job-name=fluka_sims               # a short name for your job
-#SBATCH --output=slurm-%A.%a.out            # stdout file
-#SBATCH --error=slurm-%A.%a.err             # stderr file
+#SBATCH --output=simrun-%A-%a.out            # stdout file
+#SBATCH --error=simrun-%A-%a.err             # stderr file
 #SBATCH --nodes=1                           # node count
 #SBATCH --ntasks=4                          # total number of tasks across all nodes
 #SBATCH --cpus-per-task=1                   # cpu-cores per task (>1 if multi-threaded tasks)
@@ -29,24 +29,23 @@
 #                  Variables
 #################################################
 
-fluka_bin='/usr/local/fluka/bin/'
 rand=$RANDOM
-fff="$fluka_bin"fff
-link="$fluka_bin""ldpmqmd -m fluka -o "
 path_to_sim='/gpfs/slac/staas/fs1/g/exo/exo_data8/exo_data/users/rross/flukaSims/'
 image="$path_to_sim"fluka_nEXO.sif
-mgdraw='mgdraw_neutron_count'
-source='muon_from_file'
-exe="nEXO_OD.exe"
-output=$rand"_summary.txt"
+job_num=$SLURM_ARRAY_JOB_ID         # An integer number representing this array job submission
+task_num=$SLURM_ARRAY_TASK_ID       # An integer within the array range above representing which part of the parallelized run
 
 #################################################
-#             Building Summary File
+#         Printing meta data to stdout
 ################################################
-date >> $output
 
+date
 
+echo "Executing on the machine:" $(hostname) 
 
-echo "Executing on the machine:" $(hostname) >> $output
+echo "System random number used to seed the sim:" $rand
 
-singularity exec -B /gpfs $path_to_sim/fluka_nEXO.sif python $path_to_sim/run_module.py -s $rand >> $output
+echo "Running Simulation!"
+
+singularity exec -B /gpfs $image python $path_to_sim/slurm_vars.py
+#singularity exec -B /gpfs $image python $path_to_sim/run_module.py -s $rand
