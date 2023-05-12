@@ -34,6 +34,10 @@ import argparse
 #                                               }
 #################################################
 
+slurm_job_id = int(os.environ["SLURM_ARRAY_JOB_ID"])
+slurm_task_id = int(os.environ["SLURM_ARRAY_TASK_ID"])
+slurm_prefix = 'slurm-' + str(os.environ["SLURM_ARRAY_JOB_ID"]) + '.' + str(os.environ["SLURM_ARRAY_TASK_ID"])
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--seed', type=int, dest='first_seed')
@@ -312,7 +316,6 @@ def change_seed(input_file = fluka_files['input_file']):
 
 def link_and_compile(path_to_fluka, mgdraw_file = fluka_files['mgdraw_file'], 
                      source_routine = fluka_files['source_file'], 
-                     progress_out = 'compile_summary.txt',
                      executable = 'nEXOsim.exe'):
     '''Links and compiles the fluka routines for the fluka executable'''
 
@@ -321,13 +324,13 @@ def link_and_compile(path_to_fluka, mgdraw_file = fluka_files['mgdraw_file'],
     
     compile_string = path_to_fluka + 'fff'
 
-    os.system(compile_string + ' ' + mgdraw_file + ' >> '+ progress_out)
-    os.system(compile_string + ' ' + source_routine + ' >> ' + progress_out)
+    os.system(compile_string + ' ' + mgdraw_file )
+    os.system(compile_string + ' ' + source_routine )
 
     link_string = path_to_fluka + 'ldpmqmd -m fluka -o ' + executable + ' '
     mgd_compd = mgdraw_file[:-1] + 'o'
     source_compd = source_routine[:-1] + 'o'
-    os.system(link_string + mgd_compd + ' ' + source_compd + '>> ' + progress_out)
+    os.system(link_string + mgd_compd + ' ' + source_compd )
 
 def change_number_of_muons(num_muons, input_filename = fluka_files['input_file']):
     '''Changes the number of muons in the input file for a given simulation'''

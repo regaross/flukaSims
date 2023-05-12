@@ -45,27 +45,6 @@ date >> $output
 ##SBATCH --mail-user=rross@slac.stanford.edu
 
 
-#################################################
-#         Compile & Link FLUKA Routines
-#################################################
-
-echo "My SLURM_ARRAY_JOB_ID is $SLURM_ARRAY_JOB_ID ." >> $output
-echo "My SLURM_ARRAY_TASK_ID is $SLURM_ARRAY_TASK_ID" >> $output
 echo "Executing on the machine:" $(hostname) >> $output
 
-slurm_prefix="slurm-"$SLURM_ARRAY_JOB_ID"."$SLURM_ARRAY_TASK_ID
-slurm_err=$slurm_prefix".err"
-slurm_out=$slurm_prefix".out"
-
-
-
-singularity exec -B /gpfs $path_to_sim/fluka_nEXO.sif python $path_to_sim/run_module.py -s $rand
-
-#################################################
-#             Moving SLURM files
-#################################################
-
-echo "STDOUT:" >> $output; echo '' >> $output
-cat $slurm_out >> $output; echo '' >> $output
-echo "STDERR:" >> $output; echo '' >> $output
-cat $slurm_err >> $output; echo '' >> $output
+singularity exec -B /gpfs $path_to_sim/fluka_nEXO.sif python $path_to_sim/run_module.py -s $rand >> $output
