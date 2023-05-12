@@ -273,6 +273,7 @@ def move_output_files(path, stamp):
     try:
         os.system('mkdir ' + last_dir)
         os.system('mv *' + stamp + '* ' + last_dir)
+        os.system('mv *' + str(slurm_prefix) + '* ' + last_dir)
     except: pass
 
     os.system('cp ' + fluka_files['input_file'] + ' ' + last_dir)
