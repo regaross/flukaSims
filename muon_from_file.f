@@ -525,7 +525,6 @@
       ! 8.4. Subroutine call
       ! --------------------
 
-      ! call read_phase_space_file('vertical_muons.txt', 'GeV', 'm', phase_space_entry, .true. , nomore )
       call read_phase_space_file('src/muon_file.txt', 'GeV', 'm', phase_space_entry, .true. , nomore )
 
 

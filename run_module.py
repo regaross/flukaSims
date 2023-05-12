@@ -34,13 +34,18 @@ import argparse
 #                                               }
 #################################################
 
-### Seed for random number generation from random number on system
+### Parse arguments including a seed from the current system (to set the simulation seed) and the SLURM file names for the job
 
 parser = argparse.ArgumentParser()
-parser.add_argument(dest='first_seed', type=int)
+parser.add_argument('-s', '--seed', type=int, dest='first_seed')
+parser.add_argument('-j', '--jobid', type=str, action='store', dest='job_id')
+parser.add_argument('-t', '--taskid', type=str, action='store', dest='task_id')
 args = parser.parse_args()
 
+### Seed for random number generation from random number on system
+
 np.random.seed(args.first_seed)
+stamp = args.first_seed
 
 ## Loading in the parameters from the simconfig.yaml file
 
@@ -55,22 +60,22 @@ with open('simconfig.yaml') as yaml_file:
 
     yaml_card = {
         # Simulation Parameters
-        'num_muons' : Simulation.get('Muons'),
-        'intersecting' : Simulation.get('Intersecting'),
-        'make_new' : Simulation.get('MakeNewFile'),
-        'roi_radius' : Simulation.get('ROI_Radius'),
-        'roi_height' : Simulation.get('ROI_Height'),
+        'num_muons'     : Simulation.get('Muons'),
+        'intersecting'  : Simulation.get('Intersecting'),
+        'make_new'      : Simulation.get('MakeNewFile'),
+        'roi_radius'    : Simulation.get('ROI_Radius'),
+        'roi_height'    : Simulation.get('ROI_Height'),
 
 
         # Input Parameters
-        'input_file' : input_path + Input.get('InputFile'),
-        'source_routine' : input_path + Input.get('SourceFile'),
-        'mgdraw_file' : input_path + Input.get('MGDrawFile'),
+        'input_file'        : input_path + Input.get('InputFile'),
+        'source_routine'    : input_path + Input.get('SourceFile'),
+        'mgdraw_file'       : input_path + Input.get('MGDrawFile'),
 
         # Output Parameters
-        'output_dir' : Output.get('OutputDir'),
-        'neutron_file' : Output.get('NeutronFile'),
-        'progress_out' : Output.get('ProgressOut'),
+        'output_dir'    : Output.get('OutputDir'),
+        'neutron_file'  : Output.get('NeutronFile'),
+        'progress_out'  : Output.get('ProgressOut'),
 
         # Source Parameters
         'source_path' : input_yaml.get('Source').get('FlukaPath'),
@@ -84,7 +89,7 @@ fluka_files = {
     'muon_file'             :   'src/muon_file.txt',
     'mgdraw_file'           :   'mgdraw_neutron_count.f',
     'source_file'           :   'muon_from_file.f',  
-    'input_file'            :   yaml_card['input_file'],
+    'input_file'            :   yaml_card['input_file']
 }
 
 hdf5_structure = {
@@ -250,15 +255,14 @@ def initialize_h5_file(h5_filename):
 
     return h5_filename
     
-def move_output_files(path):
+def move_output_files(path, stamp):
     '''Moves simulation output files to a specified path'''
 
     try:
         os.system('mkdir ' + path)
     except: pass
 
-    time_stamp = str(datetime.now())[11:19]
-    sub_dir = yaml_card['neutron_file'] + time_stamp
+    sub_dir = yaml_card['neutron_file'] + stamp
     last_dir = path + sub_dir + '/'
     os.system('mkdir ' + last_dir)
  
@@ -268,7 +272,8 @@ def move_output_files(path):
         os.system('mv *lis* *tab* ' + last_dir)
         os.system('mv *.hdf5 ' + path)
         os.system('mv *fort.97 ' + path)
-        os.system('mv *.log *.err *1.out *ran* *dump *fort* *.txt ' + last_dir)
+        os.system('mv *.log *.err *.out *ran* *dump *fort* *.txt ' + last_dir)
+        os.system('mv *' + stamp + '* ' + last_dir)
     except: pass
 
     os.system('cp ' + fluka_files['input_file'] + ' ' + last_dir)
@@ -288,6 +293,13 @@ def move_fluka_files(path, subdir):
         os.system('mv ' + ext + ' ' + path)
         if not ext == '*.hdf5' or not ext == '*.h5':
             os.system('mv ' + ext + ' ' + path + subdir)
+
+def change_muon_filepath(source_file, new_path):
+    '''Changes the path to the muon_file in the provided fluka source file'''
+
+    replace_string = 'call read_phase_space_file(\''+  new_path + '\', \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
+
+    os.system('sed -i \'s/call read_phase_space_file.*/' + replace_string + '/g\'')
 
 def change_seed(input_file = fluka_files['input_file']):
     '''Changes the seed to the simulation in a given input file'''
@@ -576,7 +588,7 @@ def store_data_in_h5(output_filename, seed, muon_list) -> bool:
 def run_fluka():
     ''' Executes the command to run the simulation given everything else has been done'''
 
-    run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./nEXOsim.exe ' + fluka_files['input_file'] 
+    run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./nEXO_OD.exe ' + fluka_files['input_file'] 
     os.system(run_string)
 
 def merge_hdf5_files(h5_output, *args):
@@ -715,25 +727,27 @@ def merge_hdf5_files(h5_output, *args):
 def runsim():
     ''' The function for running the simulation from beginning to end'''
     ###     STEP ZERO: Make unique timecode for simulation (for muon file, and everything)
-    time_stamp = str(datetime.now())[11:19]
+    stamp = str(datetime.now())[11:19]
     
     ###     Step one: Make changes to the input file— Number of Muons
 
     change_number_of_muons(yaml_card['num_muons'], fluka_files['input_file'])
 
-    ###     Step two: Compile and link the fluka files:
-
-    link_and_compile(yaml_card['source_path'], fluka_files['mgdraw_file'], fluka_files['source_file'], progress_out='compiled'+time_stamp+'.txt')
-
 
     ###     Make the phase space file
-    muon_filename = 'src/muons_' + time_stamp + '.txt'
-
-    roi_radius = yaml_card['roi_radius']
-    roi_height = yaml_card['roi_height']
+    muon_filename = 'src/muons_' + stamp + '.txt'
 
     muon_list = make_phase_space_file(yaml_card['num_muons'], filename = muon_filename,\
-                                        roi_radius = roi_radius, roi_height = roi_height, intersecting=yaml_card['intersecting'])
+                                        roi_radius = yaml_card['roi_radius'], roi_height = yaml_card['roi_height'],\
+                                              intersecting=yaml_card['intersecting'])
+    
+    ###     Link to phase space file in FLUKA source file
+
+    change_muon_filepath('muon_from_file.f', muon_filename)
+
+    ### Compile and link to make an executable
+
+    link_and_compile(yaml_card['source_path'])
 
     ###     Change the simulation seed
 
@@ -745,14 +759,14 @@ def runsim():
 
     ###     Deal with the output
     
-    h5_filename = yaml_card['neutron_file'] + time_stamp + '.hdf5'
+    h5_filename = yaml_card['neutron_file'] + stamp + '.hdf5'
 
     if store_data_in_h5(h5_filename, seed, muon_list):
         print('A neutron file was created')
     else:
         print('No neutron file was created')
 
-    move_output_files(yaml_card['output_dir'])
+    move_output_files(yaml_card['output_dir'], stamp)
 
 
 
