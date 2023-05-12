@@ -32,11 +32,11 @@ singularity exec -B /gpfs $image $fff "$source"".f"
 singularity exec -B /gpfs $image $link $exe "$mgdraw"".o" "$source"".o"
 
 
-
 #################################################
 #                   SLURM
 #################################################
 
+#SBATCH --partition=shared
 #SBATCH --job-name=fluka_sims               # a short name for your job
 #SBATCH --output=slurm-%A.%a.out            # stdout file
 #SBATCH --error=slurm-%A.%a.err             # stderr file
