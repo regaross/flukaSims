@@ -198,7 +198,7 @@ def read_resnuclei_file(resnuclei_file):
 
     return np.array(arr_list)
 
-def make_phase_space_file(num_muons, filename, roi_radius = 0, roi_height = 0, intersecting = True):
+def make_phase_space_file(num_muons, stamp, roi_radius = 0, roi_height = 0, intersecting = True):
     '''A function to make a phase space file for a number of muons. 
         This file is used by the larger simulation as the source for each particle.
         NOTE: if the filename is changed, it must also be changed in the .inp file for the sim.
@@ -207,6 +207,7 @@ def make_phase_space_file(num_muons, filename, roi_radius = 0, roi_height = 0, i
 
     from random import random
 
+    filename = 'muons' + str(stamp) + '.txt'
     file_stream = open(filename, 'w')
 
     if roi_radius <= 0:
@@ -257,7 +258,9 @@ def initialize_h5_file(h5_filename):
     return h5_filename
 
 def copy_input_files(stamp):
-    os.system('cp nEXO_OD.inp nEXO_OD' + stamp + '.inp')
+    os.system('cp nEXO_OD.inp input' + stamp + '.inp')
+    os.system('cp mgdraw_neutron_count.f mgdrw' + stamp + '.f')
+    os.system('cp muon_from_file.f musource' + stamp + '.inp')
 
 def move_output_files(path, stamp):
     '''Moves simulation output files to a specified path'''
@@ -294,10 +297,10 @@ def move_fluka_files(path, subdir):
         if not ext == '*.hdf5' or not ext == '*.h5':
             os.system('mv ' + ext + ' ' + path + subdir)
 
-def change_muon_filepath(source_file, new_path):
+def change_muon_filepath(stamp):
     '''Changes the path to the muon_file in the provided fluka source file'''
 
-    replace_string = 'call read_phase_space_file(\''+  new_path + '\', \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
+    replace_string = 'call read_phase_space_file(\''+ 'muons' + str(stamp) + '.txt'  + '\', \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
 
     os.system('sed  \'s/call read_phase_space_file.*/' + replace_string + '/g\'' + 'muon_from_file.f > ' + source_file )
 
@@ -313,9 +316,7 @@ def change_seed(input_file = fluka_files['input_file']):
 
     return seed
 
-def link_and_compile(path_to_fluka, mgdraw_file = fluka_files['mgdraw_file'], 
-                     source_routine = fluka_files['source_file'], 
-                     executable = 'nEXOsim.exe'):
+def link_and_compile(path_to_fluka, stamp):
     '''Links and compiles the fluka routines for the fluka executable'''
 
     if not path_to_fluka[-1] == '/':
@@ -323,12 +324,12 @@ def link_and_compile(path_to_fluka, mgdraw_file = fluka_files['mgdraw_file'],
     
     compile_string = path_to_fluka + 'fff'
 
-    os.system(compile_string + ' ' + mgdraw_file )
-    os.system(compile_string + ' ' + source_routine )
+    os.system(compile_string + ' mgdrw' + stamp + '.f' )
+    os.system(compile_string + ' musource' + stamp + '.f'  )
 
-    link_string = path_to_fluka + 'ldpmqmd -m fluka -o ' + executable + ' '
-    mgd_compd = mgdraw_file[:-1] + 'o'
-    source_compd = source_routine[:-1] + 'o'
+    link_string = path_to_fluka + 'ldpmqmd -m fluka -o exe'  + stamp + '.exe '
+    mgd_compd = 'mgdrw' + stamp + '.o'
+    source_compd = 'musource' + stamp + 'o'
     os.system(link_string + mgd_compd + ' ' + source_compd )
 
 def change_number_of_muons(num_muons, input_filename = fluka_files['input_file']):
@@ -734,19 +735,17 @@ def runsim(stamp):
     copy_input_files(stamp)
 
     ###     Make the phase space file
-    muon_filename = 'src/muons_' + stamp + '.txt'
 
-    muon_list = make_phase_space_file(yaml_card['num_muons'], filename = muon_filename,\
+    muon_list = make_phase_space_file(yaml_card['num_muons'], stamp= stamp,
                                         roi_radius = yaml_card['roi_radius'], roi_height = yaml_card['roi_height'],\
                                               intersecting=yaml_card['intersecting'])
     
     ###     Link to phase space file in FLUKA source file
-    source_filename = 'muon_source' + stamp + '.f'
-    change_muon_filepath(source_filename, muon_filename)
+    change_muon_filepath(stamp)
 
     ### Compile and link to make an executable
-    exe_name = 'nEXO_OD' + stamp + '.exe'
-    link_and_compile(yaml_card['source_path'], exe_name)
+    exe_name = 'exe' + stamp + '.exe'
+    link_and_compile(yaml_card['source_path'], stamp)
 
     ###     Change the simulation seed
 
