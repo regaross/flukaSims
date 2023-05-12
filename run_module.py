@@ -307,7 +307,7 @@ def change_muon_filepath():
     replace_string = '      call read_phase_space_file(\"'+ fluka_files['muon_file']  + '\", \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
     lines[527] = replace_string
 
-    with open(fluka_files['source_file'], 'r') as source:
+    with open(fluka_files['source_file'], 'w') as source:
         source.writelines(lines)
 
 def change_seed(input_file = fluka_files['input_file']):
