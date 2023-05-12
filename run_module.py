@@ -722,7 +722,7 @@ def merge_hdf5_files(h5_output, *args):
     # Return the string name of the file
     return h5_output
 
-def runsim():
+def runsim(stamp):
     ''' The function for running the simulation from beginning to end'''
 
     ###     Step one: Make changes to the input file— Number of Muons
@@ -768,7 +768,7 @@ def runsim():
     move_output_files(yaml_card['output_dir']+str(slurm_job_id), stamp)
 
 
-runsim()
+runsim(stamp)
 
 
 
