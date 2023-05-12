@@ -49,7 +49,7 @@ date >> $output
 #         Compile & Link FLUKA Routines
 #################################################
 
-echo "My SLURM_ARRAY_JOB_ID is $SLURM_ARRAY_JOB_ID." >> $output
+echo "My SLURM_ARRAY_JOB_ID is $SLURM_ARRAY_JOB_ID ." >> $output
 echo "My SLURM_ARRAY_TASK_ID is $SLURM_ARRAY_TASK_ID" >> $output
 echo "Executing on the machine:" $(hostname) >> $output
 
@@ -59,7 +59,7 @@ slurm_out=$slurm_prefix".out"
 
 
 
-singularity exec -B /gpfs $path_to_sim/fluka_nEXO.sif python $path_to_sim/run_module.py -s $rand -j $SLURM_ARRAY_JOB_ID -t $SLURM_ARRAY_TASK_ID
+singularity exec -B /gpfs $path_to_sim/fluka_nEXO.sif python $path_to_sim/run_module.py -s $rand
 
 #################################################
 #             Moving SLURM files

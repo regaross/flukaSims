@@ -34,12 +34,9 @@ import argparse
 #                                               }
 #################################################
 
-### Parse arguments including a seed from the current system (to set the simulation seed) and the SLURM file names for the job
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--seed', type=int, dest='first_seed')
-parser.add_argument('-j', '--jobid', type=str, action='store', dest='job_id')
-parser.add_argument('-t', '--taskid', type=str, action='store', dest='task_id')
 args = parser.parse_args()
 
 ### Seed for random number generation from random number on system
