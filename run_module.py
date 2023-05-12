@@ -272,11 +272,6 @@ def move_output_files(path, stamp):
  
     try:
         os.system('mkdir ' + last_dir)
-        os.system('mv *fort* ' + last_dir)
-        os.system('mv *lis* *tab* ' + last_dir)
-        os.system('mv *.hdf5 ' + path)
-        os.system('mv *fort.97 ' + path)
-        os.system('mv *.log *.err *.out *ran* *dump *fort* *.txt ' + last_dir)
         os.system('mv *' + stamp + '* ' + last_dir)
     except: pass
 
@@ -734,6 +729,8 @@ def runsim():
     change_number_of_muons(yaml_card['num_muons'], fluka_files['input_file'])
 
     stamp = str(stamp)
+
+    copy_input_files(stamp)
 
     ###     Make the phase space file
     muon_filename = 'src/muons_' + stamp + '.txt'
