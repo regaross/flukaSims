@@ -26,12 +26,16 @@ import h5py as h5
 from datetime import datetime
 from src import muon_functions as mf
 import yaml
+import time
 
 #################################################
 #           CONSTANTS AND DICTIONARIES          }
 #                                               }
 #################################################
 
+### Seed for random number generation from system time
+SEED = int(time.time())
+np.random.seed(SEED)
 
 
 ## Loading in the parameters from the simconfig.yaml file
