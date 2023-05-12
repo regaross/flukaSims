@@ -263,24 +263,29 @@ def copy_input_files(stamp):
     os.system('cp mgdraw_neutron_count.f mgdrw' + stamp + '.f')
     os.system('cp muon_from_file.f musource' + stamp + '.f')
 
-def move_output_files(path, stamp):
+def move_output_files(stamp):
     '''Moves simulation output files to a specified path'''
+    first = 'run' + slurm_job_id + '/'
+    second = first + 'subrun' + slurm_task_id + '/'
 
-    try:
-        os.system('mkdir ' + path)
-    except: pass
+    os.system('mv *' + stamp + '* ' + second) 
+    os.system('mv ' + slurm_prefix + '.hdf5 ' + first)
 
-    sub_dir = yaml_card['neutron_file'] + stamp
-    last_dir = path + sub_dir + '/'
-    os.system('mkdir ' + last_dir)
+    # try:
+    #     os.system('mkdir subrun' + slurm_task_id)
+    # except: pass
+
+    # sub_dir = 'run' + stamp
+    # last_dir = path + sub_dir + '/'
+    # os.system('mkdir ' + last_dir)
  
-    try:
-        os.system('mkdir ' + last_dir)
-        os.system('mv *' + stamp + '* ' + last_dir)
-        os.system('mv *' + str(slurm_prefix) + '* ' + last_dir)
-    except: pass
+    # try:
+    #     os.system('mkdir ' + last_dir)
+    #     os.system('mv *' + stamp + '* ' + last_dir)
+    #     os.system('mv *' + str(slurm_prefix) + '* ' + last_dir)
+    # except: pass
 
-    os.system('cp ' + fluka_files['input_file'] + ' ' + last_dir)
+    # os.system('cp ' + fluka_files['input_file'] + ' ' + last_dir)
 
 def remove_leftovers():
     file_list = ['*mod*', '*.o', '*.exe']
@@ -756,17 +761,16 @@ def runsim(stamp):
 
     ###     Deal with the output
     
-    h5_filename = yaml_card['neutron_file'] + stamp + '.hdf5'
+    h5_filename = slurm_prefix + '.hdf5'
 
     if store_data_in_h5(h5_filename, seed, muon_list):
         print('A neutron file was created')
     else:
         print('No neutron file was created')
 
-    move_output_files(yaml_card['output_dir']+str(slurm_job_id), stamp)
-    
-    remove_leftovers()
+    move_output_files(stamp)
 
+    remove_leftovers()
 
 runsim(stamp)
 
