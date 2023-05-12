@@ -335,7 +335,7 @@ def link_and_compile(path_to_fluka, stamp):
 
     link_string = path_to_fluka + 'ldpmqmd -m fluka -o exe'  + stamp + '.exe '
     mgd_compd = 'mgdrw' + stamp + '.o'
-    source_compd = 'musource' + stamp + 'o'
+    source_compd = 'musource' + stamp + '.o'
     os.system(link_string + mgd_compd + ' ' + source_compd )
 
 def change_number_of_muons(num_muons, input_filename = fluka_files['input_file']):
