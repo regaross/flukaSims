@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-__version__ = 1.0
+__version__ = 1.5
 __author__ = 'Regan Ross'
-## Last Edited April 26, 2023
+## Last Edited May 12, 2023
 
 '''
 run_module.py
@@ -27,16 +27,20 @@ from datetime import datetime
 from src import muon_functions as mf
 import yaml
 import time
+import argparse
 
 #################################################
 #           CONSTANTS AND DICTIONARIES          }
 #                                               }
 #################################################
 
-### Seed for random number generation from system time
-SEED = int(time.time())
-np.random.seed(SEED)
+### Seed for random number generation from random number on system
 
+parser = argparse.ArgumentParser()
+parser.add_argument(dest='first_seed', type=int)
+args = parser.parse_args()
+
+np.random.seed(args.first_seed)
 
 ## Loading in the parameters from the simconfig.yaml file
 
@@ -54,7 +58,6 @@ with open('simconfig.yaml') as yaml_file:
         'num_muons' : Simulation.get('Muons'),
         'intersecting' : Simulation.get('Intersecting'),
         'make_new' : Simulation.get('MakeNewFile'),
-        'reps' : Simulation.get('Repititions'),
         'roi_radius' : Simulation.get('ROI_Radius'),
         'roi_height' : Simulation.get('ROI_Height'),
 

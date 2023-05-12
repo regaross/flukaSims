@@ -30,7 +30,6 @@
 #                  Variables
 #################################################
 
-rand=$RANDOM
 fluka_bin='/usr/local/fluka/bin/'
 fff="$fluka_bin"fff
 link="$fluka_bin""ldpmqmd -m fluka -o "
@@ -52,4 +51,4 @@ echo "My SLURM_ARRAY_JOB_ID is $SLURM_ARRAY_JOB_ID."
 echo "My SLURM_ARRAY_TASK_ID is $SLURM_ARRAY_TASK_ID"
 echo "Executing on the machine:" $(hostname)
 
-singularity exec -B /gpfs $path_to_sim/fluka_nEXO.sif python $path_to_sim/print_random.py $rand
+singularity exec -B /gpfs $path_to_sim/fluka_nEXO.sif python $path_to_sim/run_module.py $rand
