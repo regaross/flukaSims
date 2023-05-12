@@ -725,25 +725,28 @@ def merge_hdf5_files(h5_output, *args):
 def runsim(stamp):
     ''' The function for running the simulation from beginning to end'''
 
-    ###     Step one: Make changes to the input file— Number of Muons
-
-    change_number_of_muons(yaml_card['num_muons'], fluka_files['input_file'])
-
     stamp = str(stamp)
+
+    ###     Step one: make copies of the input files so they are named with the appropriate stamp
 
     copy_input_files(stamp)
 
-    ###     Make the phase space file
+    ###     Step two: change the number of muons in the appropriate file
 
-    muon_list = make_phase_space_file(yaml_card['num_muons'], stamp= stamp,
+    change_number_of_muons(yaml_card['num_muons'], fluka_files['input_file'])
+
+    ###     Step three: Make the phase space file
+
+    muon_list = make_phase_space_file(yaml_card['num_muons'], stamp = stamp,
                                         roi_radius = yaml_card['roi_radius'], roi_height = yaml_card['roi_height'],\
                                               intersecting=yaml_card['intersecting'])
     
     ###     Link to phase space file in FLUKA source file
+
     change_muon_filepath(stamp)
 
-    ### Compile and link to make an executable
-    exe_name = 'exe' + stamp + '.exe'
+    ###     Compile and link to make an executable
+
     link_and_compile(yaml_card['source_path'], stamp)
 
     ###     Change the simulation seed

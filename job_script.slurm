@@ -47,5 +47,8 @@ echo "System random number used to seed the sim:" $rand
 
 echo "Running Simulation!"
 
+echo ; echo ; echo ; echo "COMPILING JARGON:"
+echo
+
 #singularity exec -B /gpfs $image python $path_to_sim/slurm_vars.py
 singularity exec -B /gpfs $image python $path_to_sim/run_module.py -s $rand
