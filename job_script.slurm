@@ -6,6 +6,25 @@
 #
 # PURPOSE: For requesting resources on SDF and running simultaneous simulations
 #
+
+#################################################
+#                   SLURM
+#################################################
+
+#SBATCH --partition=shared
+#SBATCH --job-name=fluka_sims               # a short name for your job
+#SBATCH --output=slurm-%A.%a.out            # stdout file
+#SBATCH --error=slurm-%A.%a.err             # stderr file
+#SBATCH --nodes=1                           # node count
+#SBATCH --ntasks=4                          # total number of tasks across all nodes
+#SBATCH --cpus-per-task=1                   # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --mem-per-cpu=20G                   # memory per cpu-core (4G is default)
+#SBATCH --time=04:00:00                     # total run time limit (HH:MM:SS)
+#SBATCH --array=0-4                         # job array with index values 0, 1, 2, 3, 4
+##SBATCH --mail-type=all                    # send email on job start, end and fault
+##SBATCH --mail-user=rross@slac.stanford.edu
+
+
 #################################################
 #                  Variables
 #################################################
@@ -26,23 +45,6 @@ output=$rand"_summary.txt"
 ################################################
 date >> $output
 
-
-#################################################
-#                   SLURM
-#################################################
-
-#SBATCH --partition=shared
-#SBATCH --job-name=fluka_sims               # a short name for your job
-#SBATCH --output=slurm-%A.%a.out            # stdout file
-#SBATCH --error=slurm-%A.%a.err             # stderr file
-#SBATCH --nodes=1                           # node count
-#SBATCH --ntasks=4                          # total number of tasks across all nodes
-#SBATCH --cpus-per-task=1                   # cpu-cores per task (>1 if multi-threaded tasks)
-#SBATCH --mem-per-cpu=20G                   # memory per cpu-core (4G is default)
-#SBATCH --time=04:00:00                     # total run time limit (HH:MM:SS)
-#SBATCH --array=0-4                         # job array with index values 0, 1, 2, 3, 4
-##SBATCH --mail-type=all                    # send email on job start, end and fault
-##SBATCH --mail-user=rross@slac.stanford.edu
 
 
 echo "Executing on the machine:" $(hostname) >> $output
