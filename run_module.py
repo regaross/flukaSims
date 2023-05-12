@@ -299,9 +299,9 @@ def move_fluka_files(path, subdir):
 def change_muon_filepath(stamp):
     '''Changes the path to the muon_file in the provided fluka source file'''
 
-    replace_string = 'call read_phase_space_file(\''+ 'muons' + str(stamp) + '.txt'  + '\', \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
+    replace_string = 'call read_phase_space_file(\"'+ 'muons' + str(stamp) + '.txt'  + '\", \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
 
-    os.system('sed  \'s/call read_phase_space_file.*/' + replace_string + '/g\'' + 'muon_from_file.f > musource' + str(stamp) + '.f' )
+    os.system('sed  \"s/call read_phase_space_file.*/' + replace_string + '/g\"' + 'muon_from_file.f > musource' + str(stamp) + '.f' )
 
 def change_seed(input_file = fluka_files['input_file']):
     '''Changes the seed to the simulation in a given input file'''
@@ -587,7 +587,7 @@ def store_data_in_h5(output_filename, seed, muon_list) -> bool:
 def run_fluka(stamp):
     ''' Executes the command to run the simulation given everything else has been done'''
 
-    run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./nEXO_OD' + stamp + '.exe ' + 'nEXO_OD' + stamp + '.inp'
+    run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./exe' + stamp + '.exe ' + 'input' + stamp + '.inp'
     os.system(run_string)
 
 def merge_hdf5_files(h5_output, *args):
