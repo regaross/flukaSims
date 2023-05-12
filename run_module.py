@@ -749,7 +749,7 @@ def runsim(stamp):
     
     ###     Link to phase space file in FLUKA source file
 
-    change_muon_filepath(stamp)
+    change_muon_filepath()
 
     ###     Compile and link to make an executable
 
