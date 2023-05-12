@@ -90,7 +90,8 @@ fluka_files = {
     'res_nuclei_cu_file'    :   'input' + str(stamp) +  '001_fort.94',
     'mgdraw_file'           :   'mgdrw' + str(stamp) + '.f',
     'source_file'           :   'musource' + str(stamp) + '.f',  
-    'input_file'            :   'input' + str(stamp) + '.inp'
+    'input_file'            :   'input' + str(stamp) + '.inp',
+    'muon_file'             :   'muons' + str(stamp) + '.txt'
 }
 
 hdf5_structure = {
@@ -296,12 +297,17 @@ def move_fluka_files(path, subdir):
         if not ext == '*.hdf5' or not ext == '*.h5':
             os.system('mv ' + ext + ' ' + path + subdir)
 
-def change_muon_filepath(stamp):
+def change_muon_filepath():
     '''Changes the path to the muon_file in the provided fluka source file'''
 
-    replace_string = 'call read_phase_space_file(\"'+ 'muons' + str(stamp) + '.txt'  + '\", \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
+    with open(fluka_files['source_file'], 'r') as source:
+        lines = source.readlines()
+    
+    replace_string = '      call read_phase_space_file(\"'+ fluka_files['muon_file']  + '\", \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
+    lines[527] = replace_string
 
-    os.system('sed  \"s/call read_phase_space_file.*/' + replace_string + '/g\"' + 'muon_from_file.f > musource' + str(stamp) + '.f' )
+    with open(fluka_files['source_file'], 'r') as source:
+        source.writelines(lines)
 
 def change_seed(input_file = fluka_files['input_file']):
     '''Changes the seed to the simulation in a given input file'''
