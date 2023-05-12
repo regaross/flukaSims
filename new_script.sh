@@ -22,8 +22,8 @@
 #SBATCH --mem-per-cpu=20G                    # memory per cpu-core (4G is default)
 #SBATCH --time=04:00:00                     # total run time limit (HH:MM:SS)
 #SBATCH --array=0-4                         # job array with index values 0, 1, 2, 3, 4
-#SBATCH --mail-type=all                     # send email on job start, end and fault
-#SBATCH --mail-user=rross@slac.stanford.edu
+##SBATCH --mail-type=all                     # send email on job start, end and fault
+##SBATCH --mail-user=rross@slac.stanford.edu
 
 
 #################################################
