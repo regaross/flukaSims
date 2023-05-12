@@ -88,7 +88,6 @@ fluka_files = {
     'od_neutron_file'       :   yaml_card['input_file'][:-4] + '001_fort.70',
     'res_nuclei_file'       :   yaml_card['input_file'][:-4] + '001_fort.97',
     'res_nuclei_cu_file'    :   yaml_card['input_file'][:-4] + '001_fort.94',
-    'muon_file'             :   'src/muon_file.txt',
     'mgdraw_file'           :   'mgdraw_neutron_count.f',
     'source_file'           :   'muon_from_file.f',  
     'input_file'            :   yaml_card['input_file']
@@ -256,7 +255,10 @@ def initialize_h5_file(h5_filename):
     file.close()
 
     return h5_filename
-    
+
+def copy_input_files(stamp):
+    os.system('cp nEXO_OD.inp nEXO_OD' + stamp + '.inp')
+
 def move_output_files(path, stamp):
     '''Moves simulation output files to a specified path'''
 
@@ -586,10 +588,10 @@ def store_data_in_h5(output_filename, seed, muon_list) -> bool:
         os.system('rm ' + output_filename)
         return False
 
-def run_fluka():
+def run_fluka(stamp):
     ''' Executes the command to run the simulation given everything else has been done'''
 
-    run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./nEXO_OD.exe ' + fluka_files['input_file'] 
+    run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./nEXO_OD' + stamp + '.exe ' + 'nEXO_OD' + stamp + '.inp'
     os.system(run_string)
 
 def merge_hdf5_files(h5_output, *args):
@@ -754,7 +756,7 @@ def runsim():
 
     ###     Run the simulation
 
-    run_fluka()
+    run_fluka(stamp)
 
     ###     Deal with the output
     
