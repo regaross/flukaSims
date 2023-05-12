@@ -288,7 +288,7 @@ def move_output_files(stamp):
     # os.system('cp ' + fluka_files['input_file'] + ' ' + last_dir)
 
 def remove_leftovers():
-    file_list = ['*mod*', '*.o', '*.exe']
+    file_list = ['*mod*', '*.o', '*.exe', 'raninput*']
 
     for ext in file_list:
         os.system('rm ' + ext )
