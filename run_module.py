@@ -260,7 +260,6 @@ def initialize_h5_file(h5_filename):
 def copy_input_files(stamp):
     os.system('cp nEXO_OD.inp input' + stamp + '.inp')
     os.system('cp mgdraw_neutron_count.f mgdrw' + stamp + '.f')
-    os.system('cp muon_from_file.f musource' + stamp + '.f')
 
 def move_output_files(path, stamp):
     '''Moves simulation output files to a specified path'''
@@ -302,7 +301,7 @@ def change_muon_filepath(stamp):
 
     replace_string = 'call read_phase_space_file(\''+ 'muons' + str(stamp) + '.txt'  + '\', \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
 
-    os.system('sed  \'s/call read_phase_space_file.*/' + replace_string + '/g\'' + 'muon_from_file.f > ' + source_file )
+    os.system('sed  \'s/call read_phase_space_file.*/' + replace_string + '/g\'' + 'muon_from_file.f > musource' + str(stamp) + '.f' )
 
 def change_seed(input_file = fluka_files['input_file']):
     '''Changes the seed to the simulation in a given input file'''
