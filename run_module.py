@@ -84,13 +84,13 @@ with open('simconfig.yaml') as yaml_file:
     }
 
 fluka_files = {
-    'tpc_neutron_file'      :   yaml_card['input_file'][:-4] + '001_fort.72',
-    'od_neutron_file'       :   yaml_card['input_file'][:-4] + '001_fort.70',
-    'res_nuclei_file'       :   yaml_card['input_file'][:-4] + '001_fort.97',
-    'res_nuclei_cu_file'    :   yaml_card['input_file'][:-4] + '001_fort.94',
-    'mgdraw_file'           :   'mgdraw_neutron_count.f',
-    'source_file'           :   'muon_from_file.f',  
-    'input_file'            :   yaml_card['input_file']
+    'tpc_neutron_file'      :   'input' + str(stamp) +  '001_fort.72',
+    'od_neutron_file'       :   'input' + str(stamp) +  '001_fort.70',
+    'res_nuclei_file'       :   'input' + str(stamp) +  '001_fort.97',
+    'res_nuclei_cu_file'    :   'input' + str(stamp) +  '001_fort.94',
+    'mgdraw_file'           :   'mgdrw' + str(stamp) + '.f',
+    'source_file'           :   'musource' + str(stamp) + '.f',  
+    'input_file'            :   'input' + str(stamp) + '.inp'
 }
 
 hdf5_structure = {
