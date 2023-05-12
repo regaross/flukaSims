@@ -34,9 +34,10 @@ import argparse
 #                                               }
 #################################################
 
+### From SLURM environment variables
 slurm_job_id = int(os.environ["SLURM_ARRAY_JOB_ID"])
 slurm_task_id = int(os.environ["SLURM_ARRAY_TASK_ID"])
-slurm_prefix = 'slurm-' + str(os.environ["SLURM_ARRAY_JOB_ID"]) + '.' + str(os.environ["SLURM_ARRAY_TASK_ID"])
+slurm_prefix = 'slurm-' + str(os.environ["SLURM_ARRAY_JOB_ID"]) + '-' + str(os.environ["SLURM_ARRAY_TASK_ID"])
 
 
 parser = argparse.ArgumentParser()
@@ -46,7 +47,7 @@ args = parser.parse_args()
 ### Seed for random number generation from random number on system
 
 np.random.seed(args.first_seed)
-stamp = args.first_seed
+stamp = int(args.first_seed)
 
 ## Loading in the parameters from the simconfig.yaml file
 
@@ -198,7 +199,7 @@ def read_resnuclei_file(resnuclei_file):
 
     return np.array(arr_list)
 
-def make_phase_space_file(num_muons, roi_radius = 0, roi_height = 0, filename = 'src/muon_file.txt', intersecting = True):
+def make_phase_space_file(num_muons, filename, roi_radius = 0, roi_height = 0, intersecting = True):
     '''A function to make a phase space file for a number of muons. 
         This file is used by the larger simulation as the source for each particle.
         NOTE: if the filename is changed, it must also be changed in the .inp file for the sim.
@@ -300,7 +301,7 @@ def change_muon_filepath(source_file, new_path):
 
     replace_string = 'call read_phase_space_file(\''+  new_path + '\', \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
 
-    os.system('sed -i \'s/call read_phase_space_file.*/' + replace_string + '/g\'')
+    os.system('sed  \'s/call read_phase_space_file.*/' + replace_string + '/g\'' + 'muon_from_file.f > ' + source_file )
 
 def change_seed(input_file = fluka_files['input_file']):
     '''Changes the seed to the simulation in a given input file'''
@@ -723,16 +724,14 @@ def merge_hdf5_files(h5_output, *args):
     # Return the string name of the file
     return h5_output
 
-
 def runsim():
     ''' The function for running the simulation from beginning to end'''
-    ###     STEP ZERO: Make unique timecode for simulation (for muon file, and everything)
-    stamp = str(datetime.now())[11:19]
-    
+
     ###     Step one: Make changes to the input file— Number of Muons
 
     change_number_of_muons(yaml_card['num_muons'], fluka_files['input_file'])
 
+    stamp = str(stamp)
 
     ###     Make the phase space file
     muon_filename = 'src/muons_' + stamp + '.txt'
@@ -742,12 +741,12 @@ def runsim():
                                               intersecting=yaml_card['intersecting'])
     
     ###     Link to phase space file in FLUKA source file
-
-    change_muon_filepath('muon_from_file.f', muon_filename)
+    source_filename = 'muon_source' + stamp + '.f'
+    change_muon_filepath(source_filename, muon_filename)
 
     ### Compile and link to make an executable
-
-    link_and_compile(yaml_card['source_path'])
+    exe_name = 'nEXO_OD' + stamp + '.exe'
+    link_and_compile(yaml_card['source_path'], exe_name)
 
     ###     Change the simulation seed
 
@@ -766,8 +765,7 @@ def runsim():
     else:
         print('No neutron file was created')
 
-    move_output_files(yaml_card['output_dir'], stamp)
-
+    move_output_files(yaml_card['output_dir']+str(slurm_job_id), stamp)
 
 
 runsim()
