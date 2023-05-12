@@ -282,21 +282,11 @@ def move_output_files(path, stamp):
 
     os.system('cp ' + fluka_files['input_file'] + ' ' + last_dir)
 
-def move_fluka_files(path, subdir):
-    file_list = ['*fort*', '*lis*', '*tab*', '*.h5', '*.hdf5', '*fort*', '*.log', '*.err', '*.out', '*dump']
+def remove_leftovers():
+    file_list = ['*mod*', '*.o', '*.exe']
 
-    if not path[-1] == '/':
-        path = path + '/'
-
-    if not subdir[-1] == '/':
-        subdir = subdir + '/'
-
-    os.system('mkdir ' + path)
-    os.system('mkdir ' + path + subdir)
     for ext in file_list:
-        os.system('mv ' + ext + ' ' + path)
-        if not ext == '*.hdf5' or not ext == '*.h5':
-            os.system('mv ' + ext + ' ' + path + subdir)
+        os.system('rm ' + ext )
 
 def change_muon_filepath():
     '''Changes the path to the muon_file in the provided fluka source file'''
@@ -774,6 +764,8 @@ def runsim(stamp):
         print('No neutron file was created')
 
     move_output_files(yaml_card['output_dir']+str(slurm_job_id), stamp)
+    
+    remove_leftovers()
 
 
 runsim(stamp)

@@ -10,7 +10,7 @@ Simulation:
   ROI_Height:  8              # How many meters larger than the OD height?
 
 Output:
-  OutputDir: './May12_out'     # Where should the output files be placed?
+  OutputDir: './May12_out/'     # Where should the output files be placed?
   NeutronFile: 'fluka_data'   # How should the neutron hdf5 files be named? This is only the prefix.
   ProgressOut: 'fluka_sim_sum.txt'    # Where should compile and other output be copied?
 
