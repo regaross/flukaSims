@@ -265,11 +265,11 @@ def copy_input_files(stamp):
 
 def move_output_files(stamp):
     '''Moves simulation output files to a specified path'''
-    first = 'run' + slurm_job_id + '/'
-    second = first + 'subrun' + slurm_task_id + '/'
+    first = 'run' + str(slurm_job_id) + '/'
+    second = first + 'subrun' + str(slurm_task_id) + '/'
 
-    os.system('mv *' + stamp + '* ' + second) 
-    os.system('mv ' + slurm_prefix + '.hdf5 ' + first)
+    os.system('mv *' + str(stamp) + '* ' + second) 
+    os.system('mv ' + str(slurm_prefix) + '.hdf5 ' + first)
 
     # try:
     #     os.system('mkdir subrun' + slurm_task_id)
