@@ -449,7 +449,7 @@ def retrieve_muons(muon_array, ncase_list) -> dict:
     for mu in ncase_list:
 
         mu = mu - 1 # ncase doesn't correspond exactly to the index
-        
+
         pos_neg.append(int(muon_array[mu].pos_neg)) # Whether the muon is positive or negative
         muenergy.append(float(muon_array[mu].energy)) # Muon Energy
         initx.append(float(muon_array[mu].initial[0]))
@@ -501,10 +501,15 @@ def store_data_in_h5(output_filename, seed, muon_list) -> bool:
         od_check = True
         od_muons = retrieve_muons(muon_list, od_neutrons['ncase'])
 
-    resnuclei_data = read_resnuclei_file(fluka_files['res_nuclei_file'])
-    resnuc_length = len(resnuclei_data)
-    resnuclei_cu_data = read_resnuclei_file(fluka_files['res_nuclei_cu_file'])
-    resnuc_cu_length = len(resnuclei_cu_data)
+    resnuc_bool = True
+    try:
+        resnuclei_data = read_resnuclei_file(fluka_files['res_nuclei_file'])
+        resnuc_length = len(resnuclei_data)
+        resnuclei_cu_data = read_resnuclei_file(fluka_files['res_nuclei_cu_file'])
+        resnuc_cu_length = len(resnuclei_cu_data)
+    except:
+        print('No resnuclei file to be found?')
+        resnuc_bool = False
 
     # Make sure we have a file to put the data into
     output_filename = initialize_h5_file(output_filename)
@@ -565,8 +570,9 @@ def store_data_in_h5(output_filename, seed, muon_list) -> bool:
 
             #   RESNUCLEI DATASET
 
-            output_file['resnuclei']['resnuclei'][indices['resnuclei']:]         = resnuclei_data
-            output_file['resnuclei']['resnuclei_cu'][indices['resnuclei_cu']:]   = resnuclei_cu_data
+            if resnuc_bool:
+                output_file['resnuclei']['resnuclei'][indices['resnuclei']:]         = resnuclei_data
+                output_file['resnuclei']['resnuclei_cu'][indices['resnuclei_cu']:]   = resnuclei_cu_data
 
 
             #   META DATASET
