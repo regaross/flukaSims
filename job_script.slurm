@@ -52,7 +52,7 @@ echo
 
 # Only create the output paths if it's the first run— every try would be redundant
 
-if $SLURM_ARRAY_TASK_ID -lt 1
+if [$SLURM_ARRAY_TASK_ID -lt 1 ]
 then
     mkdir run$SLURM_ARRAY_JOB_ID
     mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
