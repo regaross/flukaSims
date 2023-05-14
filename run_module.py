@@ -333,6 +333,8 @@ def link_and_compile(path_to_fluka, stamp):
     source_compd = 'musource' + stamp + '.o'
     os.system(link_string + mgd_compd + ' ' + source_compd )
 
+    time.sleep(2)
+
 def change_number_of_muons(num_muons, input_filename = fluka_files['input_file']):
     '''Changes the number of muons in the input file for a given simulation'''
 
