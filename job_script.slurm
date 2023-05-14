@@ -50,8 +50,17 @@ echo "Running Simulation!"
 echo ; echo ; echo ; echo "COMPILING JARGON:"
 echo
 
-mkdir run$SLURM_ARRAY_JOB_ID
-mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
+# Only create the output paths if it's the first run— every try would be redundant
 
-#singularity exec -B /gpfs $image python $path_to_sim/slurm_vars.py
+if $SLURM_ARRAY_TASK_ID -lt 1
+then
+    mkdir run$SLURM_ARRAY_JOB_ID
+    mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
+fi
+
+while [ ! -f ./exe$stamp".exe" ]
+do
+    singularity exec -B /gpfs $image python $path_to_sim/make_executable.py -s $rand
+done
+
 singularity exec -B /gpfs $image python $path_to_sim/run_module.py -s $rand
