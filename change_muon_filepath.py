@@ -13,7 +13,6 @@ def change_muon_filepath(stamp):
 
     source_name = 'musource' + str(stamp) + '.f'
 
-
     with open('muon_from_file.f', 'r') as source:
         lines = source.readlines()
     
