@@ -14,15 +14,6 @@ args = parser.parse_args()
 
 stamp = int(args.first_seed)
 
-
-def copy_input_files(stamp):
-    stamp = str(stamp)
-    if os.path.isfile('input' + str(stamp) + '.inp'):
-        return 
-    else:
-        os.system('cp nEXO_OD.inp input' + stamp + '.inp')
-        os.system('cp mgdraw_neutron_count.f mgdrw' + stamp + '.f')
-
 def change_muon_filepath(stamp):
     '''Changes the path to the muon_file in the provided fluka source file'''
 
@@ -41,27 +32,4 @@ def change_muon_filepath(stamp):
         with open(source_name, 'w') as source:
             source.writelines(lines)
 
-def link_and_compile(path_to_fluka, stamp):
-    '''Links and compiles the fluka routines for the fluka executable'''
-
-    if not path_to_fluka[-1] == '/':
-        path_to_fluka = path_to_fluka + '/'
-    
-    compile_string = path_to_fluka + 'fff'
-
-    os.system(compile_string + ' ' + 'mgdrw' + stamp + '.f' )
-    os.system(compile_string + ' ' + 'musource' + stamp + '.f'  )
-
-    link_string = path_to_fluka + 'ldpmqmd -m fluka -o exe'  + stamp + '.exe '
-    mgd_compd = 'mgdrw' + stamp + '.o'
-    source_compd = 'musource' + stamp + '.o'
-    os.system(link_string + mgd_compd + ' ' + source_compd )
-
 change_muon_filepath(stamp)
-
-copy_input_files(stamp)
-
-try:
-    link_and_compile('/usr/local/fluka/bin/', stamp)
-except:
-    print('\n\nFailed at compiling')
