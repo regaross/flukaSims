@@ -22,12 +22,11 @@ def copy_input_files(stamp):
     else:
         os.system('cp nEXO_OD.inp input' + stamp + '.inp')
         os.system('cp mgdraw_neutron_count.f mgdrw' + stamp + '.f')
-        os.system('cp muon_from_file.f musource' + stamp + '.f')
 
 def change_muon_filepath(stamp):
     '''Changes the path to the muon_file in the provided fluka source file'''
 
-    source_name = 'muons' + str(stamp) + '.txt'
+    source_name = 'musource' + str(stamp) + '.f'
 
     if os.path.isfile(source_name):
         return 
@@ -45,8 +44,6 @@ def change_muon_filepath(stamp):
 def link_and_compile(path_to_fluka, stamp):
     '''Links and compiles the fluka routines for the fluka executable'''
 
-    print('Entered Link and compile function')
-
     if not path_to_fluka[-1] == '/':
         path_to_fluka = path_to_fluka + '/'
     
@@ -60,16 +57,12 @@ def link_and_compile(path_to_fluka, stamp):
     source_compd = 'musource' + stamp + '.o'
     os.system(link_string + mgd_compd + ' ' + source_compd )
 
-    time.sleep(3)
-
 change_muon_filepath(stamp)
 
 copy_input_files(stamp)
 
-compile_tries = 0
-
 try:
-    compile_tries += 1
     link_and_compile('/usr/local/fluka/bin/', stamp)
+    time.sleep(2)
 except:
-    print('\n\nFailed at compiling after ' + str(compile_tries) + ' tries\n\n')
+    print('\n\nFailed at compiling')
