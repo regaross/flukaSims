@@ -31,8 +31,7 @@
 
 rand=$RANDOM
 path_to_sim='/gpfs/slac/staas/fs1/g/exo/exo_data8/exo_data/users/rross/flukaSims/'
-image="$path_to_sim"fluka_nEXO.sif
-image_exec='singularity exec -B /gpfs ' $image
+image="fluka_nEXO.sif"
 job_num=$SLURM_ARRAY_JOB_ID         # An integer number representing this array job submission
 task_num=$SLURM_ARRAY_TASK_ID       # An integer within the array range above representing which part of the parallelized run
 fluka_path='/usr/local/fluka/bin/'
@@ -55,13 +54,9 @@ exe_name=path_to_sim'exe'$rand'.exe'
 ################################################
 
 date
-
 echo "Executing on the machine:" $(hostname) 
-
 echo "System random number used to seed the sim:" $rand
-
 echo "Running Simulation!"
-
 echo ; echo ; echo ; echo "COMPILING JARGON:"
 echo
 
@@ -79,15 +74,15 @@ cp $input $new_input
 #   Changing the Muon filename in the source file
 #################################################
 
-$image_exec python $path_to_sim"change_muon_filepath.py" -s $rand
+singularity shell -B /gpfs $image python change_muon_filepath.py -s $rand
 
 #################################################
 #   Compile and link the simulation files
 #################################################
 
-$image_exec $fluka_path"fff" $new_mgdraw
-$image_exec $fluka_path"fff" $new_muon_source
-$image_exec $fluka_path"ldpmqmd -m fluka -o " $exe_name $new_mgdraw_o $new_muon_source_o
+# $image_exec $fluka_path"fff" $new_mgdraw
+# $image_exec $fluka_path"fff" $new_muon_source
+# $image_exec $fluka_path"ldpmqmd -m fluka -o " $exe_name $new_mgdraw_o $new_muon_source_o
 
 
 
