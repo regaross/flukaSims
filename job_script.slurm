@@ -58,7 +58,9 @@ if (( "$SLURM_ARRAY_TASK_ID" < 1 )); then
     mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
 fi
 
-while [ ! -f ./exe$stamp".exe" ]
+executable=./exe$stamp".exe"
+
+while [ ! -f $executable ]
 do
     singularity exec -B /gpfs $image python $path_to_sim/make_executable.py -s $rand
 done
