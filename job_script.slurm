@@ -60,9 +60,12 @@ fi
 
 executable=./exe$stamp".exe"
 
-while [ ! -f $executable ]
-do
-    singularity exec -B /gpfs $image python $path_to_sim/make_executable.py -s $rand
-done
+if [ ! -f $executable ]; 
+then
+echo "Inside if statement"
+#do
+#    singularity exec -B /gpfs $image python $path_to_sim/make_executable.py -s $rand
+#done
+fi 
 
 singularity exec -B /gpfs $image python $path_to_sim/run_module.py -s $rand
