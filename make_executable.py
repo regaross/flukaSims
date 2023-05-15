@@ -41,7 +41,7 @@ def change_muon_filepath(stamp):
         with open(source_name, 'w') as source:
             source.writelines(lines)
 
-def link_and_compile(path_to_fluka, stamp):
+def link_and_compile(path_to_fluka, stamp, path_to_sim = '/gpfs/slac/staas/fs1/g/exo/exo_data8/exo_data/users/rross/flukaSims/'):
     '''Links and compiles the fluka routines for the fluka executable'''
 
     if not path_to_fluka[-1] == '/':
@@ -49,13 +49,13 @@ def link_and_compile(path_to_fluka, stamp):
     
     compile_string = path_to_fluka + 'fff'
 
-    os.system(compile_string + ' mgdrw' + stamp + '.f' )
-    os.system(compile_string + ' musource' + stamp + '.f'  )
+    os.system(compile_string + ' ' + path_to_sim + 'mgdrw' + stamp + '.f' )
+    os.system(compile_string + ' ' + path_to_sim + 'musource' + stamp + '.f'  )
 
     link_string = path_to_fluka + 'ldpmqmd -m fluka -o exe'  + stamp + '.exe '
     mgd_compd = 'mgdrw' + stamp + '.o'
     source_compd = 'musource' + stamp + '.o'
-    os.system(link_string + mgd_compd + ' ' + source_compd )
+    os.system(link_string + path_to_sim + mgd_compd + ' ' + path_to_sim + source_compd )
 
 change_muon_filepath(stamp)
 
