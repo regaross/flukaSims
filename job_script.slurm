@@ -74,7 +74,7 @@ cp $input $new_input
 #   Changing the Muon filename in the source file
 #################################################
 
-singularity shell -B /gpfs $image python change_muon_filepath.py -s $rand
+singularity shell -B /gpfs $image python $path_to_sim"change_muon_filepath.py" -s $rand
 
 #################################################
 #   Compile and link the simulation files

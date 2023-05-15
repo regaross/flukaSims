@@ -2,12 +2,6 @@ import os
 import argparse
 import time
 
-### From SLURM environment variables
-slurm_job_id = int(os.environ["SLURM_ARRAY_JOB_ID"])
-slurm_task_id = int(os.environ["SLURM_ARRAY_TASK_ID"])
-slurm_prefix = 'simrun-' + str(os.environ["SLURM_ARRAY_JOB_ID"]) + '-' + str(os.environ["SLURM_ARRAY_TASK_ID"])
-
-
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--seed', type=int, dest='first_seed')
 args = parser.parse_args()
