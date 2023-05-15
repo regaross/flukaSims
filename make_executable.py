@@ -45,6 +45,8 @@ def change_muon_filepath(stamp):
 def link_and_compile(path_to_fluka, stamp):
     '''Links and compiles the fluka routines for the fluka executable'''
 
+    print('Entered Link and compile function')
+
     if not path_to_fluka[-1] == '/':
         path_to_fluka = path_to_fluka + '/'
     
