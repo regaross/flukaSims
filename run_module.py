@@ -174,6 +174,7 @@ def change_muon_filepath(stamp):
     '''Changes the path to the muon_file in the provided fluka source file'''
 
     source_name = 'musource' + str(stamp) + '.f'
+    muon_file = 'muons' + str(stamp) + '.txt'
 
     if os.path.isfile(source_name):
         return 
@@ -182,7 +183,7 @@ def change_muon_filepath(stamp):
         with open('muon_from_file.f', 'r') as source:
             lines = source.readlines()
         
-        replace_string = '      call read_phase_space_file(\"'+ source_name + '\", \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
+        replace_string = '      call read_phase_space_file(\"'+ muon_file + '\", \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
         lines[527] = replace_string
 
         with open(source_name, 'w') as source:
