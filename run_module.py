@@ -161,6 +161,49 @@ hdf5_structure = {
                      
                     }
 
+
+def copy_input_files(stamp):
+    stamp = str(stamp)
+    if os.path.isfile('input' + str(stamp) + '.inp'):
+        return 
+    else:
+        os.system('cp nEXO_OD.inp input' + stamp + '.inp')
+        os.system('cp mgdraw_neutron_count.f mgdrw' + stamp + '.f')
+
+def change_muon_filepath(stamp):
+    '''Changes the path to the muon_file in the provided fluka source file'''
+
+    source_name = 'musource' + str(stamp) + '.f'
+
+    if os.path.isfile(source_name):
+        return 
+    else:
+
+        with open('muon_from_file.f', 'r') as source:
+            lines = source.readlines()
+        
+        replace_string = '      call read_phase_space_file(\"'+ source_name + '\", \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
+        lines[527] = replace_string
+
+        with open(source_name, 'w') as source:
+            source.writelines(lines)
+
+def link_and_compile(path_to_fluka, stamp):
+    '''Links and compiles the fluka routines for the fluka executable'''
+
+    if not path_to_fluka[-1] == '/':
+        path_to_fluka = path_to_fluka + '/'
+    
+    compile_string = path_to_fluka + 'fff'
+
+    os.system(compile_string + ' ' + 'mgdrw' + stamp + '.f' )
+    os.system(compile_string + ' ' + 'musource' + stamp + '.f'  )
+
+    link_string = path_to_fluka + 'ldpmqmd -m fluka -o exe'  + stamp + '.exe '
+    mgd_compd = 'mgdrw' + stamp + '.o'
+    source_compd = 'musource' + stamp + '.o'
+    os.system(link_string + mgd_compd + ' ' + source_compd )
+
 def read_resnuclei_file(resnuclei_file):
     '''Scans the given ASCII resnuclei output file and returns an np array table 
         with the columns Z, A, and the number of stopping nuclei per primary'''
@@ -703,6 +746,13 @@ def runsim(stamp):
     ''' The function for running the simulation from beginning to end'''
 
     stamp = str(stamp)
+
+    copy_input_files(stamp)
+
+    change_muon_filepath(stamp)
+
+    while(not os.path.isfile('exe' + stamp + '.exe')):
+        link_and_compile(yaml_card['source_path'], stamp)
 
     ###     Step two: change the number of muons in the appropriate file
 

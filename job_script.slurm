@@ -52,7 +52,7 @@ exe_name=path_to_sim'exe'$rand'.exe'
 #################################################
 #         Printing meta data to stdout
 ################################################
-
+cd $path_to_sim
 date
 echo "Executing on the machine:" $(hostname) 
 echo "System random number used to seed the sim:" $rand
@@ -64,17 +64,17 @@ echo
 #          Make Copies of the Files
 #################################################
 
-echo "Making Copies of the Files"
+# echo "Making Copies of the Files"
 
-cp $muon_source $new_muon_source
-cp $mgdraw $new_mgdraw
-cp $input $new_input
+# cp $muon_source $new_muon_source
+# cp $mgdraw $new_mgdraw
+# cp $input $new_input
 
 #################################################
 #   Changing the Muon filename in the source file
 #################################################
 
-singularity shell -B /gpfs $image python $path_to_sim"change_muon_filepath.py" -s $rand
+# singularity shell -B /gpfs $image python $path_to_sim"change_muon_filepath.py" -s $rand
 
 #################################################
 #   Compile and link the simulation files
@@ -85,21 +85,13 @@ singularity shell -B /gpfs $image python $path_to_sim"change_muon_filepath.py" -
 # $image_exec $fluka_path"ldpmqmd -m fluka -o " $exe_name $new_mgdraw_o $new_muon_source_o
 
 
+#Only create the output paths if it's the first run— every try would be redundant
 
+if (( "$SLURM_ARRAY_TASK_ID" < 1 )); then
 
-
-
-
-
-
-
-# Only create the output paths if it's the first run— every try would be redundant
-
-# if (( "$SLURM_ARRAY_TASK_ID" < 1 )); then
-
-#     mkdir run$SLURM_ARRAY_JOB_ID
-#     mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
-# fi
+    mkdir run$SLURM_ARRAY_JOB_ID
+    mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
+fi
 
 # executable=./exe$stamp".exe"
 
@@ -109,4 +101,4 @@ singularity shell -B /gpfs $image python $path_to_sim"change_muon_filepath.py" -
 #     singularity exec -B /gpfs $image python $path_to_sim/make_executable.py -s $rand
 # done
 
-# singularity exec -B /gpfs $image python $path_to_sim/run_module.py -s $rand
+singularity exec -B /gpfs $image python $path_to_sim/run_module.py -s $rand
