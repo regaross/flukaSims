@@ -749,8 +749,13 @@ def runsim(stamp):
 
     stamp = str(stamp)
 
+
     # Copy the input files to versions with the running stamp
     copy_input_files(stamp)
+
+    muon_list = make_phase_space_file(yaml_card['num_muons'], stamp = stamp,
+                                        roi_radius = yaml_card['roi_radius'], roi_height = yaml_card['roi_height'],\
+                                              intersecting=yaml_card['intersecting'])
 
     # Change the filepath of the muon file in the FLUKA source file
     change_muon_filepath(stamp)
@@ -765,10 +770,6 @@ def runsim(stamp):
     change_number_of_muons(yaml_card['num_muons'], fluka_files['input_file'])
 
     ###     Step three: Make the phase space file
-
-    muon_list = make_phase_space_file(yaml_card['num_muons'], stamp = stamp,
-                                        roi_radius = yaml_card['roi_radius'], roi_height = yaml_card['roi_height'],\
-                                              intersecting=yaml_card['intersecting'])
     
 
     ###     Change the simulation seed
