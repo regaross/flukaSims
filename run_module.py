@@ -494,6 +494,8 @@ def store_data_in_h5(output_filename, seed, muon_list) -> bool:
     tpc_neutrons = read_neutron_file(fluka_files['tpc_neutron_file'])
     tpc_length = 0
 
+    resnuc_length, resnuc_cu_length = 0, 0
+
     od_check = False
     tpc_check = False
 
@@ -756,7 +758,7 @@ def runsim(stamp):
     # Try repeatedly to compile: sometimes this raises issues
     while(not os.path.isfile('exe' + stamp + '.exe')):
         link_and_compile(yaml_card['source_path'], stamp)
-        
+
 
     ###     Step two: change the number of muons in the appropriate file
 
