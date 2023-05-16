@@ -747,12 +747,16 @@ def runsim(stamp):
 
     stamp = str(stamp)
 
+    # Copy the input files to versions with the running stamp
     copy_input_files(stamp)
 
+    # Change the filepath of the muon file in the FLUKA source file
     change_muon_filepath(stamp)
 
+    # Try repeatedly to compile: sometimes this raises issues
     while(not os.path.isfile('exe' + stamp + '.exe')):
         link_and_compile(yaml_card['source_path'], stamp)
+        
 
     ###     Step two: change the number of muons in the appropriate file
 
