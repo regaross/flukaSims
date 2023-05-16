@@ -60,45 +60,16 @@ echo "Running Simulation!"
 echo ; echo ; echo ; echo "COMPILING JARGON:"
 echo
 
-#################################################
-#          Make Copies of the Files
-#################################################
-
-# echo "Making Copies of the Files"
-
-# cp $muon_source $new_muon_source
-# cp $mgdraw $new_mgdraw
-# cp $input $new_input
-
-#################################################
-#   Changing the Muon filename in the source file
-#################################################
-
-# singularity shell -B /gpfs $image python $path_to_sim"change_muon_filepath.py" -s $rand
-
-#################################################
-#   Compile and link the simulation files
-#################################################
-
-# $image_exec $fluka_path"fff" $new_mgdraw
-# $image_exec $fluka_path"fff" $new_muon_source
-# $image_exec $fluka_path"ldpmqmd -m fluka -o " $exe_name $new_mgdraw_o $new_muon_source_o
-
-
-#Only create the output paths if it's the first run— every try would be redundant
 
 if (( "$SLURM_ARRAY_TASK_ID" < 1 )); then
 
     mkdir run$SLURM_ARRAY_JOB_ID
-    mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
+
 fi
 
-# executable=./exe$stamp".exe"
-
-# while [ ! -f $executable ]
-# do
-#     echo "Trying to compile"
-#     singularity exec -B /gpfs $image python $path_to_sim/make_executable.py -s $rand
-# done
+mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
 
 singularity exec -B /gpfs $image python $path_to_sim/run_module.py -s $rand
+
+mv *$rand* "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
+mv *.hdf5 "run$SLURM_ARRAY_JOB_ID"/

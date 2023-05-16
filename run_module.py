@@ -790,10 +790,6 @@ def runsim(stamp):
     else:
         print('No neutron file was created')
 
-    move_output_files(stamp)
-
-    remove_leftovers()
-
 runsim(stamp)
 
 
