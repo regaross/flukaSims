@@ -48,10 +48,18 @@ new_input=$path_to_sim'input'$rand'.inp'
 exe_name=path_to_sim'exe'$rand'.exe'
 
 
+#################################################
+#    REMEMBER: These do not run sequentially.
+################################################
+
+
+mkdir run$SLURM_ARRAY_JOB_ID
+mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
 
 #################################################
 #         Printing meta data to stdout
 ################################################
+
 cd $path_to_sim
 date
 echo "Executing on the machine:" $(hostname) 
@@ -61,15 +69,10 @@ echo ; echo ; echo ; echo "COMPILING JARGON:"
 echo
 
 
-if (( "$SLURM_ARRAY_TASK_ID" < 1 )); then
 
-    mkdir run$SLURM_ARRAY_JOB_ID
-
-fi
-
-mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
 
 singularity exec -B /gpfs $image python $path_to_sim/run_module.py -s $rand
+
 
 mv *$rand* "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
 mv *.hdf5 "run$SLURM_ARRAY_JOB_ID"/

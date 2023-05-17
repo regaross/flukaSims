@@ -456,17 +456,19 @@ def plot_both_energy_hist(h5_file, bins = 20, label = ''):
     ax1.set_xlabel('Neutron Energy [GeV]')
 
     ax2.hist(np.unique(tpc_data), bins=logbins, histtype='step', label = 'TPC')
-    ax2.set_title('TPC Muon Impact Parameters N = ' + str(totals['neutrons_counted_tpc']))
+    ax2.set_title('TPC Neutron Energies N = ' + str(totals['neutrons_counted_tpc']))
     ax2.set_xlabel('Neutron Energy [GeV]')
     ax2.set_yscale('log'); ax2.set_xscale('log')
     ax1.set_ylabel('Count'); ax2.set_ylabel('Count')
 
 def plot_coz_neutrons(h5_file, bins=50, tpc = False):
+
     h5_file = h5.File(h5_file)
     if tpc:
         data = h5_file['tpc_data']
     else:
-        data = h5.file['od_data']
+        data = h5_file['od_data']
+
     plt.hist(data['neutron_direction'][:,2], bins=bins)
     plt.title('Neutron Zenith Angles')
     plt.xlabel(r'$\cos \theta$'); plt.ylabel('Count')
@@ -510,6 +512,17 @@ def different_seeds(file_paths) -> bool:
 
     else:
         return False
+    
+def get_filenames(path):
+    import os
+    from os import listdir
+    from os.path import isfile, join
+
+    cwd = path
+    onlyfiles = [os.path.join(cwd, f) for f in os.listdir(cwd) if 
+    os.path.isfile(os.path.join(cwd, f))]
+
+    return onlyfiles
 
 def merge_hdf5_files(file_paths, output_path):
 

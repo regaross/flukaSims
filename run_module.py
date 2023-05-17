@@ -97,13 +97,16 @@ fluka_files = {
 hdf5_structure = {
     ###---->  Meta data about the respective simulation
     'meta' : {   
-        'seed':     {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'year':     {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'month':    {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'day':      {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'hour':     {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'minute':   {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'second':   {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'seed':                 {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'year':                 {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'month':                {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'day':                  {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'hour':                 {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'minute':               {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'second':               {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'muons_simulated':      {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'roi_height':           {'shape' : (0,), 'dtype' : float, 'maxshape': (None,)},
+        'roi_radius':           {'shape' : (0,), 'dtype' : float, 'maxshape': (None,)},
         },
 
     ###----> Data points for each neutron counted in the TPC
@@ -599,7 +602,10 @@ def store_data_in_h5(output_filename, seed, muon_list) -> bool:
             output_file['meta']['month'][indices['meta']] = int(now.strftime('%m'))
             output_file['meta']['day'][indices['meta']] = int(now.strftime('%d'))
 
-            output_file['meta']['seed'][indices['meta']] = seed
+
+            output_file['meta']['muon_simulated'][indices['meta']] = od_muons['total']
+            output_file['meta']['roi_height'][indices['meta']] = mf.OD_HEIGHT + yaml_card['roi_height']
+            output_file['meta']['roi_radius'][indices['meta']] = mf.OD_RADIUS + yaml_card['roi_radius']
 
         return True
 
