@@ -603,7 +603,7 @@ def store_data_in_h5(output_filename, seed, muon_list) -> bool:
             output_file['meta']['day'][indices['meta']] = int(now.strftime('%d'))
 
 
-            output_file['meta']['muon_simulated'][indices['meta']] = od_muons['total']
+            output_file['meta']['muons_simulated'][indices['meta']] = od_muons['total']
             output_file['meta']['roi_height'][indices['meta']] = mf.OD_HEIGHT + yaml_card['roi_height']
             output_file['meta']['roi_radius'][indices['meta']] = mf.OD_RADIUS + yaml_card['roi_radius']
 
