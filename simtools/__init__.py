@@ -3,7 +3,6 @@
 #                                               }
 #################################################
 
-from scipy import constants as sc
 
 
 #################################################
@@ -108,42 +107,6 @@ jtrack_dictionary = {
     211:    'EM Energy Deposition',
 
     308:    'Low Energy Neutron Kerma'
-
-}
-
-jtrack_rest_energies = { # Expressed in MeV if known, 0 otherwise (for heavy ions for instance)
-    None:   None,
-    -6:     sc.physical_constants['alpha particle mass energy equivalent in MeV'][0],
-    -5:     sc.physical_constants['helion mass energy equivalent in MeV'][0],
-    -4:     sc.physical_constants['triton mass energy equivalent in MeV'][0],
-    -3:     sc.physical_constants['deuteron mass energy equivalent in MeV'][0],
-    -2:     0,
-    -1:     0,
-    0:      0,
-    1:      sc.physical_constants['proton mass energy equivalent in MeV'][0],
-    2:      sc.physical_constants['proton mass energy equivalent in MeV'][0],
-    3:      sc.physical_constants['electron mass energy equivalent in MeV'][0],
-    4:      sc.physical_constants['electron mass energy equivalent in MeV'][0],
-    5:      0,
-    6:      0,
-    7:      0,
-    8:      sc.physical_constants['neutron mass energy equivalent in MeV'][0],
-    9:      sc.physical_constants['neutron mass energy equivalent in MeV'][0],
-    10:     sc.physical_constants['muon mass energy equivalent in MeV'][0],
-    11:     sc.physical_constants['muon mass energy equivalent in MeV'][0],
-    12:     497.611, # https://pdg.lbl.gov/2022/listings/contents_listings.html
-    13:     139.57039, # https://pdg.lbl.gov/2022/listings/contents_listings.html
-    14:     139.57039, # https://pdg.lbl.gov/2022/listings/contents_listings.html
-    15:     493.677, # https://pdg.lbl.gov/2022/listings/contents_listings.html
-    16:     493.677, # https://pdg.lbl.gov/2022/listings/contents_listings.html
-
-    23:     134.9768, # https://pdg.lbl.gov/2022/listings/contents_listings.html
-
-    208:    0,
-
-    211:    0,
-
-    308:    0,
 
 }
 
