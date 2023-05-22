@@ -7,7 +7,6 @@ __author__ = 'Regan Ross'
 '''
 muon_functions.py
 
-
 Contact:
 Regan Ross
 rross@laurentian.ca
@@ -21,12 +20,8 @@ A module for simulating muons underneath SNOLAB's overburden for nEXO's Outer De
 #################################################
 
 import numpy as np
-import time
-import string
 
 ### Seed for random number generation from system time
-SEED = int(time.time())
-np.random.seed(SEED)
 
 #################################################
 #                   CONSTANTS                   }
@@ -233,6 +228,9 @@ class Muon:
 #                                                }
 #################################################
 
+def set_seed(seed):
+    '''Sets the numpy random generation seed with a given seed'''
+    np.random.seed(seed)
 
 def mei_hime_intensity(zenith_angles, vert_depth = SNOLAB_DEPTH)-> np.ndarray:
     ''' Function from Mei & Hime's zenith angle intensity relation- exactly the same as Eqn. 3 from the paper.'''

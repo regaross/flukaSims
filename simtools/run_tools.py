@@ -39,61 +39,6 @@ SLURM_JOB_ID = int(os.environ["SLURM_ARRAY_JOB_ID"])
 SLURM_TASK_ID = int(os.environ["SLURM_ARRAY_TASK_ID"])
 SLURM_PREFIX = 'simrun-' + str(os.environ["SLURM_ARRAY_JOB_ID"]) + '-' + str(os.environ["SLURM_ARRAY_TASK_ID"])
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-s', '--seed', type=int, dest='first_seed')
-args = parser.parse_args()
-
-### Seed for random number generation from random number on system
-
-np.random.seed(args.first_seed)
-stamp = int(args.first_seed)
-
-## Loading in the parameters from the simconfig.yaml file
-
-with open('simconfig.yaml') as yaml_file:
-
-    input_yaml = yaml.safe_load(yaml_file)
-
-    Simulation = input_yaml.get('Simulation')
-    Input = input_yaml.get('Input')
-    Output = input_yaml.get('Output')
-    input_path = Input.get('InputPath')
-
-    yaml_card = {
-        # Simulation Parameters
-        'num_muons'     : Simulation.get('Muons'),
-        'intersecting'  : Simulation.get('Intersecting'),
-        'make_new'      : Simulation.get('MakeNewFile'),
-        'roi_radius'    : Simulation.get('ROI_Radius'),
-        'roi_height'    : Simulation.get('ROI_Height'),
-
-
-        # Input Parameters
-        'input_file'        : input_path + Input.get('InputFile'),
-        'source_routine'    : input_path + Input.get('SourceFile'),
-        'mgdraw_file'       : input_path + Input.get('MGDrawFile'),
-
-        # Output Parameters
-        'output_dir'    : Output.get('OutputDir'),
-        'neutron_file'  : Output.get('NeutronFile'),
-        'progress_out'  : Output.get('ProgressOut'),
-
-        # Source Parameters
-        'source_path' : input_yaml.get('Source').get('FlukaPath'),
-    }
-
-fluka_files = {
-    'tpc_neutron_file'      :   'input' + str(stamp) +  '001_fort.72',
-    'od_neutron_file'       :   'input' + str(stamp) +  '001_fort.70',
-    'res_nuclei_file'       :   'input' + str(stamp) +  '001_fort.97',
-    'res_nuclei_cu_file'    :   'input' + str(stamp) +  '001_fort.94',
-    'mgdraw_file'           :   'mgdrw' + str(stamp) + '.f',
-    'source_file'           :   'musource' + str(stamp) + '.f',  
-    'input_file'            :   'input' + str(stamp) + '.inp',
-    'muon_file'             :   'muons' + str(stamp) + '.txt'
-}
-
 hdf5_structure = {
     ###---->  Meta data about the respective simulation
     'meta' : {   
@@ -251,7 +196,7 @@ def make_phase_space_file(num_muons, stamp, roi_radius = 0, roi_height = 0, inte
         This file is used by the larger simulation as the source for each particle.
         NOTE: if the filename is changed, it must also be changed in the .inp file for the sim.
         
-        Muon initial units are to be METRES. This is converted to FLUKA native cm in the read_phase_space_file routine'''
+        Muon initial units are to be METERS. This is converted to FLUKA native cm in the read_phase_space_file routine'''
 
     from random import random
 
@@ -335,21 +280,24 @@ def remove_leftovers():
     for ext in file_list:
         os.system('rm ' + ext )
 
-def change_seed(input_file = fluka_files['input_file']):
+def change_seed(stamp : int):
     '''Changes the seed to the simulation in a given input file'''
 
+    stamp = str(stamp)
+    input_filename = 'input'+stamp+'.inp'
     seed = str(np.random.randint(0,999999))
     os.system('echo RR: Changing seed in input file to: ' + seed)
     space_string = '                      '
     num_spaces = len(space_string) - len(str(seed))
     num_string = 'RANDOMIZ' + space_string[:num_spaces] + seed
-    os.system('sed -i \'s/^RANDOMIZ.*/' + num_string + '/\' ' + input_file)
+    os.system('sed -i \'s/^RANDOMIZ.*/' + num_string + '/\' ' + input_filename)
 
     return seed
 
-def change_number_of_muons(num_muons, input_filename = fluka_files['input_file']):
+def change_number_of_muons(num_muons, stamp):
     '''Changes the number of muons in the input file for a given simulation'''
-
+    stamp = str(stamp)
+    input_filename = 'input'+stamp+'.inp'
     space_string = '               '
     num_spaces = len(space_string) - len(str(num_muons))
     num_string = 'START' + space_string[:num_spaces] + str(num_muons)
@@ -490,7 +438,7 @@ def retrieve_muons(muon_array, ncase_list) -> dict:
 
     return muon_dict
 
-def store_data_in_h5(output_filename, seed, muon_list) -> bool:
+def store_data_in_h5(output_filename, fluka_files, seed, muon_list) -> bool:
     '''Takes the data from the FLUKA output files and builds it into an hdf5 file.'''
 
     ### First we gather the data ###
@@ -613,10 +561,10 @@ def store_data_in_h5(output_filename, seed, muon_list) -> bool:
         os.system('rm ' + output_filename)
         return False
 
-def run_fluka(stamp):
+def run_fluka(source_path, stamp):
     ''' Executes the command to run the simulation given everything else has been done'''
 
-    run_string = yaml_card['source_path'] + 'rfluka -M 1 -e ./exe' + stamp + '.exe ' + 'input' + stamp + '.inp'
+    run_string = source_path + 'rfluka -M 1 -e ./exe' + stamp + '.exe ' + 'input' + stamp + '.inp'
     os.system(run_string)
 
 def merge_hdf5_files(h5_output, *args):
@@ -751,7 +699,7 @@ def merge_hdf5_files(h5_output, *args):
     # Return the string name of the file
     return h5_output
 
-def runsim(stamp):
+def runsim(stamp, yaml_card, fluka_files):
     ''' The function for running the simulation from beginning to end'''
 
     stamp = str(stamp)
@@ -795,11 +743,3 @@ def runsim(stamp):
         print('A neutron file was created')
     else:
         print('No neutron file was created')
-
-
-
-
-
-
-
-

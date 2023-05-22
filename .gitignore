@@ -8,8 +8,8 @@
 *.exe
 *dump*
 *.txt
-*ran*
-*tab*
+*rann*
+*tab.
 *lis*
 *.dat
 *.h5
@@ -32,3 +32,6 @@
 *.aux
 *.toc
 *test*
+.vagrant/*
+.vscode/*
+ran*
