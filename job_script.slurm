@@ -71,7 +71,7 @@ echo
 
 
 
-singularity exec -B /gpfs $image python $path_to_sim/run_module.py -s $rand
+singularity exec -B /gpfs $image python $path_to_sim/run_simulation.py -s $rand
 
 
 mv *$rand* "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID

@@ -17,6 +17,8 @@ STAMP = int(args.first_seed)
 np.random.seed(STAMP)
 stamp = STAMP
 
+mf.set_seed(STAMP)
+rt.set_seed(STAMP)
 
 with open('simconfig.yaml') as yaml_file:
 
@@ -58,7 +60,8 @@ fluka_files = {
     'mgdraw_file'           :   'mgdrw' + str(stamp) + '.f',
     'source_file'           :   'musource' + str(stamp) + '.f',  
     'input_file'            :   'input' + str(stamp) + '.inp',
-    'muon_file'             :   'muons' + str(stamp) + '.txt'
+    'muon_file'             :   'muons' + str(stamp) + '.txt',
+    'executable'            :   'exe' + str(stamp) + '.exe'
 }
 
 

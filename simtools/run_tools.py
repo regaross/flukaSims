@@ -109,26 +109,29 @@ hdf5_structure = {
                      
                     }
 
+def set_seed(seed):
+    '''Sets the numpy random generation seed with a given seed'''
+    np.random.seed(seed)
 
-def copy_input_files(stamp : int):
-    stamp = str(stamp)
-    if os.path.isfile('input' + str(stamp) + '.inp'):
+def copy_input_files(fluka_files):
+    
+    if os.path.isfile(fluka_files['input_file']):
         return 
     else:
-        os.system('cp nEXO_OD.inp input' + stamp + '.inp')
-        os.system('cp mgdraw_neutron_count.f mgdrw' + stamp + '.f')
+        os.system('cp simfiles/nEXO_OD.inp ' + fluka_files['input_file'])
+        os.system('cp simfiles/mgdraw_neutron_count.f ' + fluka_files['mgdraw_file'])
 
-def change_muon_filepath(stamp):
+def change_muon_filepath(fluka_files):
     '''Changes the path to the muon_file in the provided fluka source file'''
 
-    source_name = 'musource' + str(stamp) + '.f'
-    muon_file = 'muons' + str(stamp) + '.txt'
+    source_name = fluka_files['source_file']
+    muon_file = fluka_files['muon_file']
 
     if os.path.isfile(source_name):
         return 
     else:
 
-        with open('muon_from_file.f', 'r') as source:
+        with open('simfiles/muon_from_file.f', 'r') as source:
             lines = source.readlines()
         
         replace_string = '      call read_phase_space_file(\"'+ muon_file + '\", \'GeV\', \'m\', phase_space_entry, .true. , nomore )'
@@ -137,7 +140,7 @@ def change_muon_filepath(stamp):
         with open(source_name, 'w') as source:
             source.writelines(lines)
 
-def link_and_compile(path_to_fluka, stamp):
+def link_and_compile(path_to_fluka, fluka_files):
     '''Links and compiles the fluka routines for the fluka executable'''
 
     if not path_to_fluka[-1] == '/':
@@ -145,12 +148,12 @@ def link_and_compile(path_to_fluka, stamp):
     
     compile_string = path_to_fluka + 'fff'
 
-    os.system(compile_string + ' ' + 'mgdrw' + stamp + '.f' )
-    os.system(compile_string + ' ' + 'musource' + stamp + '.f'  )
+    os.system(compile_string + ' ' + fluka_files['mgdraw_file'] )
+    os.system(compile_string + ' ' + fluka_files['source_file']  )
 
-    link_string = path_to_fluka + 'ldpmqmd -m fluka -o exe'  + stamp + '.exe '
-    mgd_compd = 'mgdrw' + stamp + '.o'
-    source_compd = 'musource' + stamp + '.o'
+    link_string = path_to_fluka + 'ldpmqmd -m fluka -o ' + fluka_files['executable']
+    mgd_compd = fluka_files['mgdraw_file'][:-2] + '.o'
+    source_compd = fluka_files['source_file'][:-2] + '.o'
     os.system(link_string + mgd_compd + ' ' + source_compd )
 
 def read_resnuclei_file(resnuclei_file):
@@ -191,7 +194,7 @@ def read_resnuclei_file(resnuclei_file):
 
     return np.array(arr_list)
 
-def make_phase_space_file(num_muons, stamp, roi_radius = 0, roi_height = 0, intersecting = True):
+def make_phase_space_file(num_muons, filename, roi_radius = 0, roi_height = 0, intersecting = True):
     '''A function to make a phase space file for a number of muons. 
         This file is used by the larger simulation as the source for each particle.
         NOTE: if the filename is changed, it must also be changed in the .inp file for the sim.
@@ -200,7 +203,6 @@ def make_phase_space_file(num_muons, stamp, roi_radius = 0, roi_height = 0, inte
 
     from random import random
 
-    filename = 'muons' + str(stamp) + '.txt'
     file_stream = open(filename, 'w')
 
     if roi_radius <= 0:
@@ -280,11 +282,9 @@ def remove_leftovers():
     for ext in file_list:
         os.system('rm ' + ext )
 
-def change_seed(stamp : int):
+def change_seed(input_filename):
     '''Changes the seed to the simulation in a given input file'''
 
-    stamp = str(stamp)
-    input_filename = 'input'+stamp+'.inp'
     seed = str(np.random.randint(0,999999))
     os.system('echo RR: Changing seed in input file to: ' + seed)
     space_string = '                      '
@@ -294,10 +294,8 @@ def change_seed(stamp : int):
 
     return seed
 
-def change_number_of_muons(num_muons, stamp):
+def change_number_of_muons(num_muons, input_filename):
     '''Changes the number of muons in the input file for a given simulation'''
-    stamp = str(stamp)
-    input_filename = 'input'+stamp+'.inp'
     space_string = '               '
     num_spaces = len(space_string) - len(str(num_muons))
     num_string = 'START' + space_string[:num_spaces] + str(num_muons)
@@ -708,16 +706,16 @@ def runsim(stamp, yaml_card, fluka_files):
     # Copy the input files to versions with the running stamp
     copy_input_files(stamp)
 
-    muon_list = make_phase_space_file(yaml_card['num_muons'], stamp = stamp,
+    muon_list = make_phase_space_file(yaml_card['num_muons'], fluka_files['muon_file'],
                                         roi_radius = yaml_card['roi_radius'], roi_height = yaml_card['roi_height'],\
                                               intersecting=yaml_card['intersecting'])
 
     # Change the filepath of the muon file in the FLUKA source file
-    change_muon_filepath(stamp)
+    change_muon_filepath(fluka_files)
 
     # Try repeatedly to compile: sometimes this raises issues
-    while(not os.path.isfile('exe' + stamp + '.exe')):
-        link_and_compile(yaml_card['source_path'], stamp)
+    while(not os.path.isfile(fluka_files['executable'])):
+        link_and_compile(yaml_card['source_path'], fluka_files)
 
 
     ###     Step two: change the number of muons in the appropriate file
