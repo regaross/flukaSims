@@ -737,7 +737,7 @@ def runsim(stamp, yaml_card, fluka_files):
     
     h5_filename = SLURM_PREFIX + '.hdf5'
 
-    if store_data_in_h5(h5_filename, seed, muon_list):
+    if store_data_in_h5(h5_filename, fluka_files, seed, muon_list):
         print('A neutron file was created')
     else:
         print('No neutron file was created')
