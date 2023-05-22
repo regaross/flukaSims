@@ -113,7 +113,7 @@ def set_seed(seed):
     '''Sets the numpy random generation seed with a given seed'''
     np.random.seed(seed)
 
-def copy_input_files(fluka_files):
+def copy_input_files(fluka_files : dict):
     
     if os.path.isfile(fluka_files['input_file']):
         return 
@@ -121,7 +121,7 @@ def copy_input_files(fluka_files):
         os.system('cp simfiles/nEXO_OD.inp ' + fluka_files['input_file'])
         os.system('cp simfiles/mgdraw_neutron_count.f ' + fluka_files['mgdraw_file'])
 
-def change_muon_filepath(fluka_files):
+def change_muon_filepath(fluka_files : dict):
     '''Changes the path to the muon_file in the provided fluka source file'''
 
     source_name = fluka_files['source_file']
@@ -140,7 +140,7 @@ def change_muon_filepath(fluka_files):
         with open(source_name, 'w') as source:
             source.writelines(lines)
 
-def link_and_compile(path_to_fluka, fluka_files):
+def link_and_compile(path_to_fluka, fluka_files : dict):
     '''Links and compiles the fluka routines for the fluka executable'''
 
     if not path_to_fluka[-1] == '/':
@@ -704,7 +704,7 @@ def runsim(stamp, yaml_card, fluka_files):
 
 
     # Copy the input files to versions with the running stamp
-    copy_input_files(stamp)
+    copy_input_files(fluka_files)
 
     muon_list = make_phase_space_file(yaml_card['num_muons'], fluka_files['muon_file'],
                                         roi_radius = yaml_card['roi_radius'], roi_height = yaml_card['roi_height'],\
@@ -731,7 +731,7 @@ def runsim(stamp, yaml_card, fluka_files):
 
     ###     Run the simulation
 
-    run_fluka(stamp)
+    run_fluka(yaml_card['source_path'], stamp)
 
     ###     Deal with the output
     
