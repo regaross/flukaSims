@@ -151,7 +151,7 @@ def link_and_compile(path_to_fluka, fluka_files : dict):
     os.system(compile_string + ' ' + fluka_files['mgdraw_file'] )
     os.system(compile_string + ' ' + fluka_files['source_file']  )
 
-    link_string = path_to_fluka + 'ldpmqmd -m fluka -o ' + fluka_files['executable']
+    link_string = path_to_fluka + 'ldpmqmd -m fluka -o ' + fluka_files['executable'] + ' '
     mgd_compd = fluka_files['mgdraw_file'][:-2] + '.o'
     source_compd = fluka_files['source_file'][:-2] + '.o'
     os.system(link_string + mgd_compd + ' ' + source_compd )
@@ -559,10 +559,10 @@ def store_data_in_h5(output_filename, fluka_files, seed, muon_list) -> bool:
         os.system('rm ' + output_filename)
         return False
 
-def run_fluka(source_path, stamp):
+def run_fluka(source_path, fluka_files):
     ''' Executes the command to run the simulation given everything else has been done'''
 
-    run_string = source_path + 'rfluka -M 1 -e ./exe' + stamp + '.exe ' + 'input' + stamp + '.inp'
+    run_string = source_path + 'rfluka -M 1 -e ./' + fluka_files['executable'] + ' ' + fluka_files['input_file']
     os.system(run_string)
 
 def merge_hdf5_files(h5_output, *args):
@@ -731,7 +731,7 @@ def runsim(stamp, yaml_card, fluka_files):
 
     ###     Run the simulation
 
-    run_fluka(yaml_card['source_path'], stamp)
+    run_fluka(yaml_card['source_path'], fluka_files)
 
     ###     Deal with the output
     
