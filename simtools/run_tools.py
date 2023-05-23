@@ -52,6 +52,7 @@ hdf5_structure = {
         'muons_simulated':      {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
         'roi_height':           {'shape' : (0,), 'dtype' : float, 'maxshape': (None,)},
         'roi_radius':           {'shape' : (0,), 'dtype' : float, 'maxshape': (None,)},
+        'hours_simulated':      {'shape' : (0,), 'dtype' : float, 'maxshape': (None,)}
         },
 
     ###----> Data points for each neutron counted in the TPC
@@ -194,7 +195,7 @@ def read_resnuclei_file(resnuclei_file):
 
     return np.array(arr_list)
 
-def make_phase_space_file(num_muons, filename, roi_radius = 0, roi_height = 0, intersecting = True):
+def make_phase_space_file(num_muons, filename, roi_radius = 0, roi_height = 0, intersecting = True) -> tuple:
     '''A function to make a phase space file for a number of muons. 
         This file is used by the larger simulation as the source for each particle.
         NOTE: if the filename is changed, it must also be changed in the .inp file for the sim.
@@ -215,7 +216,7 @@ def make_phase_space_file(num_muons, filename, roi_radius = 0, roi_height = 0, i
     roi = mf.OuterDetector(roi_radius, roi_height)
     
     if intersecting:
-        muarray = mf.intersecting_muons(num_muons, roi)
+        muarray, hours = mf.intersecting_muons_with_time(num_muons, roi)
     else:
         muarray = mf.non_intersecting_muons(num_muons, roi)
 
@@ -225,7 +226,7 @@ def make_phase_space_file(num_muons, filename, roi_radius = 0, roi_height = 0, i
 
     file_stream.close()
 
-    return muarray
+    return muarray, hours
 
 def initialize_h5_file(h5_filename):
     '''Creates an empty hdf5 file with the structure equivalent to the above dictionary. Renames the file if it already exists.'''
@@ -436,7 +437,13 @@ def retrieve_muons(muon_array, ncase_list) -> dict:
 
     return muon_dict
 
-def store_data_in_h5(output_filename, fluka_files, seed, muon_list) -> bool:
+def get_hours(roi_height, roi_radius, muons_simulated):
+    ''' Using the snolab muon vertical flux value, we return the value in hours that have passed given the '''
+    roi_height = mf.OD_HEIGHT + roi_height
+    roi_radius = mf.OD_RADIUS + roi_radius
+
+
+def store_data_in_h5(output_filename, fluka_files, yaml_card, seed, muon_list, hours) -> bool:
     '''Takes the data from the FLUKA output files and builds it into an hdf5 file.'''
 
     ### First we gather the data ###
@@ -552,6 +559,9 @@ def store_data_in_h5(output_filename, fluka_files, seed, muon_list) -> bool:
             output_file['meta']['muons_simulated'][indices['meta']] = od_muons['total']
             output_file['meta']['roi_height'][indices['meta']] = mf.OD_HEIGHT + yaml_card['roi_height']
             output_file['meta']['roi_radius'][indices['meta']] = mf.OD_RADIUS + yaml_card['roi_radius']
+            output_file['meta']['hours_simulated'][indices['meta']] = hours
+            output_file['meta']['seed'][indices['meta']] = seed
+
 
         return True
 
@@ -706,7 +716,7 @@ def runsim(stamp, yaml_card, fluka_files):
     # Copy the input files to versions with the running stamp
     copy_input_files(fluka_files)
 
-    muon_list = make_phase_space_file(yaml_card['num_muons'], fluka_files['muon_file'],
+    muon_list, hours = make_phase_space_file(yaml_card['num_muons'], fluka_files['muon_file'],
                                         roi_radius = yaml_card['roi_radius'], roi_height = yaml_card['roi_height'],\
                                               intersecting=yaml_card['intersecting'])
 
@@ -737,7 +747,7 @@ def runsim(stamp, yaml_card, fluka_files):
     
     h5_filename = SLURM_PREFIX + '.hdf5'
 
-    if store_data_in_h5(h5_filename, fluka_files, seed, muon_list):
+    if store_data_in_h5(h5_filename, fluka_files, yaml_card, seed, muon_list, hours):
         print('A neutron file was created')
     else:
         print('No neutron file was created')

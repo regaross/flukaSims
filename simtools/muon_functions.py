@@ -502,6 +502,36 @@ def intersecting_muons(how_many, detector = OuterDetector(), gen_radius=0, gen_o
 
     return np.array(muon_list)[:how_many]
 
+def intersecting_muons_with_time(how_many, detector = OuterDetector(), gen_radius=0, gen_offset=0) -> tuple:
+    ''' Returns a tuple of an array with the intersecting muons and also the count of muons that had to be tested to produce the array'''
+
+    at_a_time = int(np.sqrt(how_many))
+    no_hits_count = 0
+    hits_count = 0
+
+    muon_list = []
+
+    while len(muon_list) < how_many:
+        temp_muons = generate_muons(at_a_time, detector, gen_radius, gen_offset)
+        for mu in temp_muons:
+            if hits_detector(mu, detector):
+                if hits_count == how_many:
+                    break
+                hits_count += 1
+                muon_list.append(mu)
+                mu.path_length = path_length(mu, detector, labels=False)
+            else:
+                no_hits_count += 1
+
+    total_muons = no_hits_count + hits_count
+    area = (10**4)*np.pi*get_disk_radius(detector, detector.height)**2 ## cm squared
+
+    seconds = (total_muons/area)/SNOLAB_MU_FLUX ## seconds
+    hours = seconds / 3600
+
+    return (np.array(muon_list)[:how_many], hours)
+    
+
 def non_intersecting_muons(how_many, detector = OuterDetector(), gen_radius=0, gen_offset=0) -> np.ndarray:
     ''' Does the same as generate_muons, but returns only muons that do not intersect the provided outer detector'''
 
