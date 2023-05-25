@@ -29,6 +29,8 @@
 #                  Variables
 #################################################
 
+output_dir="run"$SLURM_ARRAY_JOB_ID
+
 rand=$RANDOM
 path_to_sim='/gpfs/slac/staas/fs1/g/exo/exo_data8/exo_data/users/rross/flukaSims/'
 image=$path_to_sim"fluka_nEXO.sif"
@@ -53,8 +55,8 @@ exe_name=path_to_sim'exe'$rand'.exe'
 ################################################
 
 
-mkdir run$SLURM_ARRAY_JOB_ID
-mkdir "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
+mkdir $output_dir
+mkdir $output_dir/subrun$SLURM_ARRAY_TASK_ID
 
 #################################################
 #         Printing meta data to stdout
@@ -74,5 +76,5 @@ echo
 singularity exec -B /gpfs $image python $path_to_sim/run_simulation.py -s $rand
 
 
-mv *$rand* "run$SLURM_ARRAY_JOB_ID"/subrun$SLURM_ARRAY_TASK_ID
-mv *.hdf5 "run$SLURM_ARRAY_JOB_ID"/
+mv *$rand* $output_dir/subrun$SLURM_ARRAY_TASK_ID
+mv *.hdf5 $output_dir/
