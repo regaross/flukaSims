@@ -1,6 +1,6 @@
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 TITLE
-Most Recent Update: March 31, 2023
+Most Recent Update: May 26, 2023
 * Setting default precision
 DEFAULTS                                                              PRECISIO
 RANDOMIZ                    93
@@ -111,8 +111,8 @@ MATERIAL                             1.5        33                    HFE
 COMPOUND         0.2  HYDROGEN     0.067    COLDOX     0.267  COLDCARBHFE
 COMPOUND       0.466  FLUORINE                                        HFE
 * Changed density from gas to liquid @ 3.6 g/ml does this make a difference?
-MATERIAL          54       136      3.60        34                    XE136
-MATERIAL          54       134       3.4        35                    XE134
+MATERIAL          54                3.60        34                 136XE136
+MATERIAL          54                 3.4        35                 134XE134
 * Select the density such that the volume of the TPC encapsulates 5000kg of LXe
 MATERIAL                            3.58        36                    LXe
 COMPOUND         0.9     XE136       0.1     XE134                    LXe
