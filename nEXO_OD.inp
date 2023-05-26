@@ -99,14 +99,14 @@ COMPOUND      -0.033  MAGNESIU     -0.09  ALUMINUM    -0.262   SILICONNORITE
 COMPOUND      -0.012  POTASSIU    -0.052   CALCIUM    -0.062      IRONNORITE
 COMPOUND      -0.005  TITANIUM   -0.0004    CARBON                    NORITE
 * Ordinary Potassium - Not in the FLUKA default materials
-MATERIAL         19.        39     0.862        27                    POTASSIU
-MATERIAL          24        52      7.19        28                    CHROMIUM
+MATERIAL         19.               0.862        27                  39POTASSIU
+MATERIAL          24                7.19        28                  52CHROMIUM
 * Ordinary Stainless Steel
 MATERIAL                            8.03        29                    STNLESS
 COMPOUND       -0.07    NICKEL     -0.17  CHROMIUM     -0.76      IRONSTNLESS
-MATERIAL           6        12      2.26        30                    COLDCARB
-MATERIAL          8.        16 0.0013315        31                    COLDOX
-MATERIAL           9     18.99  0.001696        32                    FLUORINE
+MATERIAL           6                2.26        30                  12COLDCARB
+MATERIAL          8.           0.0013315        31                  16COLDOX
+MATERIAL           9            0.001696        32                  19FLUORINE
 MATERIAL                             1.5        33                    HFE
 COMPOUND         0.2  HYDROGEN     0.067    COLDOX     0.267  COLDCARBHFE
 COMPOUND       0.466  FLUORINE                                        HFE
