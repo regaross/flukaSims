@@ -20,6 +20,9 @@ import h5py as h5
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from matplotlib import colors
+import matplotlib as mpl
+
 params = {'text.usetex' : True,
         'font.family' : 'lmodern'}
 plt.rcParams.update(params)
@@ -29,6 +32,9 @@ import re
 #                   CONSTANTS                    }
 #               (And Dictionaries)               }
 #################################################
+
+OD_RADIUS = 6.1722
+OD_HEIGHT = 12.8
 
 icode_dictionary = {
     None: None,
@@ -266,13 +272,17 @@ particle_colors_capitalized = {
 hdf5_structure = {
     ###---->  Meta data about the respective simulation
     'meta' : {   
-        'seed':     {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'year':     {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'month':    {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'day':      {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'hour':     {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'minute':   {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
-        'second':   {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'seed':                 {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'year':                 {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'month':                {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'day':                  {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'hour':                 {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'minute':               {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'second':               {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'muons_simulated':      {'shape' : (0,), 'dtype' : int, 'maxshape': (None,)},
+        'roi_height':           {'shape' : (0,), 'dtype' : float, 'maxshape': (None,)},
+        'roi_radius':           {'shape' : (0,), 'dtype' : float, 'maxshape': (None,)},
+        'hours_simulated':      {'shape' : (0,), 'dtype' : float, 'maxshape': (None,)}
         },
 
     ###----> Data points for each neutron counted in the TPC
@@ -335,27 +345,17 @@ hdf5_structure = {
 #                                               }
 #################################################
 
-
-def get_hdf5_files(path, with_path = False)-> list:
-    ''' Given a particular path, this returns a list of hdf5 files found at that location
-    if with_path, the path to the file will be prepended '''
-
-    from os import listdir
-    from os.path import isfile, join
-
-    h5_files = [f for f in listdir(path) if (isfile(join(path, f)) and f[-5:] == '.hdf5')]
-
-    if with_path:
-        h5_files = [path + file for file in h5_files]
-
-        return h5_files
+def grab_file(file):
+    '''If the file is only a string, this will open the file and return the handle'''
+    if type(file) is str:
+        return h5.File(file, 'r')
     else:
-        return h5_files
+        return file
 
 def plot_e_vs_e(h5_file, tpc = False):
     ''' A simple scatter plot of muon vs neutron energies'''
 
-    h5_file = h5.File(h5_file)
+    h5_file = grab_file(h5_file)
 
     if tpc:
         data = h5_file['tpc_data']
@@ -378,7 +378,8 @@ def plot_e_vs_e(h5_file, tpc = False):
 
 def plot_neutron_energy_histogram(h5_file, bins = 100, tpc = False):
     ''' A simple histogram of the neutron energies from the file'''
-
+    h5_file = grab_file(h5_file)
+    
     if tpc:
         data = h5_file['tpc_data']
     else:
@@ -392,6 +393,19 @@ def plot_neutron_energy_histogram(h5_file, bins = 100, tpc = False):
     plt.xlabel('Energy [GeV]'); plt.ylabel('Count')
     plt.show()
 
+def plot_impact_hist(h5_file, bins = 20, label = '', tpc = False):
+
+    h5_file = grab_file(h5_file)
+
+    if tpc:
+        data = h5_file['tpc_data']
+    else:
+        data = h5_file['od_data']
+
+    plt.hist(np.unique(data['muon_impact']), bins=bins, histtype='step', label = label)
+    plt.title('Muon Impact Parameters')
+    plt.xlabel('Impact Parameter [cm]'); plt.ylabel('Count')
+
 def get_total_muons(h5_file):
 
     summary =  {'muons_simulated'           :       np.sum(h5_file['od_totals']['muons_simulated']),
@@ -403,21 +417,9 @@ def get_total_muons(h5_file):
     
     return summary
 
-def plot_impact_hist(h5_file_path, bins = 20, label = '', tpc = False):
-
-    h5_file = h5.File(h5_file_path)
-
-    if tpc:
-        data = h5_file['tpc_data']
-    else:
-        data = h5_file['od_data']
-
-    plt.hist(np.unique(data['muon_impact']), bins=bins, histtype='step', label = label)
-    plt.title('Muon Impact Parameters')
-    plt.xlabel('Impact Parameter [cm]'); plt.ylabel('Count')
-
 def plot_both_impact_hist(h5_file, bins = 20, label = ''):
 
+    h5_file = grab_file(h5_file)
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (10,5))
 
@@ -437,6 +439,8 @@ def plot_both_impact_hist(h5_file, bins = 20, label = ''):
     ax1.set_ylabel('Count'); ax2.set_ylabel('Count')
 
 def plot_both_energy_hist(h5_file, bins = 20, label = ''):
+
+    h5_file = grab_file(h5_file)
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (10,5))
 
@@ -463,15 +467,250 @@ def plot_both_energy_hist(h5_file, bins = 20, label = ''):
 
 def plot_coz_neutrons(h5_file, bins=50, tpc = False):
 
-    h5_file = h5.File(h5_file)
-    if tpc:
-        data = h5_file['tpc_data']
-    else:
-        data = h5_file['od_data']
+    h5_file = grab_file(h5_file)
+    # if tpc:
+    #     data = h5_file['tpc_data']
+    # else:
+    #     data = h5_file['od_data']
 
-    plt.hist(data['neutron_direction'][:,2], bins=bins)
-    plt.title('Neutron Zenith Angles')
-    plt.xlabel(r'$\cos \theta$'); plt.ylabel('Count')
+    # plt.hist(data['neutron_direction'][:,2], bins=bins, histtype='step')
+    # plt.title('Neutron Zenith Angles')
+    # plt.xlabel(r'$\cos \theta$'); plt.ylabel('Count')
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (10,5))
+
+    tpc_data = h5_file['tpc_data']
+
+    od_data = h5_file['od_data']
+
+    totals = get_total_muons(h5_file)
+
+    ax1.hist(np.unique(od_data['neutron_direction'][:,2]), bins=bins, histtype='step', label = 'OD')
+    ax1.set_title('OD Neutron Zenith Angles N = ' + str(totals['neutrons_counted_od']) + ' neutrons')
+    ax1.set_xlabel(r'$\cos \theta$'); ax1.set_ylabel('Count')
+
+    ax2.hist(np.unique(tpc_data['neutron_direction'][:,2]), bins=bins, histtype='step', label = 'OD')
+    ax2.set_title('TPC Neutron Zenith Angles N = ' + str(totals['neutrons_counted_tpc']) + ' neutrons')
+    ax2.set_xlabel(r'$\cos \theta$'); ax2.set_ylabel('Count')
+    plt.show()
+
+def get_activation(h5_file, z, a, tpc = True):
+    ''' Returns the absolute "count" of Xe-137 tablued by the resnuclei FLUKA function given an hdf5 file'''
+
+    h5_file = grab_file(h5_file)
+    muons_simulated = h5_file['meta']['muons_simulated'][0]
+
+    if tpc:
+        resnuc_data = h5_file['resnuclei']['resnuclei']
+    else:
+        resnuc_data = h5_file['resnuclei']['resnuclei_cu']
+
+    entries = []
+    for entry in resnuc_data:
+        if entry[1] == a and entry[0] == z:
+            entries.append(entry)
+
+    totals = []
+
+    if len(entries) > 0:
+        for entry in entries:
+            totals.append(entry[2]*muons_simulated)
+
+        return np.sum(totals)
+    else:
+        return 0
+
+def get_xe137_activation(h5_file):
+    ''' Returns the absolute "count" of Xe-137 tablued by the resnuclei FLUKA function given an hdf5 file'''
+
+    h5_file = grab_file(h5_file)
+
+    muons_simulated = h5_file['meta']['muons_simulated'][0]
+
+    xe137_entries = []
+    for entry in h5_file['resnuclei']['resnuclei']:
+        if entry[1] == 137 and entry[0] == 54:
+            xe137_entries.append(entry)
+
+    totals = []
+
+    if len(xe137_entries) > 0:
+        for entry in xe137_entries:
+            totals.append(entry[2]*muons_simulated)
+
+        return np.sum(totals)
+    else:
+        return 0
+
+def get_total_years(h5_file) -> float:
+    h5_file = grab_file(h5_file)
+    years = np.sum(h5_file['meta']['hours_simulated'])/8760
+    return years 
+
+def print_summary(h5_file) -> dict:
+    '''Creates a summary dictionary of the file, prints a summary, and returns the dictionary'''
+    h5_file = grab_file(h5_file)
+
+    summary =  {'muons_simulated'           :       np.sum(h5_file['od_totals']['muons_simulated']),
+                'neutrons_counted_od'       :       np.sum(h5_file['od_totals']['neutrons_counted']),
+                'neutrons_counted_tpc'      :       np.sum(h5_file['tpc_totals']['neutrons_counted']),
+                'muon_parents_od'           :       np.sum(h5_file['od_totals']['muon_parents']),
+                'muon_parents_tpc'          :       np.sum(h5_file['tpc_totals']['muon_parents']),
+                'roi_radius'                :       h5_file['meta']['roi_radius'][0],
+                'roi_height'                :       h5_file['meta']['roi_height'][0],
+                'xe137_activation'          :       get_xe137_activation(h5_file),
+                'cu64_activation'           :       get_activation(h5_file, 29, 64, False),
+                'cu66_activation'           :       get_activation(h5_file, 29, 66, False),
+                'hours_simulated'           :       np.sum(h5_file['meta']['hours_simulated']),
+                'years_simulated'           :       np.sum(h5_file['meta']['hours_simulated'])/8760,
+                }
+    
+    print('Summary of Fluka File:\n')
+    print('Muons Simulated: ' + str(summary['muons_simulated']))
+    print('Intersecting ROI Radius: ' + str(summary['roi_radius']) + '[m] Height: ' + str(summary['roi_height']) + ' [m]')
+    print(str(summary['muon_parents_od']) + ' muons creating ' + str(summary['neutrons_counted_od']) + ' neutrons in the OD')
+    print(str(summary['muon_parents_tpc']) + ' muons creating ' + str(summary['neutrons_counted_tpc']) + ' neutrons in the TPC')
+    print('Xenon-137 atoms counted: ' + str(summary['xe137_activation']))
+    print('Copper-64 atoms counted in TPC shell: ' + str(summary['cu64_activation']))
+    print('Copper-66 atoms counted in TPC shell: ' + str(summary['cu66_activation']))
+
+    print('Time Simulated: ' + str(summary['hours_simulated']) + ' hours or ' + str(summary['years_simulated']) + ' years')
+    
+    return summary
+
+def tabulate_resnuclei_data(resnuclei_dataset) -> np.ndarray:
+
+    max_z = 0
+    max_a = 0
+
+    for entry in resnuclei_dataset:
+        if entry[0] > max_z:
+            max_z = int(entry[0])
+
+        if entry[1] > max_a:
+            max_a = int(entry[1])
+
+    # Make an array to represent each isotope in the resnuclei database. 
+    # The indices are then (Z,A) and the value will represent the number of counts per primary
+    resnuclei_array = np.zeros((max_z + 1, max_a + 1))
+
+    for entry in resnuclei_dataset:
+        x , y, val = int(entry[0]), int(entry[1]), entry[2]
+
+        resnuclei_array[x][y] += val
+
+    return resnuclei_array
+ 
+def activation_plot(h5_file):
+    '''Plots a histogram of the table of nuclides counted in the detector'''
+    grab_file(h5_file)
+
+    muons_per_run = h5_file['meta']['muons_simulated'][0]
+    resnuclei = tabulate_resnuclei_data(h5_file['resnuclei']['resnuclei'])*muons_per_run
+    max_z = np.shape(resnuclei)[0]; max_a = np.shape(resnuclei)[1]
+    bins = np.arange(0.1, (max_z + 1.1), 1), np.arange(0.1, (max_a + 1.1), 1)
+
+
+    resnuclei_cu = tabulate_resnuclei_data(h5_file['resnuclei']['resnuclei_cu'])*muons_per_run
+    max_z_cu = np.shape(resnuclei_cu)[0]; max_a_cu = np.shape(resnuclei_cu)[1]
+    bins_cu = np.arange(0.1, (max_z_cu + 1.1), 1), np.arange(0.1, (max_a_cu + 1.1), 1)
+
+    resnuc_z, resnuc_a, resnuc_weights = [],[],[]
+    for z in range(np.shape(resnuclei)[0]):
+        for a in range(np.shape(resnuclei)[1]):
+            resnuc_z.append(z); resnuc_a.append(a)
+            resnuc_weights.append(resnuclei[z][a])
+    
+    resnuc_cu_z, resnuc_cu_a, resnuc_cu_weights = [],[],[]
+    for z in range(np.shape(resnuclei_cu)[0]):
+        for a in range(np.shape(resnuclei_cu)[1]):
+            resnuc_cu_z.append(z); resnuc_cu_a.append(a)
+            resnuc_cu_weights.append(resnuclei_cu[z][a])
+
+    fig, ax = plt.subplots(1,2, figsize = (8, 8))
+    hist1 = ax[0].hist2d(resnuc_z, resnuc_a, bins = bins, weights = resnuc_weights,  norm=colors.LogNorm(), cmap=mpl.colormaps['winter'])
+    ax[0].grid(which = 'both')
+    ax[0].set_title('Activation in TPC')
+    ax[0].set_xticks(np.arange(0, np.shape(resnuclei)[0] + 1, 5))
+    ax[0].set_yticks(np.arange(0, np.shape(resnuclei)[1] + 1, 5))
+
+    hist2 = ax[1].hist2d(resnuc_cu_z, resnuc_cu_a, bins = bins_cu, weights = resnuc_cu_weights,  norm=colors.LogNorm(), cmap=mpl.colormaps['copper'])
+    ax[1].grid(which = 'both')
+    ax[1].set_title('Activation in TPC Copper')
+    ax[1].set_xticks(np.arange(0, np.shape(resnuclei_cu)[0] + 1, 5))
+    ax[1].set_yticks(np.arange(0, np.shape(resnuclei_cu)[1] + 1, 5))
+
+    fig.colorbar(hist1[3], ax=ax[0])
+    fig.colorbar(hist2[3], ax=ax[1])
+
+    plt.show()
+
+def activation_plot_per_year(h5_file):
+    '''Plots a histogram of the table of nuclides counted in the detector'''
+    grab_file(h5_file)
+
+    muons_per_run = h5_file['meta']['muons_simulated'][0]
+    resnuclei = tabulate_resnuclei_data(h5_file['resnuclei']['resnuclei'])*muons_per_run/get_total_years(h5_file)
+    max_z = np.shape(resnuclei)[0]; max_a = np.shape(resnuclei)[1]
+    bins = np.arange(0.1, (max_z + 1.1), 1), np.arange(0.1, (max_a + 1.1), 1)
+
+
+    resnuclei_cu = tabulate_resnuclei_data(h5_file['resnuclei']['resnuclei_cu'])*muons_per_run/get_total_years(h5_file)
+    max_z_cu = np.shape(resnuclei_cu)[0]; max_a_cu = np.shape(resnuclei_cu)[1]
+    bins_cu = np.arange(0.1, (max_z_cu + 1.1), 1), np.arange(0.1, (max_a_cu + 1.1), 1)
+
+    resnuc_z, resnuc_a, resnuc_weights = [],[],[]
+    for z in range(np.shape(resnuclei)[0]):
+        for a in range(np.shape(resnuclei)[1]):
+            resnuc_z.append(z); resnuc_a.append(a)
+            resnuc_weights.append(resnuclei[z][a])
+    
+    resnuc_cu_z, resnuc_cu_a, resnuc_cu_weights = [],[],[]
+    for z in range(np.shape(resnuclei_cu)[0]):
+        for a in range(np.shape(resnuclei_cu)[1]):
+            resnuc_cu_z.append(z); resnuc_cu_a.append(a)
+            resnuc_cu_weights.append(resnuclei_cu[z][a])
+
+    fig, ax = plt.subplots(1,2, figsize = (8, 8))
+    hist1 = ax[0].hist2d(resnuc_z, resnuc_a, bins = bins, weights = resnuc_weights,  norm=colors.LogNorm(), cmap=mpl.colormaps['winter'])
+    ax[0].grid(which = 'both')
+    ax[0].set_title('Activation in TPC')
+    ax[0].set_xticks(np.arange(0, np.shape(resnuclei)[0] + 1, 5))
+    ax[0].set_xlabel('Atomic Number Z'); ax[0].set_ylabel('Atomic Mass A')
+    ax[0].set_yticks(np.arange(0, np.shape(resnuclei)[1] + 1, 5))
+
+    hist2 = ax[1].hist2d(resnuc_cu_z, resnuc_cu_a, bins = bins_cu, weights = resnuc_cu_weights,  norm=colors.LogNorm(), cmap=mpl.colormaps['copper'])
+    ax[1].grid(which = 'both')
+    ax[1].set_title('Activation in TPC Copper')
+    ax[1].set_xticks(np.arange(0, np.shape(resnuclei_cu)[0] + 1, 5))
+    ax[1].set_xlabel('Atomic Number Z')
+    ax[1].set_yticks(np.arange(0, np.shape(resnuclei_cu)[1] + 1, 5))
+
+    fig.colorbar(hist1[3], ax=ax[0])
+    fig.colorbar(hist2[3], ax=ax[1])
+
+    plt.show()
+
+###
+ # HDF5 file management and creation functions below
+ # 
+###
+
+def get_hdf5_files(path, with_path = False)-> list:
+    ''' Given a particular path, this returns a list of hdf5 files found at that location
+    if with_path, the path to the file will be prepended '''
+
+    from os import listdir
+    from os.path import isfile, join
+
+    h5_files = [f for f in listdir(path) if (isfile(join(path, f)) and f[-5:] == '.hdf5')]
+
+    if with_path:
+        h5_files = [path + '/' + file for file in h5_files]
+
+        return h5_files
+    else:
+        return h5_files
 
 def initialize_h5_file(h5_filename) -> str:
     '''Creates an empty hdf5 file with the structure equivalent to the above dictionary. Renames the file if it already exists.'''
@@ -520,7 +759,7 @@ def same_roi(file_paths) -> bool:
     for path in file_paths:
         with h5.File(path, 'r') as file:
             for rad in file['meta']['roi_radius']:
-                roi_radii.append(roi_radii)
+                roi_radii.append(rad)
 
             for height in file['meta']['roi_height']:
                 roi_heights.append(height)
@@ -545,16 +784,38 @@ def get_filenames(path):
 
     return onlyfiles
 
+def same_number_muons(file_paths)-> bool:
+
+    numbers = []
+    for path in file_paths:
+        with h5.File(path, 'r') as file:
+            for num in file['meta']['muons_simulated']:
+                numbers.append(num)
+
+    if len(np.unique(numbers)) == 1:
+        return True
+    else:
+        return False
+
+def check_all_runs_equal(file_paths) -> bool:
+    '''determines whether or not all files have a unique seed, the same region of interest, and the same number of simulated muons'''
+        # A quick safety check to make sure the seeds for each simulation are different
+    if not different_seeds(file_paths):
+        return False
+    # Must also confirm that the roi sizes are the same
+    elif not same_roi(file_paths):
+        return False
+    elif not same_number_muons(file_paths):
+        return False
+    else:
+        return True
+    
 def merge_hdf5_files(file_paths, output_path):
 
     import h5py as h5
 
-    # A quick safety check to make sure the seeds for each simulation are different
-    if not different_seeds(file_paths):
+    if not check_all_runs_equal:
         return
-    if not same_roi(file_paths):
-        return
-    # Must also confirm that the roi sizes are the same
 
     output_path = initialize_h5_file(output_path)
 
@@ -581,6 +842,8 @@ def merge_hdf5_files(file_paths, output_path):
                     output_dset.resize(size = current_size + dset.shape[0], axis = 0)
 
                     output_dset[current_size:] = new_data
+
+
 
 ###
  # Not necessarily functional for this module yet _ salvaged from another notebook
