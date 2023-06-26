@@ -1,0 +1,75 @@
+\section{Submitting Jobs with SLURM}
+
+
+\paragraph{}
+When running FLUKA simulations on a computing cluster such as SDF, one has to submit \textit{jobs} to be performed. These are the tasks that you are requesting the computer perform; for instance, you may submit a job of simulating 5000 muons in your geometry. The simulations performed here were generally submitted in batches— many jobs at once. Each job would require a node (a CPU) and these would each churn through two-months worth of muons through the OD simultaneously.  The SDF cluster uses SLURM to allocate jobs and thus we will briefly discuss SLURM here as it pertains to running the FLUKA simulations. Following this section is an example of a job submission script used to submit jobs to the SDF cluster.
+
+\paragraph{}
+In the following script, the first line tells the interpreter to use \textit{bash} to interpret the uncommented lines. Bear in mind, this script is not run in the conventional way by entering its path into the terminal, but by typing \textit{SBATCH} followed by the path to the script. Now, the next commented (\#) lines beginning with SBATCH are commands read in exclusively by SLURM. These request the specific resources for each node in the array (we're requesting an array of jobs here— see line 14). Each node will have 3 hours and 30 minutes to complete the task before the job will be ended by SLURM (line 13). Then for each one of these nodes, the following bash commands are executed (line 19 onward).
+
+\begin{linenumbers}
+\begin{verbatim}
+#!/bin/bash
+
+#################################################
+#                   SLURM
+#################################################
+
+#SBATCH --partition=shared
+#SBATCH --job-name=fluka_sims               # a short name for your job
+#SBATCH --output=simrun-%A-%a.out           # stdout file
+#SBATCH --error=simrun-%A-%a.err            # stderr file
+#SBATCH --cpus-per-task=1                   # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --mem-per-cpu=10G                   # memory per cpu-core (4G is default)
+#SBATCH --time=03:30:00                     # total run time limit (HH:MM:SS)
+#SBATCH --array=0-50                        # job array with index values 0, 1, 2, 3, 4
+
+#################################################
+#                  Variables
+#################################################
+
+output_dir="run"$SLURM_ARRAY_JOB_ID
+
+rand=$RANDOM
+path_to_sim='/gpfs/slac/staas/fs1/g/exo/exo_data8/exo_data/users/rross/flukaSims/'
+image=$path_to_sim"fluka_nEXO.sif"
+job_num=$SLURM_ARRAY_JOB_ID         # An integer number representing this array job submission
+task_num=$SLURM_ARRAY_TASK_ID       # An integer within the array range above representing which part of the parallelized run
+fluka_path='/usr/local/fluka/bin/'
+
+muon_source=$path_to_sim'muon_from_file.f'
+mgdraw=$path_to_sim'mgdraw_neutron_count.f'
+input=$path_to_sim'nEXO_OD.inp'
+
+new_muon_source=$path_to_sim'musource'$rand'.f'
+new_muon_source_o=$path_to_sim'musource'$rand'.o'
+new_mgdraw=$path_to_sim'mgdrw'$rand'.f'
+new_mgdraw_o=$path_to_sim'mgdrw'$rand'.o'
+new_input=$path_to_sim'input'$rand'.inp'
+exe_name=path_to_sim'exe'$rand'.exe'
+
+#################################################
+#    REMEMBER: These do not run sequentially.
+################################################
+
+mkdir $output_dir
+mkdir $output_dir/subrun$SLURM_ARRAY_TASK_ID
+
+#################################################
+#         Printing meta data to stdout
+################################################
+
+cd $path_to_sim
+date
+echo "Executing on the machine:" $(hostname) 
+echo "System random number used to seed the sim:" $rand
+echo "Running Simulation!"
+echo ; echo ; echo ; echo "COMPILING JARGON:"
+echo
+
+singularity exec -B /gpfs $image python $path_to_sim/run_simulation.py -s $rand
+
+mv *$rand* $output_dir/subrun$SLURM_ARRAY_TASK_ID
+mv *.hdf5 $output_dir/
+\end{verbatim}
+\end{linenumbers}

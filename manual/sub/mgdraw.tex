@@ -1,4 +1,39 @@
 \section{Customized Scoring}
 
 \paragraph{}
-While for many general purposes FLUKA comes equipped with adequate features, more particular circumstances may call for probing the particle stack directly. This is done through external user routines that are only deployed when explicitly linked at compile time. For instance, to determine the distances of closest approach for muons that produce neutrons in the TPC region, access to these data is necessary. For the most part, all the features of FLUKA can be accessed with customized code through the ``mgdraw.f'' user routine.
+While for many general purposes FLUKA comes equipped with adequate features, more particular circumstances may call for probing the particle stack directly. This is done through external user routines that are only deployed when explicitly linked at compile time. For instance, to determine the distances of closest approach for muons that produce neutrons in the TPC region, access to these data is necessary. For the most part, all the features of FLUKA can be accessed with customized code through the ``mgdraw.f'' user routine. For the nEXO simulations, only a small part of the ``mgdraw.f'' capabilities were deployed with a two primary goals in the readout:
+
+\begin{enumerate}
+    \item Retrieve neutron data for neutrons in the configuration (within the TPC or internal to the OD)
+    \item For each logged neutron, save its the parent muon data
+\end{enumerate}
+
+\paragraph{}
+Specifically the data saved were the following:
+
+\footnotesize
+
+\begin{center}
+    \label{tab:mgdraw_vars}
+\begin{tabular}[h]{|c|c|c|}
+    \hline
+    \textbf{Particle Stack Variable} & \textbf{Definition} & \textbf{Data Type}\\
+    \hline
+    \hline
+    ICODE & event type being logged (for which the current particle is a parent) & integer \\
+    NCASE & number of the current primary $\in [1,N]$ & integer\\
+    JTRACK & FLUKA particle ID & integer \\
+    MREG & region number where the particle was scored & integer \\
+    LTRACK & generation of the particle (primaries have LTRACK = 1) & integer \\
+    ETRACK & total energy of the particle (rest + kinetic) & float \\
+    (X or Y or Z)SCO & geometric coordinate where the particle was scored & float \\
+    C(X or Y or Z)TRCK & direction cosines for the respective coordinate axis & float \\
+    \hline
+
+\end{tabular}
+\end{center}
+
+\normalsize
+
+\paragraph{}
+In this instance, saving the data implied telling FLUKA to write the data to a particular output channel in the form of a human-readable ascii file. Later on however, these data were transcribed into HDF5 files for smaller storage sizes and for faster parsing. An overview of this process will be presented in the section on analysis.
