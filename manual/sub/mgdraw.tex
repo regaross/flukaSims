@@ -1,4 +1,6 @@
-\section{Customized Scoring}
+\section{Custom Outputs}
+
+\subsection{mgdraw.f}
 
 \paragraph{}
 While for many general purposes FLUKA comes equipped with adequate features, more particular circumstances may call for probing the particle stack directly. This is done through external user routines that are only deployed when explicitly linked at compile time. For instance, to determine the distances of closest approach for muons that produce neutrons in the TPC region, access to these data is necessary. For the most part, all the features of FLUKA can be accessed with customized code through the ``mgdraw.f'' user routine. For the nEXO simulations, only a small part of the ``mgdraw.f'' capabilities were deployed with a two primary goals in the readout:
@@ -37,3 +39,6 @@ Specifically the data saved were the following:
 
 \paragraph{}
 In this instance, saving the data implied telling FLUKA to write the data to a particular output channel in the form of a human-readable ascii file. Later on however, these data were transcribed into HDF5 files for smaller storage sizes and for faster parsing. An overview of this process will be presented in the section on analysis.
+
+\subsection{Activation}
+The activation data can also be scored in a custom fashion, however, when possible it is easier to use the builtin FLUKA features. The RESNUCLE output is an array consisting of 10 columns and N rows (as most FLUKA ascii output files are) that must be re-arranged to be in Z-A format. 

@@ -14,3 +14,6 @@ In order to deploy FLUKA on a remote cluster, SDF for instance, it must be packa
 
 \paragraph{}
 The definition file ``\begin{tt}.def\end{tt}'' for the Singularity container is in the Github repository. Should the reader wish to reproduce or modify the container, they'll need at minimum a CERN FLUKA licence in order to download the FLUKA binaries and they'll need to be placed in the directory where the container will be created along with any other files and software that cannot be installed separately from within the ``\begin{tt}.def\end{tt}'' file.
+
+\paragraph{}
+Put simply, the Singularity container holds some Python packages, the FLUKA binaries and an Evaluated Nuclear Data File (ENDF) database holding cross sections read by FLUKA when transporting neutrons.

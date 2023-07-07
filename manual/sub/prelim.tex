@@ -1,0 +1,11 @@
+\section{Some Results}
+\paragraph{}
+The primary motivation for these FLUKA simulations was to validate the GEANT4 simulations that had previously been performed to estimate activation due to the cosmogenic muons. Other connections were investigated including the distances of closest approach (impact parameters) of the muons producing neutrons in the vicinity of the nEXO OD. There had been a connection established between the impact parameters and the propensity of a muon to produce neutrons within or entering the OD or the TPC volume; muons with large impact parameters were unlikely to contribute to activation.
+
+\paragraph{}
+For the simulations in this work, the impact parameters were calculated upon the random generation of the muons in the external python module. These data, along with all the other muon data, were saved and added to the ``.hdf5'' files after the simulations were performed. The activation data were scored with FLUKA's RESNUCLEi function that counts ``residual nuclei'' in a chosen region. The analyses were entirely performed externally using various python libraries.
+
+\subsection{Activation}
+
+\paragraph{}
+The activation was scored for the TPC internal liquid xenon volume and its copper shell. 
