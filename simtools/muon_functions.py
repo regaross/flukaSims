@@ -138,7 +138,7 @@ class Muon:
     charge = 1.60218e-19        # [C]
     
 
-    def __init__(self, zenith=0, azimuth=0, energy=SNOLAB_MU_E_AVG, initial=(0,0,0), pos_neg = np.random.random() > 0.5) -> 'Muon':
+    def __init__(self, zenith=0, azimuth=0, energy=SNOLAB_MU_E_AVG, initial=(0,0,0), pos_neg = np.random.random() < 0.72) -> 'Muon':
         ''' A constructor for the muon. Defaults to vertical muon at average SNOLAB energy'''
 
         self.zenith = zenith
@@ -152,9 +152,9 @@ class Muon:
         self.pos_neg = pos_neg
 
         if pos_neg:
-            self.fluka_number = 10
+            self.fluka_number = 10 # Positive muon
         else:
-            self.fluka_number = 11
+            self.fluka_number = 11 # Negative muon
 
 
     ### Instance Functions
