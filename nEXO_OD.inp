@@ -62,10 +62,25 @@ XYP tpc_otop   65.56
 SPH i_cryo_i   0.0 0.0 0.0 167.12
 * Inner Cryostat Outside
 SPH i_cryo_o   0.0 0.0 0.0 168.38
+* Inner Cryostat Support Cone Attached to inside of Outer Cryostat
+TRC ic_con_o   0 0 200 0 0 -70 155 110
+TRC ic_con_i   0 0 200 0 0 -70 154 109
 * Outer Cryostat Inside
 SPH o_cryo_i   0.0 0.0 40.0 225.0
 * Outer Cryostat Outside
 SPH o_cryo_o   0.0 0.0 40.0 227.33
+* The conic section attaching the Outer Cryostat to the Support Structure
+TRC oc_con_o   0 0 367.33 0 0 -150 220 145
+TRC oc_con_i   0 0 367.33 0 0 -150 219 144
+* Radial Trusses supporting the internal geometry
+RPP truss_1    219 222 -1 2 367.34 639.9
+RPP truss_2    154 157 154 157 367.34 639.9
+RPP truss_3    -1 2 219 222 367.34 639.9
+RPP truss_4    154 157 -157 154 367.34 639.9
+RPP truss_5    -157 -154 -157 -154 367.34 639.9
+RPP truss_6    -222 -219 -1 2 367.34 639.9
+RPP truss_7    -1 2 -222 -219 367.34 639.9
+RPP truss_8    -157 154 154 157 367.334 639.9
 * OD Geometry— inside and outside columns, inside and outside planes
 ZCC od_icol    0 0 617.22
 XYP od_ibot    -640
@@ -79,14 +94,19 @@ XYP rock_bot   -1000.0
 XYP rock_top   5642
 * BLACK HOLE SPHERE
 SPH blkhole    0 0 0 8000
+YZP body1      -780.0
 END
 tpc_in       5 (tpc_icol + tpc_itop - tpc_ibot)
 tpc          5 (tpc_ocol + tpc_otop - tpc_obot) - (tpc_icol + tpc_itop - tpc_ibot)
 icryo_in     5 (i_cryo_i - (tpc_ocol + tpc_otop - tpc_obot))
 icryo        5 i_cryo_o - i_cryo_i
-ocryo_in     5 o_cryo_i - i_cryo_o
+ocryo_in     5 o_cryo_i - i_cryo_o - (ic_con_o - ic_con_i)
 ocryo        5 o_cryo_o - o_cryo_i
-od_in        5 (od_icol + od_itop - od_ibot) - o_cryo_o
+oc_con       5 (oc_con_o - oc_con_i)
+ic_con       5 (ic_con_o - ic_con_i)
+trusses      5 truss_1 | truss_2 | truss_3 | truss_4 | truss_5 | truss_6 | truss_7 | truss_8
+od_in        5 (od_icol + od_itop - od_ibot) - o_cryo_o - (oc_con_o - oc_con_i) - (truss_1 | truss_2 | truss_3
+               | truss_4 | truss_5 | truss_6 | truss_7 | truss_8)
 od           5 (od_ocol + od_otop - od_obot) - (od_icol + od_itop - od_ibot)
 rock         5 (rock_col + rock_top - rock_bot) - (od_ocol + od_otop - od_obot)
 blkhole      5 blkhole - (rock_col + rock_top - rock_bot)
@@ -122,6 +142,9 @@ ASSIGNMA      NORITE      rock
 ASSIGNMA       WATER     od_in
 ASSIGNMA    COLDCARB     ocryo
 ASSIGNMA      VACUUM  ocryo_in
+ASSIGNMA     STNLESS    oc_con
+ASSIGNMA     STNLESS    ic_con
+ASSIGNMA     STNLESS   trusses
 ASSIGNMA    COLDCARB     icryo
 ASSIGNMA         HFE  icryo_in
 ASSIGNMA      COPPER       tpc
