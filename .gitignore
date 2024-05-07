@@ -37,3 +37,9 @@
 ran*
 data/*
 *.png
+*.numbers
+*.deb
+*.ipynb
+*.bash_history
+*.json
+*-layout
