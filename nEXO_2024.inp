@@ -1,6 +1,6 @@
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 TITLE
-Most Recent Update: March, 2024
+Most Recent Update: May, 2024
 * Setting default precision
 DEFAULTS                                                              PRECISIO
 RANDOMIZ                    93
@@ -86,9 +86,9 @@ ZCC sup_ocol   0 0 218.66
 ZCC od_icol    0 0 617.22
 XYP od_ibot    -640
 XYP od_itop    640
-ZCC od_ocol    0 0 620.0
-XYP od_obot    -642.0
-XYP od_otop    642.0
+ZCC od_ocol    0 0 618.5
+XYP od_obot    -640.95
+XYP od_otop    641.27
 *Cryopit Cylinder
 ZCC cpit_col   0 0 720.0
 XYP cpit_bot   -643.0

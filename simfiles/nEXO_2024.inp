@@ -1,11 +1,11 @@
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 TITLE
-Most Recent Update: May 26, 2023
+Most Recent Update: May, 2024
 * Setting default precision
 DEFAULTS                                                              PRECISIO
 RANDOMIZ                    93
 START              1
-* Source command needed for deploying source_newgen.f
+* Source command needed for deploying the customized source file. (muon_source.f?)
 SOURCE
 * Setting Beam Position (overidden by source_newgen.f)  NEGATIVE means down in z
 BEAMPOS            0         0      2000                              NEGATIVE
@@ -50,44 +50,49 @@ PHYSICS          202                        PROTON     MUON-          DECAYS
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 * ------------> GEOMETRY DEFINITIONS
 GEOBEGIN                                                              COMBNAME
-    0    0          Simplified nEXO Outer Detector
+    0    0          nEXO, Simplified.
 * TPC Geometry— inside and outside columns, inside and outside planes
-ZCC tpc_icol   0 0 59.0
+ZCC tpc_icol   0 0 63.84
 XYP tpc_ibot   -63.9
 XYP tpc_itop   63.9
-ZCC tpc_ocol   0 0 59.5
+ZCC tpc_ocol   0 0 64.24
 XYP tpc_obot   -65.
-XYP tpc_otop   65.56
+XYP tpc_otop   65.67
+*Copper TPC support conic section
+TRC tpc_coni   0 0 120.0001 0 0 -65.0002 108 65
+TRC tpc_cono   0 0 120 0 0 -65 108.3 65.2
 * Inner Cryostat Inside
-SPH i_cryo_i   0.0 0.0 0.0 167.12
+SPH i_cryo_i   0.0 0.0 0.0 167.8
 * Inner Cryostat Outside
-SPH i_cryo_o   0.0 0.0 0.0 168.38
+SPH i_cryo_o   0.0 0.0 0.0 169.71
 * Inner Cryostat Support Cone Attached to inside of Outer Cryostat
-TRC ic_con_o   0 0 200 0 0 -70 155 110
-TRC ic_con_i   0 0 200 0 0 -70 154 109
-* Outer Cryostat Inside
-SPH o_cryo_i   0.0 0.0 40.0 225.0
+TRC ic_con_o   0 0 205.5 0 0 -72.5 155 110
+TRC ic_con_i   0 0 205.50001 0 0 -72.50002 151 106
 * Outer Cryostat Outside
-SPH o_cryo_o   0.0 0.0 40.0 227.33
+SPH o_cryo_o   0.0 0.0 40.0 229.28
+* Outer Cryostat Inside
+SPH o_cryo_i   0.0 0.0 40.0 227
 * The conic section attaching the Outer Cryostat to the Support Structure
-TRC oc_con_o   0 0 367.33 0 0 -150 220 145
-TRC oc_con_i   0 0 367.33 0 0 -150 219 144
-* Radial Trusses supporting the internal geometry
-RPP truss_1    219 222 -1 2 367.34 639.9
-RPP truss_2    154 157 154 157 367.34 639.9
-RPP truss_3    -1 2 219 222 367.34 639.9
-RPP truss_4    154 157 -157 154 367.34 639.9
-RPP truss_5    -157 -154 -157 -154 367.34 639.9
-RPP truss_6    -222 -219 -1 2 367.34 639.9
-RPP truss_7    -1 2 -222 -219 367.34 639.9
-RPP truss_8    -157 154 154 157 367.334 639.9
+TRC oc_con_o   0 0 327 0 0 -107.5 221.4 145
+TRC oc_con_i   0 0 327.0001 0 0 -107.5002 218 143
+*Stainless Steel Support Structure to hold the conic section of the OC
+ZCC sup_icol   0 0 218
+XYP sup_top    639
+XYP sup_bot    329
+XYP sup_itop   639.0001
+XYP sup_ibot   328
+ZCC sup_ocol   0 0 218.66
 * OD Geometry— inside and outside columns, inside and outside planes
 ZCC od_icol    0 0 617.22
 XYP od_ibot    -640
 XYP od_itop    640
-ZCC od_ocol    0 0 620.0
-XYP od_obot    -642.0
-XYP od_otop    642.0
+ZCC od_ocol    0 0 618.5
+XYP od_obot    -640.95
+XYP od_otop    641.27
+*Cryopit Cylinder
+ZCC cpit_col   0 0 720.0
+XYP cpit_bot   -643.0
+XYP cpit_top   742.0
 * ROCK Geometry— inside and outside columns, inside and outside planes
 ZCC rock_col   0 0 2617.22
 XYP rock_bot   -1000.0
@@ -98,21 +103,23 @@ YZP body1      -780.0
 END
 tpc_in       5 (tpc_icol + tpc_itop - tpc_ibot)
 tpc          5 (tpc_ocol + tpc_otop - tpc_obot) - (tpc_icol + tpc_itop - tpc_ibot)
-icryo_in     5 (i_cryo_i - (tpc_ocol + tpc_otop - tpc_obot))
+tpc_con      5 tpc_cono - tpc_coni
+icryo_in     5 (i_cryo_i - (tpc_ocol + tpc_otop - tpc_obot) - (tpc_cono - tpc_coni))
 icryo        5 i_cryo_o - i_cryo_i
 ocryo_in     5 o_cryo_i - i_cryo_o - (ic_con_o - ic_con_i)
 ocryo        5 o_cryo_o - o_cryo_i
 oc_con       5 (oc_con_o - oc_con_i)
+oc_sup       5 (sup_ocol + sup_top - sup_bot) - (sup_icol + sup_itop - sup_ibot)
 ic_con       5 (ic_con_o - ic_con_i)
-trusses      5 truss_1 | truss_2 | truss_3 | truss_4 | truss_5 | truss_6 | truss_7 | truss_8
-od_in        5 (od_icol + od_itop - od_ibot) - o_cryo_o - (oc_con_o - oc_con_i) - (truss_1 | truss_2 | truss_3
-               | truss_4 | truss_5 | truss_6 | truss_7 | truss_8)
+od_in        5 (od_icol + od_itop - od_ibot) - o_cryo_o -  (oc_con_o - oc_con_i) - ((sup_ocol + sup_top - sup_bot
+               ) - (sup_icol + sup_itop - sup_ibot))
 od           5 (od_ocol + od_otop - od_obot) - (od_icol + od_itop - od_ibot)
-rock         5 (rock_col + rock_top - rock_bot) - (od_ocol + od_otop - od_obot)
+cpit         5 (cpit_col + cpit_top - cpit_bot) - (od_ocol + od_otop - od_obot)
+rock         5 (rock_col + rock_top - rock_bot) - (cpit_col + cpit_top - cpit_bot)
 blkhole      5 blkhole - (rock_col + rock_top - rock_bot)
 END
 GEOEND
-MATERIAL                             2.8        26                    NORITE
+MATERIAL                            2.85        26                    NORITE
 * SNOLAB Norite (Rock)- See O. Scallon PhD Thesis
 COMPOUND     -0.0015  HYDROGEN     -0.46    OXYGEN    -0.022    SODIUMNORITE
 COMPOUND      -0.033  MAGNESIU     -0.09  ALUMINUM    -0.262   SILICONNORITE
@@ -122,19 +129,20 @@ COMPOUND      -0.005  TITANIUM   -0.0004    CARBON                    NORITE
 MATERIAL         19.               0.862        27                  39POTASSIU
 MATERIAL          24                7.19        28                  52CHROMIUM
 * Ordinary Stainless Steel
-MATERIAL                            8.03        29                    STNLESS
+MATERIAL                            8.00        29                    STNLESS
 COMPOUND       -0.07    NICKEL     -0.17  CHROMIUM     -0.76      IRONSTNLESS
 MATERIAL           6                1.88        30                  12COLDCARB
 MATERIAL          8.           0.0013315        31                  16COLDOX
 MATERIAL           9            0.001696        32                  19FLUORINE
-MATERIAL                            1.77        33                    HFE
-COMPOUND         0.2  HYDROGEN     0.067    COLDOX     0.267  COLDCARBHFE
-COMPOUND       0.466  FLUORINE                                        HFE
-* Changed density from gas to liquid @ 3.6 g/ml does this make a difference?
-MATERIAL          54                3.60        34                 136XE136
-MATERIAL          54                 3.4        35                 134XE134
+*HFE-7200
+MATERIAL                            1.72        33                    HFE
+COMPOUND       0.238  HYDROGEN     0.476    COLDOX     0.286    CARBONHFE
+COMPOUND       0.429  FLUORINE                                        HFE
+*Density chosen to preserve TPC dimensions
+MATERIAL          54                2.94        34                 136XE136
+MATERIAL          54                2.94        35                 134XE134
 * Select the density such that the volume of the TPC encapsulates 5000kg of LXe
-MATERIAL                            3.57        36                    LXe
+MATERIAL                            2.94        36                    LXe
 COMPOUND         0.9     XE136       0.1     XE134                    LXe
 ASSIGNMA    BLCKHOLE   blkhole
 ASSIGNMA     STNLESS        od
@@ -142,13 +150,16 @@ ASSIGNMA      NORITE      rock
 ASSIGNMA       WATER     od_in
 ASSIGNMA    COLDCARB     ocryo
 ASSIGNMA      VACUUM  ocryo_in
-ASSIGNMA     STNLESS    oc_con
-ASSIGNMA     STNLESS    ic_con
-ASSIGNMA     STNLESS   trusses
+ASSIGNMA    COLDCARB    oc_con
+ASSIGNMA     STNLESS    oc_sup
+ASSIGNMA    COLDCARB    ic_con
+*ASSIGNMA     STNLESS   trusses
 ASSIGNMA    COLDCARB     icryo
 ASSIGNMA         HFE  icryo_in
+ASSIGNMA      COPPER   tpc_con
 ASSIGNMA      COPPER       tpc
 ASSIGNMA         LXe    tpc_in
+ASSIGNMA         AIR      cpit
 * LOW-MAT Cards point materials to their respective cross section files
 LOW-MAT     POTASSIU        19        -2       296                    POTASSIU
 LOW-MAT     HYDROGEN         1        -5       296                    HYDROGEN
