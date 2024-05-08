@@ -119,7 +119,7 @@ def copy_input_files(fluka_files : dict):
     if os.path.isfile(fluka_files['input_file']):
         return 
     else:
-        os.system('cp simfiles/nEXO_OD.inp ' + fluka_files['input_file'])
+        os.system('cp simfiles/nEXO_2024.inp ' + fluka_files['input_file'])
         os.system('cp simfiles/mgdraw_neutron_count.f ' + fluka_files['mgdraw_file'])
 
 def change_muon_filepath(fluka_files : dict):

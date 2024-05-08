@@ -1,3 +1,6 @@
+! Dear future nEXO friend, this file is for custom scoring of particle trajectories.
+! Most of the features herein are not used, but are kept commented out because they might
+! just be useful to you. Consult the FLUKA manual and the forum for more information.
 *                                                                      *
 *=== mgdraw ===========================================================*
 *                                                                      *
