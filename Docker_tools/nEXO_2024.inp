@@ -106,11 +106,11 @@ tpc          5 (tpc_ocol + tpc_otop - tpc_obot) - (tpc_icol + tpc_itop - tpc_ibo
 tpc_con      5 tpc_cono - tpc_coni
 icryo_in     5 (i_cryo_i - (tpc_ocol + tpc_otop - tpc_obot) - (tpc_cono - tpc_coni))
 icryo        5 i_cryo_o - i_cryo_i
+ic_con       5 ic_con_o -ic_con_i
 ocryo_in     5 o_cryo_i - i_cryo_o - (ic_con_o - ic_con_i)
 ocryo        5 o_cryo_o - o_cryo_i
 oc_con       5 (oc_con_o - oc_con_i)
 oc_sup       5 (sup_ocol + sup_top - sup_bot) - (sup_icol + sup_itop - sup_ibot)
-ic_con       5 (ic_con_o - ic_con_i)
 od_in        5 (od_icol + od_itop - od_ibot) - o_cryo_o -  (oc_con_o - oc_con_i) - ((sup_ocol + sup_top - sup_bot
                ) - (sup_icol + sup_itop - sup_ibot))
 od           5 (od_ocol + od_otop - od_obot) - (od_icol + od_itop - od_ibot)
