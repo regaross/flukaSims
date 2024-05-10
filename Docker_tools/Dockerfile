@@ -38,7 +38,7 @@ COPY compile_singularity.sh /root/singularity-ce-4.1.0/
 RUN cd singularity-ce-4.1.0 && ./compile_singularity.sh
 
 
-# Update and install necessary packages
+# Update and install necessary packages for Flair
 RUN apt-get update && \
     apt-get install -y \
         software-properties-common \
@@ -48,12 +48,9 @@ RUN apt-get update && \
         x11-apps \
         x11-utils
 
+RUN wget https://flukafiles.web.cern.ch/flukafiles/neutron/fluka-pw-endf-viii0_1-0_all.deb 
 
-# Install any other dependencies you need for your GUI application
-
-# Install X11 and other necessary tools for GUI
-RUN apt-get update && \
-    apt-get install -y \
+RUN dpkg -i /root/fluka-pw-endf-viii0_1-0_all.deb
 
 RUN wget -q -O - https://flair.web.cern.ch/flair/download/ubuntu/flair.gpg |  tee /etc/apt/trusted.gpg.d/flair.asc && \
  add-apt-repository 'deb [arch=all,amd64] https://cern.ch/flair/download/ubuntu/23.10 /'

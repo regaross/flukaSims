@@ -30,7 +30,7 @@ IONTRANS    HEAVYION
 LOW-PWXS                                                              ENDF-VIII0
 LOW-PWXS      541360                 150     XE136                    ENDF-VIII0
 LOW-PWXS      541340                 150     XE134                    ENDF-VIII0
-*LOW-PWXS       10010     h_zrh            HYDROGEN                    ENDF-VIII0
+LOW-PWXS       10010     h_zrh            HYDROGEN                    ENDF-VIII0
 * Muon-nuclear interactions must be enabled in all materials; Hydrogen to @LASTMAT
 MUPHOTON           1                      HYDROGEN  @LASTMAT
 * Activates photon interactions with nuclei for all energies
