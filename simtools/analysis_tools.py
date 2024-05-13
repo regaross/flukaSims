@@ -36,6 +36,24 @@ import re
 OD_RADIUS = 6.1722
 OD_HEIGHT = 12.8
 
+fluka_nEXO_regions = {
+                1:     'tpc_in',
+                2:     'tpc',
+                3:     'tpc_con',
+                4:     'icryo_in',
+                5:     'icryo',
+                6:     'ic_con',
+                7:     'ocryo_in',
+                8:     'ocryo',
+                9:     'oc_con',
+                10:    'oc_sup',
+                11:    'od_in',
+                12:    'od',
+                13:    'cpit',
+                14:    'rock',
+                15:    'blkhole'
+                 }
+
 icode_dictionary = {
     None: None,
     -1: 'event not completed',
@@ -142,16 +160,16 @@ jtrack_rest_energies = { # Expressed in MeV if known, 0 otherwise (for heavy ion
     -5:     sc.physical_constants['helion mass energy equivalent in MeV'][0],
     -4:     sc.physical_constants['triton mass energy equivalent in MeV'][0],
     -3:     sc.physical_constants['deuteron mass energy equivalent in MeV'][0],
-    -2:     0,
-    -1:     0,
-    0:      0,
+    -2:     0,  # Generic heavy ion (see FLUKA Manual)
+    -1:     0,  # Optical photon
+    0:      0,  # Pseudo-particle (see FLUKA Manual)
     1:      sc.physical_constants['proton mass energy equivalent in MeV'][0],
     2:      sc.physical_constants['proton mass energy equivalent in MeV'][0],
     3:      sc.physical_constants['electron mass energy equivalent in MeV'][0],
     4:      sc.physical_constants['electron mass energy equivalent in MeV'][0],
-    5:      0,
-    6:      0,
-    7:      0,
+    5:      0,  # Electron neutrino
+    6:      0,  # Electron anti-neutrino
+    7:      0,  # Photon
     8:      sc.physical_constants['neutron mass energy equivalent in MeV'][0],
     9:      sc.physical_constants['neutron mass energy equivalent in MeV'][0],
     10:     sc.physical_constants['muon mass energy equivalent in MeV'][0],
@@ -164,11 +182,11 @@ jtrack_rest_energies = { # Expressed in MeV if known, 0 otherwise (for heavy ion
 
     23:     134.9768, # https://pdg.lbl.gov/2022/listings/contents_listings.html
 
-    208:    0,
-
-    211:    0,
-
+    208:    0,  # Energy for dose scoring (see FLUKA Manual)
+    211:    0,  
     308:    0,
+
+    # We don't care about many of these masses; for instance strange mesons, or anything else we won't be counting in the analysis.
 
 }
 

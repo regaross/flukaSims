@@ -2,7 +2,7 @@
 
 __version__ = 1.5
 __author__ = 'Regan Ross'
-## Last Edited May 12, 2023
+## Last Edited May 12, 2024
 
 '''
 run_module.py
@@ -10,9 +10,9 @@ run_module.py
 
 Contact:
 Regan Ross
-rross@laurentian.ca
+regan.ross@mail.mcgill.ca
 
-A module for coordinating the FLUKA Simulation process on SDF.
+A module for coordinating the FLUKA Simulation process on S3DF.
 
 '''
 #################################################
@@ -38,6 +38,24 @@ import argparse
 SLURM_JOB_ID = int(os.environ["SLURM_ARRAY_JOB_ID"])
 SLURM_TASK_ID = int(os.environ["SLURM_ARRAY_TASK_ID"])
 SLURM_PREFIX = 'simrun-' + str(os.environ["SLURM_ARRAY_JOB_ID"]) + '-' + str(os.environ["SLURM_ARRAY_TASK_ID"])
+
+fluka_nEXO_regions = {
+                1:     'tpc_in',
+                2:     'tpc',
+                3:     'tpc_con',
+                4:     'icryo_in',
+                5:     'icryo',
+                6:     'ic_con',
+                7:     'ocryo_in',
+                8:     'ocryo',
+                9:     'oc_con',
+                10:    'oc_sup',
+                11:    'od_in',
+                12:    'od',
+                13:    'cpit',
+                14:    'rock',
+                15:    'blkhole'
+                 }
 
 hdf5_structure = {
     ###---->  Meta data about the respective simulation
