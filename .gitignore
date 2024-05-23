@@ -43,3 +43,4 @@ data/*
 *.bash_history
 *.json
 *-layout
+Docker_tools/flair_only/*

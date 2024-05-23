@@ -421,7 +421,7 @@ def resize_output_file(h5_filename, tpc_data_length, od_data_length, resnuc, res
     return indices
 
 def retrieve_muons(muon_array, ncase_list) -> dict:
-    '''Retrieves the list of muons that correspond to the list of ncase values. Don't forget, the ncase variable doesn't directly correspond to the muon number in the file. They are different by 1 as FORTRAN indices begin at 1, python indices begin at 0.'''
+    '''Retrieves the list of muons that correspond to the list of ncase values. Don't forget, the ncase variable doesn't directly correspond to the muon number in the file. They are different by 1 as FORTRAN indices begin at 1, python indices begin at 0— We account for this here!'''
 
     muenergy, impact,  initx, inity, initz, mucosx, mucosy, mucosz, pos_neg = [],[],[],[],[],[],[],[],[]
     total = len(muon_array)
@@ -459,7 +459,6 @@ def get_hours(roi_height, roi_radius, muons_simulated):
     ''' Using the snolab muon vertical flux value, we return the value in hours that have passed given the '''
     roi_height = mf.OD_HEIGHT + roi_height
     roi_radius = mf.OD_RADIUS + roi_radius
-
 
 def store_data_in_h5(output_filename, fluka_files, yaml_card, seed, muon_list, hours) -> bool:
     '''Takes the data from the FLUKA output files and builds it into an hdf5 file.'''

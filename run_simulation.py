@@ -55,8 +55,9 @@ with open('simconfig.yaml') as yaml_file:
 fluka_files = {
     'tpc_neutron_file'      :   'input' + str(stamp) +  '001_fort.72',
     'od_neutron_file'       :   'input' + str(stamp) +  '001_fort.70',
-    'res_nuclei_file'       :   'input' + str(stamp) +  '001_fort.97',
-    'res_nuclei_cu_file'    :   'input' + str(stamp) +  '001_fort.94',
+    'res_nuclei_file'       :   'input' + str(stamp) +  '001_fort.21',
+    'res_nuclei_cu_file'    :   'input' + str(stamp) +  '001_fort.22',
+    'res_nuclei_icryo_file' :   'input' + str(stamp) +  '001_fort.23',
     'mgdraw_file'           :   'mgdrw' + str(stamp) + '.f',
     'source_file'           :   'musource' + str(stamp) + '.f',  
     'input_file'            :   'input' + str(stamp) + '.inp',
