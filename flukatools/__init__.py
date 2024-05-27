@@ -1,5 +1,4 @@
 #!/usr/bin/python
-import yaml
 from os import environ, uname, popen
 from datetime import datetime
 import numpy as np
@@ -8,6 +7,10 @@ import numpy as np
 #                   CONSTANTS                    }
 #               (And Dictionaries)               }
 #################################################
+# Note: Any variable declared or assigned here will be available through each sub file of this module.
+# HOWEVER, once changed, a change to any of these variables is only global if the variable is of a mutable type AND the change is not a reassignment,
+# but rather a modification like appending to an array, adding a new key : val in a dictionary and so on. STRINGS ARE IMMUTABLE. Therefore, any STRING 
+# must not be altered in subordinate files with the change assumed global. Wrap things in dictionaries, and life will be okay.
 
 TODAY = datetime.now().strftime("%b%d-%H:%M")
 with popen('echo $RANDOM') as pipe:
@@ -18,13 +21,40 @@ np.random.seed(SEED)
 ### Set some environment variables for SLURM.
 if uname().nodename[:3] == 'sdf':
     ### From SLURM environment variables
-    SLURM_JOB_ID = int(environ["SLURM_ARRAY_JOB_ID"])
-    SLURM_TASK_ID = int(environ["SLURM_ARRAY_TASK_ID"])
-    SLURM_PREFIX = 'simrun-' + str(environ["SLURM_ARRAY_JOB_ID"]) + '-' + str(environ["SLURM_ARRAY_TASK_ID"])
+    SLURM = {
+    'SLURM_JOB_ID' : int(environ["SLURM_ARRAY_JOB_ID"]),
+    'SLURM_TASK_ID' : int(environ["SLURM_ARRAY_TASK_ID"]),
+    'SLURM_PREFIX' : 'simrun-' + str(environ["SLURM_ARRAY_JOB_ID"]) + '-' + str(environ["SLURM_ARRAY_TASK_ID"])
+    }
 
 
+# Declare a global dictionary to house the YAML parameters
+# These are set when the YAML file is read in from within the filemanip script; these are declared here to be overwritten later
+YAML_PARAMS = {
+            # Simulation Parameters
+            'num_muons'     : 0,
+            'intersecting'  : True,
+            'make_new'      : True,
+            'roi_radius'    : '',
+            'roi_height'    : '',
 
-### FLUKA variable information
+            # Input Parameters
+            'input_file'        : '',
+            'source_routine'    : '',
+            'mgdraw_file'       : '',
+
+            # Source Parameters
+            'source_path' : '',
+    }
+
+# These are set and forget
+PATHS = {
+'input' : '',
+'workpath' : '',
+'workdir' : ''
+}
+
+# FLUKA variable information
 ICODE_DICTIONARY = {
     None: None,
     -1: 'event not completed',
@@ -161,7 +191,7 @@ JTRACK_LABELS = {
 
 }
 
-### Configuring Input and Output
+# Configuring Input and Output
 HDF5_STRUCTURE = {
     ###---->  Meta data about the respective simulation
     'meta' : {   
@@ -259,53 +289,21 @@ FLUKA_OUTPUT_CHANNELS = {
     72  : 'neutronsTPC',
 }
 
-### Reading in YAML card parameters
-with open('simconfig.yaml') as YAML_FILE:
-
-    input_yaml = yaml.safe_load(YAML_FILE)
-
-    Simulation = input_yaml.get('Simulation')
-    Input = input_yaml.get('Input')
-
-
-    INPUT_PATH = Input.get('InputPath')
-    WORKPATH = INPUT_PATH + '.temp/'
-    WORKDIR = '.temp/'
-
-    YAML_PARAMS = {
-        # Simulation Parameters
-        'num_muons'     : Simulation.get('Muons'),
-        'intersecting'  : Simulation.get('Intersecting'),
-        'make_new'      : Simulation.get('MakeNewFile'),
-        'roi_radius'    : Simulation.get('ROI_Radius'),
-        'roi_height'    : Simulation.get('ROI_Height'),
-
-        # Input Parameters
-        'input_file'        : Input.get('InputFile'),
-        'source_routine'    : Input.get('SourceFile'),
-        'mgdraw_file'       : Input.get('MGDrawFile'),
-
-        # Source Parameters
-        'source_path' : input_yaml.get('Source').get('FlukaPath'),
-    }
-
-# These will be changed in the filemanip functions with later files added as needed
-# The idea is that at first, the main input files will have no path prepended to them, and this will be added when they're renamed and copied.
-
 FLUKA_FILES = {
-    # These ones already exist but will be copied and renamed:
+    # These ones already exist but will be renamed and copied to FLUKA_JOB_FILES
     'input'             :   YAML_PARAMS['input_file'],
     'source_routine'    :   YAML_PARAMS['source_routine'],
     'mgdraw'            :   YAML_PARAMS['mgdraw_file'],
+}
 
+FLUKA_JOB_FILES = { # This dictionary will be populated with files that are only required for the particular run; the copies.
     # These ones will be created, but we only need the names for now
     'muon_file'         :  WORKPATH + 'muons' + str(SEED) + '.txt',
     'executable'        :  WORKPATH + str(SEED) + '.exe',
     
 }
 
-
-### For various plotting tools (not super important)
+# For various plotting tools (not super important)
 PARTICLE_COLOUR_DICTIONARY = {
     None:   None,
     -6:     'darkorange',   #Alpha

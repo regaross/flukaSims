@@ -143,7 +143,7 @@ def copy_input_files(fluka_files : dict):
 def change_muon_filepath(fluka_files : dict):
     '''Changes the path to the muon_file in the provided fluka source file'''
 
-    source_name = fluka_files['source_file']
+    source_name = ['source_file']
     muon_file = fluka_files['muon_file']
 
     if os.path.isfile(source_name):

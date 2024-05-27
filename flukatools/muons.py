@@ -686,7 +686,7 @@ def make_phase_space_file() -> tuple:
         
         Muon initial units are to be METERS. This is converted to FLUKA native cm in the read_phase_space_file routine'''
     
-    filename = FLUKA_FILES['muon_file']
+    filename = FLUKA_JOB_FILES['muon_file']
 
     num_muons = YAML_PARAMS['num_muons']
     roi_radius = YAML_PARAMS['roi_radius']
