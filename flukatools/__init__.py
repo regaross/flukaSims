@@ -298,8 +298,11 @@ FLUKA_FILES = {
 
 FLUKA_JOB_FILES = { # This dictionary will be populated with files that are only required for the particular run; the copies.
     # These ones will be created, but we only need the names for now
-    'muon_file'         :  WORKPATH + 'muons' + str(SEED) + '.txt',
-    'executable'        :  WORKPATH + str(SEED) + '.exe',
+    'muon_file'         :  PATHS['workpath'] + 'muons' + str(SEED) + '.txt',
+    'executable'        :  PATHS['workpath'] + str(SEED) + '.exe',
+    'input'             : '',
+    'source_routine'    : '',
+    'mgdraw'            : '',
     
 }
 

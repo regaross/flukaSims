@@ -135,3 +135,35 @@ def change_muon_filepath() -> None:
     # Open the copied source routine file in write mode, and replace the text within to include the appropriate path to the muon phase space file
     with open(source_routine, 'w') as source:
         source.writelines(lines)
+
+def manage_output_files() -> None:
+    '''This function is meant to move the relevant and useful output files to a particular directory.
+    It should also remove the files that are no longer relevant: the copies of input files, the compiled binaries'''
+
+    # Create an output directory
+
+    # Probably already exists
+    system('mkdir ./data/')
+    
+    output_dir = './data/' + TODAY + '/'
+    # This one probably does not
+    system('mkdir ' + output_dir)
+
+    # Remove the temporary job specific files
+    remove = ['*.o', '*ran*', '*.exe', ]
+    for entry in remove:
+        system('rm ' + entry)
+
+        
+    for entry in FLUKA_JOB_FILES:
+        system('rm ' + FLUKA_JOB_FILES[entry])
+
+    # The name of the copy of the input file, followed by the seed number
+    input_prefix = FLUKA_JOB_FILES['input'][:-4]
+
+    for entry in FLUKA_OUTPUT_CHANNELS:
+        # Rename the fort.## files to something sensible for later parsing
+        filename = input_prefix + '_001.' + entry
+        new_filename = output_dir + FLUKA_OUTPUT_CHANNELS[entry] + '.asc'
+
+    extras = ['.log', '.err', '.out']
