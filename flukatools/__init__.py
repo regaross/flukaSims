@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from os import environ, uname, popen
+from os import environ, uname, getenv
 from datetime import datetime
 import numpy as np
 
@@ -13,9 +13,7 @@ import numpy as np
 # must not be altered in subordinate files with the change assumed global. Wrap things in dictionaries, and life will be okay.
 
 TODAY = datetime.now().strftime("%b%d-%H:%M")
-with popen('echo $RANDOM') as pipe:
-    SEED = int(pipe.read().strip())
-
+SEED = int(getenv('FLUKA_RANDOM_SEED'))
 np.random.seed(SEED)
 
 ### Set some environment variables for SLURM.

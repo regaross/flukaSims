@@ -32,6 +32,7 @@
 output_dir="run"$SLURM_ARRAY_JOB_ID
 
 rand=$RANDOM
+export FLUKA_RANDOM_SEED=$RANDOM
 path_to_sim='/sdf/home/r/rross/nEXO/flukaSims/'
 image=$path_to_sim"FLUKA.sif"
 job_num=$SLURM_ARRAY_JOB_ID         # An integer number representing this array job submission
@@ -73,8 +74,9 @@ echo
 
 
 
-singularity exec -B /sdf $image python $path_to_sim/run_simulation.py -s $rand
+#singularity exec -B /sdf $image python $path_to_sim/run_simulation.py -s $rand
+singularity exec -B /sdf FLUKA.sif python runsim.py
 
 
-mv *$rand* $output_dir/subrun$SLURM_ARRAY_TASK_ID
-mv *.hdf5 $output_dir/
+#mv *$rand* $output_dir/subrun$SLURM_ARRAY_TASK_ID
+#mv *.hdf5 $output_dir/
