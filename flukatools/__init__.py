@@ -28,28 +28,37 @@ if uname().nodename[:3] == 'sdf':
 
 # Declare a global dictionary to house the YAML parameters
 # These are set when the YAML file is read in from within the filemanip script; these are declared here to be overwritten later
-YAML_PARAMS = {
-            # Simulation Parameters
-            'num_muons'     : 0,
-            'intersecting'  : True,
-            'make_new'      : True,
-            'roi_radius'    : '',
-            'roi_height'    : '',
-
-            # Input Parameters
-            'input_file'        : '',
-            'source_routine'    : '',
-            'mgdraw_file'       : '',
-
-            # Source Parameters
-            'source_path' : '',
-    }
+YAML_PARAMS = {}
 
 # These are set and forget
-PATHS = {
-'input' : '',
-'workpath' : '',
-'workdir' : ''
+PATHS = {'SIF'      :   '',             # System dependent (absolute path)
+         'simfiles' :   'simfiles/',    # Relative path to the simulation files
+         'workdir'  :   '.temp/',       # Relative path to the copies of simulation files and compiled FLUKA code
+         'output'   :   './data/' + TODAY + '/'}       
+
+FLUKA_OUTPUT_CHANNELS = {
+    # The FLUKA data emerge in fort.## files. The ## tells us what the output files are. This will have to change to something more general.
+    21  : 'resnucTPC',
+    22  : 'resnucTPCCu',
+    23  : 'resnucCryo',
+    70  : 'neutronsOD',
+    72  : 'neutronsTPC',
+}
+
+FLUKA_FILES = {
+    # These files will be found in the relative path PATHS['simfiles'] but may have different names...
+    'input'             :   '',
+    'source_routine'    :   '',
+    'mgdraw'            :   '',
+}
+
+FLUKA_JOB_FILES = { # This dictionary will be populated with files that are only required for the particular run; the copies with unique names.
+    'muons'             : '',
+    'executable'        : '',
+    'input'             : '',
+    'source_routine'    : '',
+    'mgdraw'            : '',
+    
 }
 
 # FLUKA variable information
@@ -278,31 +287,6 @@ NEXO_FLUKA_REGIONS = {
                 15:    'blkhole'
                  }
 
-FLUKA_OUTPUT_CHANNELS = {
-
-    21  : 'resnucTPC',
-    22  : 'resnucTPCCu',
-    23  : 'resnucCryo',
-    70  : 'neutronsOD',
-    72  : 'neutronsTPC',
-}
-
-FLUKA_FILES = {
-    # These ones already exist but will be renamed and copied to FLUKA_JOB_FILES
-    'input'             :   YAML_PARAMS['input_file'],
-    'source_routine'    :   YAML_PARAMS['source_routine'],
-    'mgdraw'            :   YAML_PARAMS['mgdraw_file'],
-}
-
-FLUKA_JOB_FILES = { # This dictionary will be populated with files that are only required for the particular run; the copies.
-    # These ones will be created, but we only need the names for now
-    'muon_file'         :  PATHS['workpath'] + 'muons' + str(SEED) + '.txt',
-    'executable'        :  PATHS['workpath'] + str(SEED) + '.exe',
-    'input'             : '',
-    'source_routine'    : '',
-    'mgdraw'            : '',
-    
-}
 
 # For various plotting tools (not super important)
 PARTICLE_COLOUR_DICTIONARY = {

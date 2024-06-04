@@ -17,15 +17,23 @@ def link_and_compile():
     system(compile_string + ' ' + FLUKA_JOB_FILES['mgdraw'] )
     system(compile_string + ' ' + FLUKA_JOB_FILES['source_routine']  )
 
+    FLUKA_JOB_FILES['executable'] = PATHS['SIF'] +'execute' + str(SEED) + '.exe'
+
+
     link_string = path_to_fluka + 'ldpmqmd -m fluka -o ' + FLUKA_JOB_FILES['executable'] + ' '
     mgd_compd = FLUKA_JOB_FILES['mgdraw'][:-2] + '.o'
     source_compd = FLUKA_JOB_FILES['source_routine'][:-2] + '.o'
     system(link_string + mgd_compd + ' ' + source_compd )
 
+    # Move the .o and .mod files...
+    system('mv ' + PATHS['SIF'] + '*.o' + ' ' + PATHS['SIF'] + PATHS['workdir'])
+    system('mv ' + PATHS['SIF'] + '*.mod' + ' ' + PATHS['SIF'] + PATHS['workdir'])
+
+
 def run_fluka():
     ''' Executes the command to run the simulation given everything else has been done'''
     source_path = YAML_PARAMS['source_path']
 
-    run_string = source_path + 'rfluka -M 1 -e ./' + FLUKA_JOB_FILES['executable'] + ' ' + FLUKA_JOB_FILES['input_file']
+    run_string = source_path + 'rfluka -M 1 -e ./' + FLUKA_JOB_FILES['executable'] + ' ' + FLUKA_JOB_FILES['input']
     system(run_string)
 

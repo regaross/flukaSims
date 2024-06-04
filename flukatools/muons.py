@@ -686,7 +686,8 @@ def make_phase_space_file() -> tuple:
         
         Muon initial units are to be METERS. This is converted to FLUKA native cm in the read_phase_space_file routine'''
     
-    filename = FLUKA_JOB_FILES['muon_file']
+    filename = PATHS['workdir'] + 'muons' + str(SEED) + '.txt'
+    FLUKA_JOB_FILES['muons'] = filename
 
     num_muons = YAML_PARAMS['num_muons']
     roi_radius = YAML_PARAMS['roi_radius']
@@ -723,137 +724,137 @@ def make_phase_space_file() -> tuple:
 
 
 
-#################################################
-#                   PLOTTING                     }
-#                  FUNCTIONS                     }
-#################################################
+# #################################################
+# #                   PLOTTING                     }
+# #                  FUNCTIONS                     }
+# #################################################
 
-def plot_path_lengths(points, savefile = False):
-    ''' A function designed to plot a histogram of the points from the previous intersection_points function. Pass this function an array
-    argument equivalent to the output from the previous.
-    '''
-    import matplotlib.pyplot as plt
-    plt.rcParams.update({
-    "text.usetex": True,})
+# def plot_path_lengths(points, savefile = False):
+#     ''' A function designed to plot a histogram of the points from the previous intersection_points function. Pass this function an array
+#     argument equivalent to the output from the previous.
+#     '''
+#     import matplotlib.pyplot as plt
+#     plt.rcParams.update({
+#     "text.usetex": True,})
 
-    pathLengths = []
-    top_bottom = [] #Muons that pass through both top and bottom
-    top_side = []
-    side_side = []
-    ssCount = 0
-    side_bottom = []
+#     pathLengths = []
+#     top_bottom = [] #Muons that pass through both top and bottom
+#     top_side = []
+#     side_side = []
+#     ssCount = 0
+#     side_bottom = []
 
-    ##(entryPoint, entryLabel, exitPoint, exitLabel)
-    for point in points:
-        if not type(point) is bool: #If there is an entry point
-            if type(point[1]) is str:
-                pathLength = np.sqrt((point[0][0]-point[2][0])**2 + (point[0][1] - point[2][1])**2 + (point[0][2] - point[2][2])**2)
-                #If points are both top and bottom, append there
-                if point[1] == 'TOP' and point[3] == 'BOT':
-                    top_bottom.append(pathLength)
-                #If points are top side, append there
-                elif point[1] == 'TOP' and point[3] == 'SIDE':
-                    top_side.append(pathLength)
-                #If points are side side, append there
-                elif point[1] == 'SIDE' and point[3] == 'SIDE':
-                    side_side.append(pathLength)
-                    ssCount += 1
-                #If points are side bottom, append there
-                elif point[1] == 'SIDE' and point[3] == 'BOT':
-                    side_bottom.append(pathLength)
-                pathLengths.append(pathLength)
-            else:
-                print(' Points input for path_lengths function requires labels being switched on ')
+#     ##(entryPoint, entryLabel, exitPoint, exitLabel)
+#     for point in points:
+#         if not type(point) is bool: #If there is an entry point
+#             if type(point[1]) is str:
+#                 pathLength = np.sqrt((point[0][0]-point[2][0])**2 + (point[0][1] - point[2][1])**2 + (point[0][2] - point[2][2])**2)
+#                 #If points are both top and bottom, append there
+#                 if point[1] == 'TOP' and point[3] == 'BOT':
+#                     top_bottom.append(pathLength)
+#                 #If points are top side, append there
+#                 elif point[1] == 'TOP' and point[3] == 'SIDE':
+#                     top_side.append(pathLength)
+#                 #If points are side side, append there
+#                 elif point[1] == 'SIDE' and point[3] == 'SIDE':
+#                     side_side.append(pathLength)
+#                     ssCount += 1
+#                 #If points are side bottom, append there
+#                 elif point[1] == 'SIDE' and point[3] == 'BOT':
+#                     side_bottom.append(pathLength)
+#                 pathLengths.append(pathLength)
+#             else:
+#                 print(' Points input for path_lengths function requires labels being switched on ')
 
-    bins = 100
-    counts_tb, bins_tb = np.histogram(top_bottom, bins = bins, density=False)
-    counts_ts, bins_ts = np.histogram(top_side, bins = bins, density=False)
-    counts_ss, bins_ss = np.histogram(side_side, bins = bins, density=False)
-    counts_sb, bins_sb = np.histogram(side_bottom, bins = bins, density=False)
+#     bins = 100
+#     counts_tb, bins_tb = np.histogram(top_bottom, bins = bins, density=False)
+#     counts_ts, bins_ts = np.histogram(top_side, bins = bins, density=False)
+#     counts_ss, bins_ss = np.histogram(side_side, bins = bins, density=False)
+#     counts_sb, bins_sb = np.histogram(side_bottom, bins = bins, density=False)
 
-    counts, bins = np.histogram(pathLengths, bins = 50, density=False)
-    plt.figure()
-    plt.hist(bins[:-1], bins, weights=counts, histtype='stepfilled', alpha=0.4, color='orange', label = 'Total')
-    plt.xlabel('Path Length [m]', size = 'large'); plt.ylabel('Count', size = 'large')
-    #plt.text(1, counts[0]*1.5, 'Mean = ' + str(np.average(pathLengths)), size = 12)
-    #plt.title('Path Length Distribution: '+ str(len(pathLengths)) + ' paths', size = 'x-large')
+#     counts, bins = np.histogram(pathLengths, bins = 50, density=False)
+#     plt.figure()
+#     plt.hist(bins[:-1], bins, weights=counts, histtype='stepfilled', alpha=0.4, color='orange', label = 'Total')
+#     plt.xlabel('Path Length [m]', size = 'large'); plt.ylabel('Count', size = 'large')
+#     #plt.text(1, counts[0]*1.5, 'Mean = ' + str(np.average(pathLengths)), size = 12)
+#     #plt.title('Path Length Distribution: '+ str(len(pathLengths)) + ' paths', size = 'x-large')
 
-    #Plotting other subordinate hists
-    top_bot = str(len(top_bottom)*100/len(pathLengths))[0:4]
-    plt.hist(bins_tb[:-1], bins, weights=counts_tb, histtype='step', alpha=1.0, color='blue', label = r'Top $\rightarrow$ Bottom: ' + top_bot + '\%')
-    top_sides = str(len(top_side)*100/len(pathLengths))[0:4]
-    plt.hist(bins_ts[:-1], bins, weights=counts_ts, histtype='step', alpha=1.0, color='green', label = r'Top $\rightarrow$ Side: ' + top_sides + '\%')
-    sides = str(len(side_side)*100/len(pathLengths))[0:4]
-    plt.hist(bins_ss[:-1], bins, weights=counts_ss, histtype='step', alpha=1.0, color='red', label = r'Side $\rightarrow$ Side: ' + sides + '\%')
-    side_bot = str(len(side_bottom)*100/len(pathLengths))[0:4]
-    plt.hist(bins_sb[:-1], bins, weights=counts_sb, histtype='step', alpha=1.0, color='purple', label = r'Side $\rightarrow$ Bottom: ' + side_bot + '\%')
+#     #Plotting other subordinate hists
+#     top_bot = str(len(top_bottom)*100/len(pathLengths))[0:4]
+#     plt.hist(bins_tb[:-1], bins, weights=counts_tb, histtype='step', alpha=1.0, color='blue', label = r'Top $\rightarrow$ Bottom: ' + top_bot + '\%')
+#     top_sides = str(len(top_side)*100/len(pathLengths))[0:4]
+#     plt.hist(bins_ts[:-1], bins, weights=counts_ts, histtype='step', alpha=1.0, color='green', label = r'Top $\rightarrow$ Side: ' + top_sides + '\%')
+#     sides = str(len(side_side)*100/len(pathLengths))[0:4]
+#     plt.hist(bins_ss[:-1], bins, weights=counts_ss, histtype='step', alpha=1.0, color='red', label = r'Side $\rightarrow$ Side: ' + sides + '\%')
+#     side_bot = str(len(side_bottom)*100/len(pathLengths))[0:4]
+#     plt.hist(bins_sb[:-1], bins, weights=counts_sb, histtype='step', alpha=1.0, color='purple', label = r'Side $\rightarrow$ Bottom: ' + side_bot + '\%')
 
-    plt.yscale('log')
-    plt.legend(loc = 8, fontsize = 'large')
-    #plt.grid()
-    #print('Mean:', np.mean(pathLengths))
-    if savefile:
-        plt.savefig('pathLengths.png', facecolor = 'white')
+#     plt.yscale('log')
+#     plt.legend(loc = 8, fontsize = 'large')
+#     #plt.grid()
+#     #print('Mean:', np.mean(pathLengths))
+#     if savefile:
+#         plt.savefig('pathLengths.png', facecolor = 'white')
 
-    plt.show()
+#     plt.show()
 
-def muons_to_array(muons):
-    '''Converts an array of muon objects to a 2D array of the muon attributes'''
+# def muons_to_array(muons):
+#     '''Converts an array of muon objects to a 2D array of the muon attributes'''
 
-    # [Zenith, Azimuth, Energy, Initial_x, Initial_y, Initial_z, impact_parameter]
-    rows = len(muons)
-    cols = 7
+#     # [Zenith, Azimuth, Energy, Initial_x, Initial_y, Initial_z, impact_parameter]
+#     rows = len(muons)
+#     cols = 7
 
-    new_array = np.ndarray((rows, cols), dtype=float)
+#     new_array = np.ndarray((rows, cols), dtype=float)
 
-    iter = 0
-    for muon in muons:
-        temp_array = np.array([muon.zenith, muon.azimuth, muon.energy, muon.initial[0], muon.initial[1], muon.initial[2], muon.impact_param])
-        new_array[iter] = temp_array
-        iter += 1
+#     iter = 0
+#     for muon in muons:
+#         temp_array = np.array([muon.zenith, muon.azimuth, muon.energy, muon.initial[0], muon.initial[1], muon.initial[2], muon.impact_param])
+#         new_array[iter] = temp_array
+#         iter += 1
 
 
-    return new_array
+#     return new_array
 
-def plot_muon_counts_hist(days, od = OuterDetector(), with_oc = True, oc = OuterCryostat(), with_tpc = True, tpc = OuterDetector(0.6, 1.35)):
-    ''' Plots overlapping histograms of counts of muons hitting the OD, Outer Cryostat and TPC.'''
-    import matplotlib.pyplot as plt
+# def plot_muon_counts_hist(days, od = OuterDetector(), with_oc = True, oc = OuterCryostat(), with_tpc = True, tpc = OuterDetector(0.6, 1.35)):
+#     ''' Plots overlapping histograms of counts of muons hitting the OD, Outer Cryostat and TPC.'''
+#     import matplotlib.pyplot as plt
 
-    od_counts = []
-    oc_counts = []
-    tpc_counts = []
+#     od_counts = []
+#     oc_counts = []
+#     tpc_counts = []
     
-    for day in range(days):
-        muons = muons_from_time(24)
-        od_count = 0
-        oc_count = 0
-        tpc_count = 0
+#     for day in range(days):
+#         muons = muons_from_time(24)
+#         od_count = 0
+#         oc_count = 0
+#         tpc_count = 0
 
-        for muon in muons:
-            if hits_detector(muon, od):
-                od_count += 1
+#         for muon in muons:
+#             if hits_detector(muon, od):
+#                 od_count += 1
             
-            if path_through_cryostat(muon, od) > 0:
-                oc_count += 1
+#             if path_through_cryostat(muon, od) > 0:
+#                 oc_count += 1
 
-            if hits_detector(muon, tpc):
-                tpc_count += 1
+#             if hits_detector(muon, tpc):
+#                 tpc_count += 1
 
-        od_counts.append(od_count)
-        oc_counts.append(oc_count)
-        tpc_counts.append(tpc_count)
+#         od_counts.append(od_count)
+#         oc_counts.append(oc_count)
+#         tpc_counts.append(tpc_count)
 
-    od_counts = np.array(od_counts)
-    oc_counts = np.array(oc_counts)
-    tpc_counts = np.array(tpc_counts)
+#     od_counts = np.array(od_counts)
+#     oc_counts = np.array(oc_counts)
+#     tpc_counts = np.array(tpc_counts)
 
-    od_hist = plt.hist(od_counts, histtype = 'stepfilled', bins = (od_counts.max() - od_counts.min()), label = r'OD $\mu = $ ' + str(np.mean(od_counts))[:4], density=True, alpha = 0.7)
-    oc_hist = plt.hist(oc_counts, histtype = 'stepfilled', bins = (oc_counts.max() - oc_counts.min()), label = r'OC $\mu = $ ' + str(np.mean(oc_counts))[:4], density=True, alpha = 0.7)
-    tpc_hist = plt.hist(tpc_counts, histtype = 'stepfilled', bins = (tpc_counts.max() - tpc_counts.min()), label = r'TPC $\mu = $ ' + str(np.mean(tpc_counts))[:4], density=True, alpha = 0.7)
+#     od_hist = plt.hist(od_counts, histtype = 'stepfilled', bins = (od_counts.max() - od_counts.min()), label = r'OD $\mu = $ ' + str(np.mean(od_counts))[:4], density=True, alpha = 0.7)
+#     oc_hist = plt.hist(oc_counts, histtype = 'stepfilled', bins = (oc_counts.max() - oc_counts.min()), label = r'OC $\mu = $ ' + str(np.mean(oc_counts))[:4], density=True, alpha = 0.7)
+#     tpc_hist = plt.hist(tpc_counts, histtype = 'stepfilled', bins = (tpc_counts.max() - tpc_counts.min()), label = r'TPC $\mu = $ ' + str(np.mean(tpc_counts))[:4], density=True, alpha = 0.7)
 
-    years = days/365
+#     years = days/365
 
-    plt.xlabel('Muons counted per day')
-    plt.ylabel('Fraction of Runtime')
-    plt.title('Muon counts in detector for ' + str(years) + ' years')
-    plt.legend()
+#     plt.xlabel('Muons counted per day')
+#     plt.ylabel('Fraction of Runtime')
+#     plt.title('Muon counts in detector for ' + str(years) + ' years')
+#     plt.legend()

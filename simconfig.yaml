@@ -3,7 +3,7 @@
 ########################################################
 
 Simulation:
-  Muons: 10 #5790                   # Number of muons to run for simulation equivalent to about 2 months
+  Muons: 5790                   # Number of muons to run for simulation equivalent to about 2 months
   Intersecting : True         ### MUST BE SET TO TRUE FOR MUONS HITTING ROI
   MakeNewFile: True           # Generate a new batch of muons for the sim? False -> Use the previous batch
   ROI_Radius:  2              # How many meters larger than the OD radius?
@@ -15,11 +15,12 @@ Output:
   ProgressOut: 'fluka_sim_sum.txt'    # Where should compile and other output be copied?
 
 Input:                              # Not likely to require changing
-  InputPath: '/sdf/home/r/rross/nEXO/flukaSims/'
+  SIFPath: '/sdf/home/r/rross/nEXO/flukaSims/'
+  InputPath: '/sdf/home/r/rross/nEXO/flukaSims/simfiles/'
   # Define the paths below with respect to this path!^^
   InputFile: 'nEXO_2024.inp'              # Not likely to require changing
-  SourceFile: 'simfiles/muon_from_file.f'        # Not likely to require changing
-  MGDrawFile: 'simfiles/mgdraw_neutron_count.f'  # Not likely to require changing
+  SourceFile: 'muon_from_file.f'        # Not likely to require changing
+  MGDrawFile: 'mgdraw_neutron_count.f'  # Not likely to require changing
 
 Source: # (DON'T CHANGE -unless running locally) For FLUKA binaries in the singularity image 
   FlukaPath: '/usr/local/fluka/bin/'
