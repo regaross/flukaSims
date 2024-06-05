@@ -10,6 +10,8 @@ sleep(1)
 
 # 2. Copy files to working directory
 filemanip.copy_input_to_workdir()
+# Make the output directory and copy the input to that directory
+filemanip.make_output_directory()
 
 sleep(1)
 
@@ -39,3 +41,4 @@ runtools.run_fluka()
 sleep(1)
 
 # 8. Deal with Output...
+filemanip.manage_output_files()
