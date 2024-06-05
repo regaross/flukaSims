@@ -52,14 +52,6 @@ exe_name=path_to_sim'exe'$rand'.exe'
 
 
 #################################################
-#    REMEMBER: These do not run sequentially.
-################################################
-
-
-mkdir $output_dir
-mkdir $output_dir/subrun$SLURM_ARRAY_TASK_ID
-
-#################################################
 #         Printing meta data to stdout
 ################################################
 
@@ -72,11 +64,5 @@ echo ; echo ; echo ; echo "COMPILING JARGON:"
 echo
 
 
-
-
 #singularity exec -B /sdf $image python $path_to_sim/run_simulation.py -s $rand
 singularity exec -B /sdf FLUKA.sif python runsim.py
-
-
-#mv *$rand* $output_dir/subrun$SLURM_ARRAY_TASK_ID
-#mv *.hdf5 $output_dir/
