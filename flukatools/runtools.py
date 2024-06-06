@@ -17,7 +17,7 @@ def link_and_compile():
     system(compile_string + ' ' + FLUKA_JOB_FILES['mgdraw'] )
     system(compile_string + ' ' + FLUKA_JOB_FILES['source_routine']  )
 
-    FLUKA_JOB_FILES['executable'] = PATHS['SIF'] +'execute' + str(SEED) + '.exe'
+    FLUKA_JOB_FILES['executable'] = PATHS['workdir'] +'execute' + str(SEED) + '.exe'
 
 
     link_string = path_to_fluka + 'ldpmqmd -m fluka -o ' + FLUKA_JOB_FILES['executable'] + ' '
@@ -28,6 +28,8 @@ def link_and_compile():
     # Move the .o and .mod files...
     system('mv ' + PATHS['SIF'] + '*.o' + ' ' + PATHS['SIF'] + PATHS['workdir'])
     system('mv ' + PATHS['SIF'] + '*.mod' + ' ' + PATHS['SIF'] + PATHS['workdir'])
+    system('chmod +x ' + PATHS['SIF'] + '*.exe')
+    system('mv ' + PATHS['SIF'] + '*.exe' + ' ' + PATHS['SIF'] + PATHS['workdir'])
 
 
 def run_fluka():

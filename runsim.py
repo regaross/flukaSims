@@ -6,6 +6,8 @@ from time import sleep
 # 1. Import the parameters from the YAML file.
 filemanip.read_in_config_yaml('simconfig.yaml')
 
+print(filemanip.FLUKA_FILES['input'])
+
 sleep(1)
 
 # 2. Copy files to working directory
@@ -38,7 +40,7 @@ sleep(1)
 # 7. Run the Simulation
 runtools.run_fluka()
 
-sleep(1)
+sleep(2)
 
-# 8. Deal with Output...
+# # 8. Deal with Output...
 filemanip.manage_output_files()

@@ -2,7 +2,7 @@
 #
 # SCRIPT: job_script.slurm
 # AUTHOR: Regan_Ross
-# DATE: May 7, 2024
+# DATE: June 7, 2024
 #
 # PURPOSE: For requesting resources on SDF and running simultaneous simulations
 #
@@ -25,13 +25,15 @@
 #SBATCH --mail-user=regan.ross@mail.mcgill.ca   # This feature does work!
 
 
+sleep $((SLURM_ARRAY_TASK_ID*5))
+
+
 #################################################
 #                  Variables
 #################################################
 
 output_dir="run"$SLURM_ARRAY_JOB_ID
 
-rand=$RANDOM
 export FLUKA_RANDOM_SEED=$RANDOM
 path_to_sim='/sdf/home/r/rross/nEXO/flukaSims/'
 image=$path_to_sim"FLUKA.sif"
@@ -43,12 +45,12 @@ muon_source=$path_to_sim'muon_from_file.f'
 mgdraw=$path_to_sim'mgdraw_neutron_count.f'
 input=$path_to_sim'nEXO_2024.inp'
 
-new_muon_source=$path_to_sim'musource'$rand'.f'
-new_muon_source_o=$path_to_sim'musource'$rand'.o'
-new_mgdraw=$path_to_sim'mgdrw'$rand'.f'
-new_mgdraw_o=$path_to_sim'mgdrw'$rand'.o'
-new_input=$path_to_sim'input'$rand'.inp'
-exe_name=path_to_sim'exe'$rand'.exe'
+#new_muon_source=$path_to_sim'musource'$rand'.f'
+#new_muon_source_o=$path_to_sim'musource'$rand'.o'
+#new_mgdraw=$path_to_sim'mgdrw'$rand'.f'
+#new_mgdraw_o=$path_to_sim'mgdrw'$rand'.o'
+#new_input=$path_to_sim'input'$rand'.inp'
+#exe_name=path_to_sim'exe'$rand'.exe'
 
 
 #################################################
@@ -58,7 +60,7 @@ exe_name=path_to_sim'exe'$rand'.exe'
 cd $path_to_sim
 date
 echo "Executing on the machine:" $(hostname) 
-echo "System random number used to seed the sim:" $rand
+echo "Random number used to seed sim: $FLUKA_RANDOM_SEED"
 echo "Running Simulation!"
 echo ; echo ; echo ; echo "COMPILING JARGON:"
 echo

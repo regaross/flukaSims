@@ -12,7 +12,7 @@ import numpy as np
 # but rather a modification like appending to an array, adding a new key : val in a dictionary and so on. STRINGS ARE IMMUTABLE. Therefore, any STRING 
 # must not be altered in subordinate files with the change assumed global. Wrap things in dictionaries, and life will be okay.
 
-TODAY = datetime.now().strftime("%b%d-%H:%M")
+TODAY = datetime.now().strftime("%B%d-%Hh%M").lower()
 SEED = int(getenv('FLUKA_RANDOM_SEED'))
 np.random.seed(SEED)
 

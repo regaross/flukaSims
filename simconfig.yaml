@@ -3,7 +3,7 @@
 ########################################################
 
 Simulation:
-  Muons: 5790                   # Number of muons to run for simulation equivalent to about 2 months
+  Muons: 50 #5790                   # Number of muons to run for simulation equivalent to about 2 months
   Intersecting : True         ### MUST BE SET TO TRUE FOR MUONS HITTING ROI
   MakeNewFile: True           # Generate a new batch of muons for the sim? False -> Use the previous batch
   ROI_Radius:  2              # How many meters larger than the OD radius?

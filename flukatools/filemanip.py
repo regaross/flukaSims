@@ -86,12 +86,12 @@ def copy_input_to_workdir() -> None:
             base, ext = path.splitext(filename)
 
             ## Add the SEED string between the two
-            filename = base + str(SEED) + ext
+            new_filename = base + str(SEED) + ext
 
-            rename(WORKPATH + base + ext, WORKPATH + filename)
+            rename(WORKPATH + filename, WORKPATH + new_filename)
 
             # Change the global variable for this filename
-            FLUKA_JOB_FILES[entry] = WORKPATH + filename
+            FLUKA_JOB_FILES[entry] = WORKPATH + new_filename
 
 def change_number_of_muons() -> None:
     '''Changes the number of muons in the input file for a given simulation'''
@@ -166,27 +166,29 @@ def manage_output_files() -> None:
     # Move the output data files to the proper directory
     for entry in FLUKA_OUTPUT_CHANNELS:
         # Rename the fort.## files to something sensible for later parsing
-        filename = input_prefix + '_001.' + entry
-        new_filename = output + FLUKA_OUTPUT_CHANNELS[entry] + '.asc'
-        system('mv ' + filename + ' ' + new_filename)
+        input_prefix = FLUKA_FILES['input'][:-4] + str(SEED)
+        filename = input_prefix + '001_fort.' + str(entry)
+        new_filename = output + FLUKA_OUTPUT_CHANNELS[entry] + str(SEED) + '.asc'
+        system('mv ' + PATHS['SIF'] + filename + ' ' + new_filename)
     
     # Step TWO
     # Copy the muon file from .temp 
-    system('mv ' + FLUKA_JOB_FILES['muons'] + ' .temp/muons' + str(SEED) + '.txt')
+    system('mv ' + FLUKA_JOB_FILES['muons'] + ' ' + output + 'muons' + str(SEED) + '.txt')
 
     # Step THREE
     # Produce a concatenated std error, std output and log files
-    output_filename = 'outlogerr' + str(SEED) + '.txt'
-    system('cat ' + SLURM['SLURM_PREFIX'] + '.out >> .temp/' + output_filename + ' && rm .temp/' + SLURM['SLURM_PREFIX'] + '.out')
-    system('cat ' + SLURM['SLURM_PREFIX'] + '.log >> .temp/' + output_filename + ' && rm .temp/' + SLURM['SLURM_PREFIX'] + '.log')
-    system('cat ' + SLURM['SLURM_PREFIX'] + '.err >> .temp/' + output_filename + ' && rm .temp/' + SLURM['SLURM_PREFIX'] + '.err')
+    slurm_output_filename = 'slurm_outlogerr' + str(SEED) + '.txt'
+    fluka_output_filename = 'fluka_outlogerr' + str(SEED) + '.txt'
 
-    # Step FOUR
-    # Remove the temporary job specific files
-    remove = ['ran*', '*.exe', ]
-    
-    for entry in remove:
-        system('rm ' + entry)
+    # Copy the SLURM simulation output files 
+    system('cat ' + SLURM['SLURM_PREFIX'] + '.out >> ' + output + slurm_output_filename + ' && rm ' + PATHS['SIF'] + SLURM['SLURM_PREFIX'] + '.out')
+    system('cat ' + SLURM['SLURM_PREFIX'] + '.log >> ' + output + slurm_output_filename + ' && rm ' + PATHS['SIF'] + SLURM['SLURM_PREFIX'] + '.log')
+    system('cat ' + SLURM['SLURM_PREFIX'] + '.err >> ' + output + slurm_output_filename + ' && rm ' + PATHS['SIF'] + SLURM['SLURM_PREFIX'] + '.err')
 
-    for entry in FLUKA_JOB_FILES:
-        system('rm ' + FLUKA_JOB_FILES[entry])
+    # Copy the FLUKA simulation output files
+    system('cat ' + SLURM['SLURM_PREFIX'] + '.out >> ' + output + slurm_output_filename + ' && rm ' + PATHS['SIF'] + SLURM['SLURM_PREFIX'] + '.out')
+    system('cat ' + SLURM['SLURM_PREFIX'] + '.log >> ' + output + slurm_output_filename + ' && rm ' + PATHS['SIF'] + SLURM['SLURM_PREFIX'] + '.log')
+    system('cat ' + SLURM['SLURM_PREFIX'] + '.err >> ' + output + slurm_output_filename + ' && rm ' + PATHS['SIF'] + SLURM['SLURM_PREFIX'] + '.err')
+
+    # Step FOUR: remove what remains
+    system('rm .temp/*' + str(SEED) + '* *' + str(SEED) + '*')
