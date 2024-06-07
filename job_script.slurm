@@ -20,7 +20,7 @@
 #SBATCH --cpus-per-task=1                       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=10G                       # memory per cpu-core (4G is default)
 #SBATCH --time=03:30:00                         # total run time limit (HH:MM:SS)
-#SBATCH --array=0-4                             # job array with index values 0, 1, 2, 3, 4
+#SBATCH --array=0-5                             # job array with index values 0, 1, 2, 3, 4, 5 (about a year of data)
 #SBATCH --mail-type=all                         # send email on job start, end and fault
 #SBATCH --mail-user=regan.ross@mail.mcgill.ca   # This feature does work!
 

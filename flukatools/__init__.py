@@ -3,22 +3,32 @@ from os import environ, uname, getenv
 from datetime import datetime
 import numpy as np
 
-#################################################
-#                   CONSTANTS                    }
-#               (And Dictionaries)               }
-#################################################
-# Note: Any variable declared or assigned here will be available through each sub file of this module.
-# HOWEVER, once changed, a change to any of these variables is only global if the variable is of a mutable type AND the change is not a reassignment,
-# but rather a modification like appending to an array, adding a new key : val in a dictionary and so on. STRINGS ARE IMMUTABLE. Therefore, any STRING 
-# must not be altered in subordinate files with the change assumed global. Wrap things in dictionaries, and life will be okay.
+################################################################################
+#                                                                              #
+#               CONSTANTS AND DICTIONARIES- FILES, PATHS AND ENV               #
+#                                                                              #
+################################################################################
+# Note: Any variable declared or assigned here will be available through each sub 
+# file of this module. HOWEVER, once changed, a change to any of these variables 
+# is only global if the variable is of a mutable type AND the change is not a 
+# reassignment,but rather a modification like appending to an array, adding a new 
+# key : val in a dictionary and so on. STRINGS ARE IMMUTABLE. Therefore, any STRING 
+# must not be altered in subordinate files with the change assumed global. Wrap 
+# things in dictionaries, and life will be okay.
 
+# This is a nicely formatted date-time string that is used for labelling output directories
 TODAY = datetime.now().strftime("%B%d-%Hh%M").lower()
+
+# This is used to seed the random number generator and also to name files. Each simulation
+# run will get its own seed value as defined on the system that will be appended to file
+# names. It is unlikely that there will be an overlap... but it's possible.
 SEED = int(getenv('FLUKA_RANDOM_SEED'))
 np.random.seed(SEED)
 
-### Set some environment variables for SLURM.
+# If we're loading the module on the server— in particular S3DF, these are important
+# environment variables for subsequent file manipulation.
 if uname().nodename[:3] == 'sdf':
-    ### From SLURM environment variables
+    # SLURM environment variables for running job arrays
     SLURM = {
     'SLURM_JOB_ID' : int(environ["SLURM_ARRAY_JOB_ID"]),
     'SLURM_TASK_ID' : int(environ["SLURM_ARRAY_TASK_ID"]),
@@ -26,18 +36,24 @@ if uname().nodename[:3] == 'sdf':
     }
 
 
-# Declare a global dictionary to house the YAML parameters
-# These are set when the YAML file is read in from within the filemanip script; these are declared here to be overwritten later
+# Declare a global dictionary to house the YAML configuration file parameters
+# These are set when the YAML file is read in from within the filemanip script; 
+# these are declared here to be overwritten later. Dictionaries are mutable!
 YAML_PARAMS = {}
 
-# These are set and forget
-PATHS = {'SIF'      :   '',             # System dependent (absolute path)
-         'simfiles' :   'simfiles/',    # Relative path to the simulation files
-         'workdir'  :   '.temp/',       # Relative path to the copies of simulation files and compiled FLUKA code
-         'output'   :   './data/' + TODAY + '/'}       
+# These are set and forgotten in the filemanip functions
+PATHS = {
+    # System dependent (absolute path)— where is the SIF file?
+    'SIF'      :   '',
+    # Relative path to the simulation files
+    'simfiles' :   'simfiles/',
+    # Relative path to the copies of simulation files and compiled FLUKA code
+    'workdir'  :   '.temp/',
+    'output'   :   './data/' + TODAY + '/'
+    }       
 
 FLUKA_OUTPUT_CHANNELS = {
-    # The FLUKA data emerge in fort.## files. The ## tells us what the output files are. This will have to change to something more general.
+    # The FLUKA data emerge in fort.## files. The <##> tells us what the output files are. This will have to change to something more general.
     21  : 'resnucTPC',
     22  : 'resnucTPCCu',
     23  : 'resnucCryo',
@@ -60,6 +76,14 @@ FLUKA_JOB_FILES = { # This dictionary will be populated with files that are only
     'mgdraw'            : '',
     
 }
+
+################################################################################
+#                                                                              #
+#                    DICTIONARIES- ANALYSIS & OTHER TOOLS                      #
+#                                                                              #
+################################################################################
+
+# Here the FLUKA variable dictionaries are taken from entries in the FLUKA manual
 
 # FLUKA variable information
 ICODE_DICTIONARY = {
