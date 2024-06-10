@@ -16,7 +16,7 @@ Output:
 
 Input:                              # Not likely to require changing
   SIFPath: '/sdf/home/r/rross/nEXO/flukaSims/'
-  InputPath: '/sdf/home/r/rross/nEXO/flukaSims/simfiles/'
+  InputPath: 'input/'
   # Define the paths below with respect to this path!^^
   InputFile: 'nEXO_2024.inp'              # Not likely to require changing
   SourceFile: 'muon_from_file.f'        # Not likely to require changing

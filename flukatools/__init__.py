@@ -46,7 +46,7 @@ PATHS = {
     # System dependent (absolute path)— where is the SIF file?
     'SIF'      :   '',
     # Relative path to the simulation files
-    'simfiles' :   'simfiles/',
+    'input' :   '',
     # Relative path to the copies of simulation files and compiled FLUKA code
     'workdir'  :   '.temp/',
     'output'   :   './data/' + TODAY + '/'

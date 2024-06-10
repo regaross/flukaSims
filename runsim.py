@@ -6,12 +6,12 @@ from time import sleep
 # 1. Import the parameters from the YAML file.
 filemanip.read_in_config_yaml('simconfig.yaml')
 
-print(filemanip.FLUKA_FILES['input'])
-
 sleep(1)
 
 # 2. Copy files to working directory
 filemanip.copy_input_to_workdir()
+
+
 # Make the output directory and copy the input to that directory
 filemanip.make_output_directory()
 

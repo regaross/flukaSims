@@ -46,6 +46,7 @@ def read_in_config_yaml(yaml_filename : str) -> None :
         Input = input_yaml.get('Input')
 
         PATHS['SIF'] = Input.get('SIFPath')
+        PATHS['input'] = Input.get('InputPath')
 
         # Simulation Parameters
         YAML_PARAMS['num_muons']     =  Simulation.get('Muons')
@@ -76,7 +77,7 @@ def copy_input_to_workdir() -> None:
     global FLUKA_JOB_FILES
 
     WORKPATH = PATHS['SIF'] + PATHS['workdir']
-    INPUT_PATH = PATHS['SIF'] + PATHS['simfiles']
+    INPUT_PATH = PATHS['SIF'] + PATHS['input']
 
     # Create the working directory
     if not path.exists(WORKPATH):
