@@ -20,7 +20,7 @@ RESNUCLE           3        23        90       190  icryo_in          ResNuCryo
 * $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 * ------------> PHYSICS and PROCESS REGULATORS
-IONTRANS    HEAVYION
+IONTRANS          -2
 * Empty LOW-PWXS card to enable pointwise treatment in "all materials"
 LOW-PWXS                                                              ENDF-VIII0
 LOW-PWXS      541360                 150     XE136                    ENDF-VIII0
