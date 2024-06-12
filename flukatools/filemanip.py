@@ -23,6 +23,7 @@ from . import *
 from os import path, makedirs, system, rename
 from shutil import copy
 from yaml import safe_load
+import re
 
 ################################################################################
 #                                                                              #
@@ -218,15 +219,94 @@ def manage_output_files() -> None:
 '''Native FLUKA scoring functions produce an ASCII file with a header of 14 lines
 followed by an array of dimension n x 10; that is, there are 10 columns and n rows.'''
 
-def read_resnuclei_file(filepath) -> dict:
+def read_resnuclei_file(filepath, checkseed = True) -> dict:
     ''' One FLUKA scoring card is called RESNUCLEI for scoring residual nuclei.
     As with all native FLUKA scoring outputs, there is a header for the file
     that can be parsed for meta data, and a subsequent 2D array of numbers 
     representing the number of nuclei counted in a given region. The dimensions
     of this array are not straightforward and obvious. Edit this function with 
-    caution.
+    caution. The header of a typical ResNuclei output file looks like this: 
+
+    ##### Header begins below this line
+    
+        *****  Most Recent Update: May 21, 2024                                                  *****
+
+                DATE:  6/11/24,  TIME:  9:13:51
+
+                Total number of particles followed           5790, for a total weight of  5.7900E+03
+
+        1
+
+        Res. nuclei n.   3  "ResNuCryo " ,  all         products, region n.     4
+            detector volume:  1.0000E+00 cm**3
+            Max. Z:  90, Max. N-Z: 185 Min. N-Z: -4
+            Data follow in a matrix A(z,n-z-k), k: -5 format (1(5x,1p,10(1x,e11.4)))
     '''
-    raw =  np.loadtxt(filepath, skiprows = 14) 
+
+    # Grad the raw data in the form of a numpy array
+    raw =  np.loadtxt(filepath, skiprows = 14)
+
+    # Get the header of the file; it will be parsed for a few particular values.
+    with open(filepath, 'r') as file:
+        header = file.readlines()[:15]
+
+
+    # Create a dictionary with the findings
+    resnuc = {
+    # Containing pairs of digits (sometimes only single ones) separated by forward slashes /
+    'date' : re.search('\d\d?\/\d\d?\/\d\d', header[3])[0],
+    # Containing pairs of digits (sometimes only single ones) separated by colons :
+    'time' : re.search('\d\d?:\d\d?:\d\d?', header[3])[0],
+    # Preceded by some spaces, containing at least one digit, and followed by an =
+    'primaries' : int(re.search('(?<=\s+)\d+(?=,)', header[5])[0]),
+    # Preceded by "n.", some space, and containing only digits— we take the second result here.
+    'region' : int(re.search('(?<=n\.\s+)\d+',header[9])[1]),
+    # Wrapped in quotations, but we don't want the trailing space
+    'cardname' : re.search('(?<=\").*(?=\s+\")', header[9])[0],
+    # A few entires on this line, each entry preceded by (at least) "Z: "
+    'atomic' : re.search('(?!Z:\s+)\-?\d+', header[11]),
+    'max_z' : int(re.search('(?!Z:\s+)\-?\d+', header[11])[0]),
+    'max_n_minus_z' : int(re.search('(?!Z:\s+)\-?\d+', header[11])[1]),
+    'min_n_minus_z' : int(re.search('(?!Z:\s+)\-?\d+', header[11])[2]),
+    }
+
+    if checkseed:
+        # We assume a filename ending with a few digits being the seed
+        # Preceded by a forward slash / followed by a dot . and containing only digits
+        seed = int(re.search('(?!\/)\d+(?=\.)', filepath)[0])
+        resnuc['seed'] = seed
+
+    # Data follow in a matrix A(z,n-z-k)— should probably sort it here. 
+    # See the head of the unclear Resnuclei Output file for more details.
+    k = -5
+    max_a = resnuc['max_n_minus_z'] - k
+    resnuc['max_a'] = max_a
+
+    # Here, most of the entries will invariably be zero. Don't bother keeping all that junk in a big array.
+    # We'll make an array with the row entries being [Z,A,datum]
+
+    total = np.count_nonzero(raw)
+    data = np.ndarray((total, 3), dtype=int)
+
+    # Yes, the array parsing is FUNKY. Don't worry about it. This ought to be right
+    # See this outdated (but still useful) man page: http://www.fluka.org/fluka.php?id=man_onl&sub=67
+    count = 0
+    for i in range(max_a):
+        for j in range(resnuc['max_z']):
+            Z = j + 1
+            A = (i+1)+k+2*(j+1)
+            if raw[i,j] > 0.0:
+                data[count] = np.array([Z, A, raw[i,j]])
+                count += 1
+
+    resnuc['data'] = data
+
+    return resnuc
+
+    
+
+
+    
 
 def read_muon_phase_space_file(filepath)-> dict:
     ''' The customized muon source for these FLUKA simulations requires producing 
@@ -235,7 +315,7 @@ def read_muon_phase_space_file(filepath)-> dict:
     is saved along with the simulation output as a '.txt' file. This way, the muon
     file isn't just saved in volatile memory and can be stored and, if necessary, 
     re-used. This function will read in that file and return the data.'''
-    pass
+    raw =  np.loadtxt(filepath)
 
 def read_neutron_file(filepath)-> dict:
     ''' The customized mgdraw output deployed to score neutrons in various regions
@@ -243,4 +323,4 @@ def read_neutron_file(filepath)-> dict:
     about the neutrons as they are scored by FLUKA. The parameters and their order 
     are defined in the mgdraw file. This function will read in that _fort.## file and
     return the relevant data.'''
-    pass
+    raw =  np.loadtxt(filepath)
