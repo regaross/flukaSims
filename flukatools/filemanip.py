@@ -24,13 +24,13 @@ from os import path, makedirs, system, rename
 from shutil import copy
 from yaml import safe_load
 import re
+import pandas as pd
 
 ################################################################################
 #                                                                              #
 #                         SIMULATION FILE HANDLING                             #
 #                                                                              #
 ################################################################################
-
 
 def read_in_config_yaml(yaml_filename : str) -> None :
     '''Reads in a particular yaml file with the appropriate parameters for the simulation'''
@@ -219,6 +219,12 @@ def manage_output_files() -> None:
 '''Native FLUKA scoring functions produce an ASCII file with a header of 14 lines
 followed by an array of dimension n x 10; that is, there are 10 columns and n rows.'''
 
+
+################################################################################
+#                         RESIDUAL NUCLEI OUTPUT                               #
+################################################################################
+
+
 def read_resnuclei_file(filepath, checkseed = True) -> dict:
     ''' One FLUKA scoring card is called RESNUCLEI for scoring residual nuclei.
     As with all native FLUKA scoring outputs, there is a header for the file
@@ -351,19 +357,53 @@ def clean_resnuclei_data(resnuc_dict)-> dict:
 
     return resnuc_dict    
 
-def read_muon_phase_space_file(filepath)-> dict:
+################################################################################
+#                    PHASE SPACE FILE & NEUTRON OUTPUT                         #
+################################################################################
+
+def read_muon_phase_space_file(filepath, pandas = False):
     ''' The customized muon source for these FLUKA simulations requires producing 
     a 'phase space' file with information containing the muon energies, direction
     cosines and so forth. As the simulation currently works, the phase space file
     is saved along with the simulation output as a '.txt' file. This way, the muon
     file isn't just saved in volatile memory and can be stored and, if necessary, 
-    re-used. This function will read in that file and return the data.'''
-    raw =  np.loadtxt(filepath)
+    re-used. This function will read in that file and return the data. '''
 
-def read_neutron_file(filepath)-> dict:
+    data = np.loadtxt(filepath)
+    if not pandas:
+        # A numpy array
+        print('The phase space file consists of rows of the format: \n \
+            [][0]fnumber(10 or 11), [][1]energy, [][2]initial x, [][3]initial y, \n \
+            [][4]initial z, [][5]cos_x, [][6]cos_y, [][7]-cos_z, [][8]weight (1)')
+        return data
+    else:
+        # A pandas dataframe
+        columns = ['fluka_number', 'energy', 'x_ini', 'y_ini', 'z_ini', 'cosx', 'cosy', 'cosz', 'weight']
+        return pd.DataFrame(data, columns=columns)
+
+def read_neutron_file(filepath, pandas = False):
     ''' The customized mgdraw output deployed to score neutrons in various regions
     produces a file that is effectively a 2D array of numbers providing information
     about the neutrons as they are scored by FLUKA. The parameters and their order 
     are defined in the mgdraw file. This function will read in that _fort.## file and
-    return the relevant data.'''
-    raw =  np.loadtxt(filepath)
+    return the relevant data. '''
+
+
+    data = np.loadtxt(filepath)
+
+    if not pandas:
+        print('The neutron output file consists of rows of the format: \n \
+            [][0]ICODE, [][1]NCASE, [][2]JTRACK, [][3]MREG, [][4]LTRACK, [][5]ETRACK, \n \
+            [][6]XSCO, [][7]YSCO, [][8]ZSCO, [][9]CXTRCK, [][10]CYTRCK, [][11]CZTRCK, \n \
+                followed by the parent particle information: \n \
+            [][12]ICODE, [][13]NCASE, [][14]JTRACK, [][15]MREG, [][16]LTRACK, [][17]ETRACK, \n \
+            [][18]XSCO, [][19]YSCO, [][20]ZSCO, [][21]CXTRCK, [][22]CYTRCK, [][23]CZTRCK, \n ')
+        return data
+    else:
+        columns =['ICODE', 'NCASE', 'JTRACK', 'MREG', 'LTRACK', 'ETRACK', \
+                  'XSCO', 'YSCO', 'ZSCO', 'CXTRCK', 'CYTRCK', 'CZTRCK', \
+                  # here the p before the rest of the variable name means "parent"
+                    'pICODE', 'pNCASE', 'pJTRACK', 'pMREG', 'pLTRACK', 'pETRACK', \
+                  'pXSCO', 'pYSCO', 'pZSCO', 'pCXTRCK', 'pCYTRCK', 'pCZTRCK']
+        
+        return pd.DataFrame(data, columns=columns)
