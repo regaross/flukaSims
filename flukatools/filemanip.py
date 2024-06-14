@@ -254,18 +254,18 @@ def read_resnuclei_file(filepath, checkseed = True) -> dict:
     # Create a dictionary with the findings
     resnuc = {
     # Containing pairs of digits (sometimes only single ones) separated by forward slashes /
-    'date' : re.search('\d\d?\/\d\d?\/\d\d', header[3])[0],
+    'date'          : re.search('\d\d?\/\d\d?\/\d\d', header[3])[0],
     # Containing pairs of digits (sometimes only single ones) separated by colons :
-    'time' : re.search('\d\d?:\d\d?:\d\d?', header[3])[0],
+    'time'          : re.search('\d\d?:\d\d?:\d\d?', header[3])[0],
     # Preceded by some spaces, containing at least one digit, and followed by an =
-    'primaries' : int(re.search('(?<=\s+)\d+(?=,)', header[5])[0]),
+    'primaries'     : int(re.search('(?<=\s+)\d+(?=,)', header[5])[0]),
     # Preceded by "n.", some space, and containing only digits— we take the second result here.
-    'region' : int(re.search('(?<=n\.\s+)\d+',header[9])[1]),
+    'region'        : int(re.search('(?<=n\.\s+)\d+',header[9])[1]),
     # Wrapped in quotations, but we don't want the trailing space
-    'cardname' : re.search('(?<=\").*(?=\s+\")', header[9])[0],
+    'cardname'      : re.search('(?<=\").*(?=\s+\")', header[9])[0],
     # A few entires on this line, each entry preceded by (at least) "Z: "
-    'atomic' : re.search('(?!Z:\s+)\-?\d+', header[11]),
-    'max_z' : int(re.search('(?!Z:\s+)\-?\d+', header[11])[0]),
+    'atomic'        : re.search('(?!Z:\s+)\-?\d+', header[11]),
+    'max_z'         : int(re.search('(?!Z:\s+)\-?\d+', header[11])[0]),
     'max_n_minus_z' : int(re.search('(?!Z:\s+)\-?\d+', header[11])[1]),
     'min_n_minus_z' : int(re.search('(?!Z:\s+)\-?\d+', header[11])[2]),
     }
@@ -282,31 +282,74 @@ def read_resnuclei_file(filepath, checkseed = True) -> dict:
     max_a = resnuc['max_n_minus_z'] - k
     resnuc['max_a'] = max_a
 
-    # Here, most of the entries will invariably be zero. Don't bother keeping all that junk in a big array.
-    # We'll make an array with the row entries being [Z,A,datum]
+    # Here, most of the entries will invariably be zero. It is however useful to keep even the zero'd entries for easier adding of
+    # elements later on; yeah it might be a bit of a heffer of an array, but we have memory. So we'll just return the raw figures.
+
+    resnuc['raw'] = raw
+
+    return resnuc
+
+def add_resnuclei_dicts(resnuclei_dicts : list) -> dict:
+    '''Scans through the residual nuclei output dictionaries to make sure seeds aren't repeated. Sums the number of primaries.
+    Will ensure that all the regions are the same too'''
+
+    n_files = len(resnuclei_dicts)
+    seeds, nprimaries, regions = np.zeros(n_files), np.zeros(n_files), np.zeros(n_files)
+
+    for i in range(n_files):
+        seeds[i]        = resnuclei_dicts[i]['seed']
+        nprimaries[i]   = resnuclei_dicts[i]['primaries']
+        regions[i]      = resnuclei_dicts[i]['region']
+
+    if np.unique(seeds) != 1:
+        raise RuntimeError('You have repeated seeds in the resnuclei list!')
+        return None
+    elif np.unique(regions) != 1:
+        raise RuntimeError('There are different regions being scored in this list!')
+        return None
+    else:
+        try:
+            new_raw = np.add([resnuc['raw'] for resnuc in resnuclei_dicts])
+        except:
+            raise RuntimeError('The data have different dimensions! Make sure the same nuclei species are being scored.')
+        
+        new_resnuc = {
+            'primaries' : np.sum(nprimaries),
+            'seed'      : seeds,
+            'seeds'     : seeds,
+            'region'    : regions[0],
+            'raw'       : new_raw,
+            'max_a'     : resnuclei_dicts[0]['max_a'],
+            'max_z'     : resnuclei_dicts[0]['max_z']
+        }
+
+    return new_resnuc
+
+def clean_resnuclei_data(resnuc_dict)-> dict:
+    '''Given a residual nuclei dictionary, this function sorts the data into a 3-column format: Z, A, and counts. It creates a new dictionary entry 'data' which will hold the newly sorted array. This can be used on residual nuclei dictionaries that have already been added together, OR individual ones.'''
+
+    raw = resnuc_dict['raw']
+    max_z = resnuc_dict['max_z']
+    max_a = resnuc_dict['max_a']
 
     total = np.count_nonzero(raw)
-    data = np.ndarray((total, 3), dtype=int)
+    data = np.zeros((total, 3), dtype=int)
 
     # Yes, the array parsing is FUNKY. Don't worry about it. This ought to be right
     # See this outdated (but still useful) man page: http://www.fluka.org/fluka.php?id=man_onl&sub=67
     count = 0
+    k = -5
     for i in range(max_a):
-        for j in range(resnuc['max_z']):
+        for j in range(max_z):
             Z = j + 1
             A = (i+1)+k+2*(j+1)
             if raw[i,j] > 0.0:
                 data[count] = np.array([Z, A, raw[i,j]])
                 count += 1
 
-    resnuc['data'] = data
+    resnuc_dict['data'] = data
 
-    return resnuc
-
-    
-
-
-    
+    return resnuc_dict    
 
 def read_muon_phase_space_file(filepath)-> dict:
     ''' The customized muon source for these FLUKA simulations requires producing 
