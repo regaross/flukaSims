@@ -20,7 +20,7 @@ This part of the module is for interfacing with any of the simulation files. Cop
 from . import *
 
 # Others (only the necessary ones)
-from os import path, makedirs, system, rename
+from os import path, makedirs, system, rename, listdir
 from shutil import copy
 from yaml import safe_load
 import re
@@ -407,3 +407,20 @@ def read_neutron_file(filepath, pandas = False):
                   'pXSCO', 'pYSCO', 'pZSCO', 'pCXTRCK', 'pCYTRCK', 'pCZTRCK']
         
         return pd.DataFrame(data, columns=columns)
+
+
+################################################################################
+#                       PRODUCING OVERALL HDF5 FILES                           #
+################################################################################
+
+def make_h5_file(path):
+    '''This function will produce an hdf5 file with all the data from files within
+     the directory path given as an argument.'''
+    
+    # 1. Find all the seeds from the directory; muon there should be a muon file for each 
+    files = listdir(path)
+    seeds = []
+    for file in files:
+        if file[:5] == 'muons':
+            # We have a muon file, and it has a seed
+            seeds.append(file[5:-4])
