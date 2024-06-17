@@ -2,6 +2,7 @@
 from os import environ, uname, getenv
 from datetime import datetime
 import numpy as np
+# from scipy.constants import physical_constants
 
 ################################################################################
 #                                                                              #
@@ -149,6 +150,44 @@ ICODE_DICTIONARY = {
     # Icode = 40x: call from Kashea
     400: 'delta ray generation secondaries',
 }
+
+#### Need to add scipy into the Singularity container to use this!
+
+# jtrack_rest_energies = { # Expressed in MeV if known, 0 otherwise (for heavy ions for instance)
+#     None:   None,
+#     -6:     physical_constants['alpha particle mass energy equivalent in MeV'][0],
+#     -5:     physical_constants['helion mass energy equivalent in MeV'][0],
+#     -4:     physical_constants['triton mass energy equivalent in MeV'][0],
+#     -3:     physical_constants['deuteron mass energy equivalent in MeV'][0],
+#     -2:     0,  # Generic heavy ion (see FLUKA Manual)
+#     -1:     0,  # Optical photon
+#     0:      0,  # Pseudo-particle (see FLUKA Manual)
+#     1:      physical_constants['proton mass energy equivalent in MeV'][0],
+#     2:      physical_constants['proton mass energy equivalent in MeV'][0],
+#     3:      physical_constants['electron mass energy equivalent in MeV'][0],
+#     4:      physical_constants['electron mass energy equivalent in MeV'][0],
+#     5:      0,  # Electron neutrino
+#     6:      0,  # Electron anti-neutrino
+#     7:      0,  # Photon
+#     8:      physical_constants['neutron mass energy equivalent in MeV'][0],
+#     9:      physical_constants['neutron mass energy equivalent in MeV'][0],
+#     10:     physical_constants['muon mass energy equivalent in MeV'][0],
+#     11:     physical_constants['muon mass energy equivalent in MeV'][0],
+#     12:     497.611, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+#     13:     139.57039, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+#     14:     139.57039, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+#     15:     493.677, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+#     16:     493.677, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+
+#     23:     134.9768, # https://pdg.lbl.gov/2022/listings/contents_listings.html
+
+#     208:    0,  # Energy for dose scoring (see FLUKA Manual)
+#     211:    0,  
+#     308:    0,
+
+#     # We don't care about many of these masses; for instance strange mesons, or anything else we won't be counting in the analysis.
+
+# }
 
 JTRACK_DICTIONARY = {
     None:   None,
