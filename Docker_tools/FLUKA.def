@@ -27,7 +27,7 @@ MirrorURL: http://ch.archive.ubuntu.com/ubuntu/
     rm Miniconda3-latest-Linux-x86_64.sh
      
     # Use conda to install pip, numpy
-    /miniconda3/bin/conda install -y -c conda-forge pip numpy h5py pyyaml
+    /miniconda3/bin/conda install -y -c conda-forge pip numpy h5py pyyaml pandas scipy
 
     # Help conda resolving Python "import" 
     /miniconda3/bin/conda update --all 
