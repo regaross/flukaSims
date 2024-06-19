@@ -22,13 +22,15 @@ TODAY = datetime.now().strftime("%B%d-%Hh%M").lower()
 
 # This is used to seed the random number generator and also to name files. Each simulation
 # run will get its own seed value as defined on the system that will be appended to file
-# names. It is unlikely that there will be an overlap... but it's possible.
-SEED = int(getenv('FLUKA_RANDOM_SEED'))
-np.random.seed(SEED)
+# names. It is unlikely that there will be an overlap... but it's possible
 
 # If we're loading the module on the server— in particular S3DF, these are important
 # environment variables for subsequent file manipulation.
 if uname().nodename[:3] == 'sdf':
+
+    SEED = int(getenv('FLUKA_RANDOM_SEED'))
+    np.random.seed(SEED)
+
     # SLURM environment variables for running job arrays
     SLURM = {
     'SLURM_JOB_ID' : int(environ["SLURM_ARRAY_JOB_ID"]),
