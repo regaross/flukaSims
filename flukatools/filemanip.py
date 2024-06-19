@@ -249,8 +249,6 @@ def read_resnuclei_file(filepath, checkseed = True) -> dict:
             Data follow in a matrix A(z,n-z-k), k: -5 format (1(5x,1p,10(1x,e11.4)))
     '''
 
-    # Grad the raw data in the form of a numpy array
-    raw =  np.loadtxt(filepath, skiprows = 14)
 
     # Get the header of the file; it will be parsed for a few particular values.
     with open(filepath, 'r') as file:
@@ -291,7 +289,13 @@ def read_resnuclei_file(filepath, checkseed = True) -> dict:
     # Here, most of the entries will invariably be zero. It is however useful to keep even the zero'd entries for easier adding of
     # elements later on; yeah it might be a bit of a heffer of an array, but we have memory. So we'll just return the raw figures.
 
+    # Grad the raw data in the form of a numpy array
+    raw =  np.loadtxt(filepath, skiprows = 14)*resnuc['primaries']
+
+    # This is the number of nuclei produced— NOT as a function of time, nor number of primaries anymore.
     resnuc['raw'] = raw
+    resnuc['shaped'] = np.reshape(raw, (resnuc['max_z'], resnuc['max_a']))
+
 
     return resnuc
 
@@ -307,15 +311,20 @@ def add_resnuclei_dicts(resnuclei_dicts : list) -> dict:
         nprimaries[i]   = resnuclei_dicts[i]['primaries']
         regions[i]      = resnuclei_dicts[i]['region']
 
-    if np.unique(seeds) != 1:
+    if len(np.unique(seeds)) <  len(seeds):
+        # All the seeds should be DIFFERENT
         raise RuntimeError('You have repeated seeds in the resnuclei list!')
         return None
-    elif np.unique(regions) != 1:
+    elif len(np.unique(regions)) != 1:
+        # All the regions should be THE SAME
         raise RuntimeError('There are different regions being scored in this list!')
         return None
     else:
+        # Seeds are all different and all regions are the same; we already have the total number, 
+        # NO NEED to multiply by the number of primaries
         try:
-            new_raw = np.add([resnuc['raw'] for resnuc in resnuclei_dicts])
+            new_raw = np.sum([resnuc['raw'] for resnuc in resnuclei_dicts], axis = 0)
+            new_shaped = np.sum([resnuc['shaped'] for resnuc in resnuclei_dicts], axis = 0)
         except:
             raise RuntimeError('The data have different dimensions! Make sure the same nuclei species are being scored.')
         
@@ -325,37 +334,12 @@ def add_resnuclei_dicts(resnuclei_dicts : list) -> dict:
             'seeds'     : seeds,
             'region'    : regions[0],
             'raw'       : new_raw,
+            'shaped'    : new_shaped,
             'max_a'     : resnuclei_dicts[0]['max_a'],
             'max_z'     : resnuclei_dicts[0]['max_z']
         }
 
-    return new_resnuc
-
-def clean_resnuclei_data(resnuc_dict)-> dict:
-    '''Given a residual nuclei dictionary, this function sorts the data into a 3-column format: Z, A, and counts. It creates a new dictionary entry 'data' which will hold the newly sorted array. This can be used on residual nuclei dictionaries that have already been added together, OR individual ones.'''
-
-    raw = resnuc_dict['raw']
-    max_z = resnuc_dict['max_z']
-    max_a = resnuc_dict['max_a']
-
-    total = np.count_nonzero(raw)
-    data = np.zeros((total, 3), dtype=int)
-
-    # Yes, the array parsing is FUNKY. Don't worry about it. This ought to be right
-    # See this outdated (but still useful) man page: http://www.fluka.org/fluka.php?id=man_onl&sub=67
-    count = 0
-    k = -5
-    for i in range(max_a):
-        for j in range(max_z):
-            Z = j + 1
-            A = (i+1)+k+2*(j+1)
-            if raw[i,j] > 0.0:
-                data[count] = np.array([Z, A, raw[i,j]])
-                count += 1
-
-    resnuc_dict['data'] = data
-
-    return resnuc_dict    
+    return new_resnuc    
 
 ################################################################################
 #                    PHASE SPACE FILE & NEUTRON OUTPUT                         #
@@ -407,7 +391,6 @@ def read_neutron_file(filepath, pandas = False):
                   'pXSCO', 'pYSCO', 'pZSCO', 'pCXTRCK', 'pCYTRCK', 'pCZTRCK']
         
         return pd.DataFrame(data, columns=columns)
-
 
 ################################################################################
 #                       PRODUCING OVERALL HDF5 FILES                           #

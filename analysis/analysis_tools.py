@@ -539,7 +539,7 @@ def get_activation(h5_file, z, a, tpc = True):
         return 0
 
 def get_xe137_activation(h5_file):
-    ''' Returns the absolute "count" of Xe-137 tablued by the resnuclei FLUKA function given an hdf5 file'''
+    ''' Returns the absolute "count" of Xe-137 tabled by the resnuclei FLUKA function given an hdf5 file'''
 
     h5_file = grab_file(h5_file)
 
