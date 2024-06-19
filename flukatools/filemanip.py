@@ -260,26 +260,26 @@ def read_resnuclei_file(filepath, checkseed = True) -> dict:
     # Create a dictionary with the findings
     resnuc = {
     # Containing pairs of digits (sometimes only single ones) separated by forward slashes /
-    'date'          : re.search('\d\d?\/\d\d?\/\d\d', header[3])[0],
+    'date'          : re.search(r'\d\d?\/\d\d?\/\d\d', header[3]).group(0),
     # Containing pairs of digits (sometimes only single ones) separated by colons :
-    'time'          : re.search('\d\d?:\d\d?:\d\d?', header[3])[0],
+    'time'          : re.search(r'\d\d?:\d\d?:\d\d?', header[3]).group(0),
     # Preceded by some spaces, containing at least one digit, and followed by an =
-    'primaries'     : int(re.search('(?<=\s+)\d+(?=,)', header[5])[0]),
+    'primaries'     : int(re.search(r'\d+(?=,)', header[5]).group(0)),
     # Preceded by "n.", some space, and containing only digits— we take the second result here.
-    'region'        : int(re.search('(?<=n\.\s+)\d+',header[9])[1]),
+    'region'        : int(re.search(r'\d+\n',header[9]).group(0)),
     # Wrapped in quotations, but we don't want the trailing space
-    'cardname'      : re.search('(?<=\").*(?=\s+\")', header[9])[0],
+    'cardname'      : re.search(r'(?<=\").*(?=\s+\")', header[9]).group(0),
     # A few entires on this line, each entry preceded by (at least) "Z: "
-    'atomic'        : re.search('(?!Z:\s+)\-?\d+', header[11]),
-    'max_z'         : int(re.search('(?!Z:\s+)\-?\d+', header[11])[0]),
-    'max_n_minus_z' : int(re.search('(?!Z:\s+)\-?\d+', header[11])[1]),
-    'min_n_minus_z' : int(re.search('(?!Z:\s+)\-?\d+', header[11])[2]),
+    'atomic'        : re.findall(r'(?!Z:\s+)\-?\d+', header[11])
     }
+    resnuc['max_z']             = int(resnuc['atomic'][0])
+    resnuc['max_n_minus_z']     = int(resnuc['atomic'][1])
+    resnuc['min_n_minus_z']     = int(resnuc['atomic'][2])
 
     if checkseed:
         # We assume a filename ending with a few digits being the seed
         # Preceded by a forward slash / followed by a dot . and containing only digits
-        seed = int(re.search('(?!\/)\d+(?=\.)', filepath)[0])
+        seed = int(re.search(r'(?!\/)\d+(?=\.)', filepath).group(0))
         resnuc['seed'] = seed
 
     # Data follow in a matrix A(z,n-z-k)— should probably sort it here. 
