@@ -252,8 +252,29 @@ JTRACK_LABELS = {
     14:     'Negative Pion',
     15:     'Positive Kaon',
     16:     'Negative Kaon',
-
+    17:     'Lambda',
+    18:     'Antilambda',
+    19:     'Kaon zero short',
+    20:     'Negative Sigma',
+    21:     'Positive Sigma',
+    22:     'Sigma-zero',
     23:     'Pion-zero',
+    24:     'Kaon-zero',
+    25:     'Antikaon-zero',
+    27:     'Muon neutrino',
+    28:     'Muon antineutrino',
+    31:     'Antisigma-minus',
+    32:     'Antisigma-zero',
+    33:     'Antisigma-plus',
+    34:     'Xi-zero',
+    35:     'Antixi-zero',
+    36:     'Negative Xi',
+    37:     'Positive Xi',
+    38:     'Omega-minus',
+    39:     'Antiomega',
+    41:     'Positive Tau',
+    
+
 
     208:    'Energy Deposition',
 

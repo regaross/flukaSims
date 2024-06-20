@@ -25,8 +25,8 @@ from . import *
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
-
-
+import plotly.graph_objects as go
+from collections import Counter
 
 ################################################################################
 #                                                                              #
@@ -98,4 +98,54 @@ def plot_resnuclei_table_of_nuclides(nuclide_table : np.ndarray, title = 'Residu
                     '<extra></extra>')
     
     fig.update_layout(coloraxis_colorbar = dict(title = 'Total Count ' + time, titleside = 'right', len = 0.6))
+    fig.show()
+
+
+def plot_neutron_parents_pie(neutrons : np.ndarray, title = 'Parents of Neutrons')-> None:
+    '''Produces a plot of the immediate parent of neutrons as they are scored in the TPC.
+    This simply tallies the parent JTRACK variables from the muon array.'''
+
+    # Numbers representing parent particle species
+    particle_species = neutrons[:,14]
+    # Count occurrences of each particle species
+    species_counts = Counter(particle_species)
+
+    # Prepare labels and values for the pie chart
+    labels = [JTRACK_LABELS[num] for num in species_counts.keys()]
+    values = list(species_counts.values())
+
+    # Create the pie chart
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='none')])
+
+    # Customize the layout
+    fig.update_layout(
+        title=title,
+        title_x=0.5
+    )
+
+    # Show the plot
+    fig.show()
+
+def plot_neutron_icodes_pie(neutrons : np.ndarray, title = 'Neutron Birth Icodes')-> None:
+    '''Produces a pie chart plot of the ICode values of the neutrons.
+    In FLUKA lingo, this is basically their creation events.'''
+    
+    # Sample data: list of numbers representing particle species
+    icodes = neutrons[:,0]
+    # Count occurrences of each particle species
+    icodes_counts = Counter(icodes)
+
+    # Prepare labels and values for the pie chart
+    labels = [ICODE_DICTIONARY[num] for num in icodes_counts.keys()]
+    values = list(icodes_counts.values())
+
+    # Create the pie chart
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+    # Customize the layout
+    fig.update_layout(
+        title=title,
+        title_x=0.5
+    )
+    # Show the plot
     fig.show()
