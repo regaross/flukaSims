@@ -62,6 +62,12 @@ def clean_resnuclei_data(resnuc_dict)-> None:
     resnuc_dict['table'] = data
 
 
+def get_bootstrap_resnuc_data()-> np.ndarray:
+    '''This function will be for producing an array of activation rates per year by sampling randomly
+    and repeatedly from within a larger number of dictionaries.'''
+    pass
+
+
 ################################################################################
 #                                                                              #
 #                              PLOTTING FUNCTIONS                              #

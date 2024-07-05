@@ -299,7 +299,7 @@ def read_resnuclei_file(filepath, checkseed = True) -> dict:
 
     return resnuc
 
-def add_resnuclei_dicts(resnuclei_dicts : list) -> dict:
+def add_resnuclei_dicts(resnuclei_dicts : list, check_seeds_and_regions = True) -> dict:
     '''Scans through the residual nuclei output dictionaries to make sure seeds aren't repeated. Sums the number of primaries.
     Will ensure that all the regions are the same too'''
 
@@ -311,11 +311,11 @@ def add_resnuclei_dicts(resnuclei_dicts : list) -> dict:
         nprimaries[i]   = resnuclei_dicts[i]['primaries']
         regions[i]      = resnuclei_dicts[i]['region']
 
-    if len(np.unique(seeds)) <  len(seeds):
+    if len(np.unique(seeds)) <  len(seeds) and check_seeds_and_regions:
         # All the seeds should be DIFFERENT
         raise RuntimeError('You have repeated seeds in the resnuclei list!')
         return None
-    elif len(np.unique(regions)) != 1:
+    elif len(np.unique(regions)) != 1 and check_seeds_and_regions:
         # All the regions should be THE SAME
         raise RuntimeError('There are different regions being scored in this list!')
         return None
