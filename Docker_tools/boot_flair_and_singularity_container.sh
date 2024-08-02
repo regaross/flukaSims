@@ -9,4 +9,4 @@ xhost + $ip
 local_dir="./"
 
 # Run Docker container with necessary configurations
-docker run -it --rm -u root --privileged --name flair_singularity_image -e DISPLAY=$ip:0 -v /tmp/.X11-unix:/tmp/.X11-unix -v $local_dir:/root flair_singularity
+docker run -it --rm -u root --privileged --name flair_singularity_image -e DISPLAY=$ip:0 -v /tmp/.X11-unix:/tmp/.X11-unix -v $local_dir:/root flair_singularity_container

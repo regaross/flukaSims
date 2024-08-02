@@ -48,9 +48,16 @@ RUN apt-get update && \
         x11-apps \
         x11-utils
 
-RUN wget https://flukafiles.web.cern.ch/flukafiles/neutron/fluka-pw-endf-viii0_1-0_all.deb 
+### Sourcing the nuclear data files doesn't seem to work properly, so you'd be better off sourcing them yourself and putting them in the right spot.
 
-RUN dpkg -i /root/fluka-pw-endf-viii0_1-0_all.deb
+# Fetch the ENDF neutron data cross section files
+# RUN wget https://flukafiles.web.cern.ch/flukafiles/neutron/fluka-pw-endf-viii0_1-0_all.deb
+# # Extract the data from the debian files
+# RUN dpkg -i /root/fluka-pw-endf-viii0_1-0_all.deb
+
+# # Fetch the JEFF neutron data cross section files
+# RUN wget https://flukafiles.web.cern.ch/flukafiles/neutron/fluka-pw-jeff-3.3_1-1_all.deb
+# RUN dpkg -i /root/fluka-pw-jeff-3.3_1-1_all.deb
 
 RUN wget -q -O - https://flair.web.cern.ch/flair/download/ubuntu/flair.gpg |  tee /etc/apt/trusted.gpg.d/flair.asc && \
  add-apt-repository 'deb [arch=all,amd64] https://cern.ch/flair/download/ubuntu/23.10 /'

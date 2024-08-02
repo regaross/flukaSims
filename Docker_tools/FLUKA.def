@@ -5,6 +5,7 @@ MirrorURL: http://ch.archive.ubuntu.com/ubuntu/
 %files
     ./fluka_4-4.0.x86-Linux-gfor9_amd64.deb /home/fluka/
     ./fluka-pw-endf-viii0_1-0_all.deb /home/fluka/
+    ./fluka-pw-jeff-3.3_1-1_all.deb /home/fluka/
 
 %runscript
     echo "Welcome to FLUKA on Singularity"
@@ -17,6 +18,7 @@ MirrorURL: http://ch.archive.ubuntu.com/ubuntu/
 
     apt -y install /home/fluka/fluka_4-4.0.x86-Linux-gfor9_amd64.deb
     apt -y install /home/fluka/fluka-pw-endf-viii0_1-0_all.deb
+    apt -y install /home/fluka/fluka-pw-jeff-3.3_1-1_all.deb
 
     rm -rf /home/fluka
 
