@@ -20,12 +20,12 @@ RESNUCLE           3        23        90       190  icryo_in          ResNuCryo
 * $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 * ------------> PHYSICS and PROCESS REGULATORS
-IONTRANS          -2
+IONTRANS    HEAVYION
 * Empty LOW-PWXS card to enable pointwise treatment in "all materials"
-LOW-PWXS                                                              ENDF-VIII0
-LOW-PWXS      541360                 150     XE136                    ENDF-VIII0
-LOW-PWXS      541340                 150     XE134                    ENDF-VIII0
-LOW-PWXS       10010     h_zrh            HYDROGEN                    ENDF-VIII0
+LOW-PWXS                                                              JEFF-3.3
+*LOW-PWXS      541360                 150     XE136
+*LOW-PWXS      541340                 150     XE134
+*LOW-PWXS       10010     h_zrh            HYDROGEN
 * Muon-nuclear interactions must be enabled in all materials; Hydrogen to @LASTMAT
 MUPHOTON           1                      HYDROGEN  @LASTMAT
 * Activates photon interactions with nuclei for all energies
