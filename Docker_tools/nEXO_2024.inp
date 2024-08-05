@@ -66,7 +66,7 @@ TRC ic_con_i   0 0 205.50001 0 0 -72.50002 151 106
 * Outer Cryostat Outside
 SPH o_cryo_o   0.0 0.0 40.0 229.28
 * Outer Cryostat Inside
-SPH o_cryo_i   0.0 0.0 40.0 227
+SPH o_cryo_i   0.0 0.0 40.0 227.33
 * The conic section attaching the Outer Cryostat to the Support Structure
 TRC oc_con_o   0 0 327 0 0 -107.5 221.4 145
 TRC oc_con_i   0 0 327.0001 0 0 -107.5002 218 143
