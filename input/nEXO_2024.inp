@@ -1,6 +1,6 @@
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 TITLE
-Most Recent Update: May 21, 2024
+Most Recent Update: August 5, 2024
 * Setting default precision
 DEFAULTS                                                              PRECISIO
 RANDOMIZ                    93
@@ -20,12 +20,12 @@ RESNUCLE           3        23        90       190  icryo_in          ResNuCryo
 * $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 * ------------> PHYSICS and PROCESS REGULATORS
-IONTRANS          -2
+IONTRANS    HEAVYION
 * Empty LOW-PWXS card to enable pointwise treatment in "all materials"
-LOW-PWXS                                                              ENDF-VIII0
-LOW-PWXS      541360                 150     XE136                    ENDF-VIII0
-LOW-PWXS      541340                 150     XE134                    ENDF-VIII0
-LOW-PWXS       10010     h_zrh            HYDROGEN                    ENDF-VIII0
+LOW-PWXS                                                              JEFF-3.3
+*LOW-PWXS      541360                 150     XE136
+*LOW-PWXS      541340                 150     XE134
+*LOW-PWXS       10010     h_zrh            HYDROGEN
 * Muon-nuclear interactions must be enabled in all materials; Hydrogen to @LASTMAT
 MUPHOTON           1                      HYDROGEN  @LASTMAT
 * Activates photon interactions with nuclei for all energies
@@ -81,6 +81,7 @@ ZCC sup_ocol   0 0 218.66
 ZCC od_icol    0 0 617.22
 XYP od_ibot    -640
 XYP od_itop    640
+XYP wtrsurf    607
 ZCC od_ocol    0 0 618.5
 XYP od_obot    -640.95
 XYP od_otop    641.27
@@ -106,7 +107,9 @@ ocryo_in     5 o_cryo_i - i_cryo_o - (ic_con_o - ic_con_i)
 ocryo        5 o_cryo_o - o_cryo_i
 oc_con       5 (oc_con_o - oc_con_i)
 oc_sup       5 (sup_ocol + sup_top - sup_bot) - (sup_icol + sup_itop - sup_ibot)
-od_in        5 (od_icol + od_itop - od_ibot) - o_cryo_o -  (oc_con_o - oc_con_i) - ((sup_ocol + sup_top - sup_bot
+od_in        5 (od_icol + wtrsurf - od_ibot) - o_cryo_o -  (oc_con_o - oc_con_i) - ((sup_ocol + sup_top - sup_bot
+               ) - (sup_icol + sup_itop - sup_ibot))
+cov_gas      5 (od_icol + od_itop - wtrsurf) - o_cryo_o -  (oc_con_o - oc_con_i) - ((sup_ocol + sup_top - sup_bot
                ) - (sup_icol + sup_itop - sup_ibot))
 od           5 (od_ocol + od_otop - od_obot) - (od_icol + od_itop - od_ibot)
 cpit         5 (cpit_col + cpit_top - cpit_bot) - (od_ocol + od_otop - od_obot)
@@ -142,6 +145,7 @@ ASSIGNMA    BLCKHOLE   blkhole
 ASSIGNMA     STNLESS        od
 ASSIGNMA      NORITE      rock
 ASSIGNMA       WATER     od_in
+ASSIGNMA    NITROGEN   cov_gas
 ASSIGNMA      NICKEL     ocryo
 ASSIGNMA      VACUUM  ocryo_in
 ASSIGNMA      NICKEL    oc_con
