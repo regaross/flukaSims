@@ -167,7 +167,10 @@ LOW-MAT       OXYGEN         8        16       296                    OXYGEN
 LOW-MAT     MAGNESIU        12        -2       296                    MAGNESIU
 LOW-MAT      SILICON        14        -2       296                    SILICON
 LOW-MAT      CALCIUM        20        -2       296                    CALCIUM
-LOW-MAT       COLDOX         8        16        87                    OXYGEN
-LOW-MAT     FLUORINE         9        19        87                    FLUORINE
-LOW-MAT       COPPER        29        -2        87                    COPPER
+LOW-MAT       COLDOX         8        16       296                    OXYGEN
+LOW-MAT     FLUORINE         9        19       296                    FLUORINE
+LOW-MAT       COPPER        29        -2       296                    COPPER
+LOW-MAT        XE136        54       136       296                    136-XE
+LOW-MAT        XE134        54       134       296                    134-XE
+LOW-MAT       NICKEL        28        -2       296                    NICKEL
 STOP
