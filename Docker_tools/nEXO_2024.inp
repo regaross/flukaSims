@@ -57,16 +57,16 @@ XYP tpc_otop   65.67
 TRC tpc_coni   0 0 120.0001 0 0 -65.0002 108 65
 TRC tpc_cono   0 0 120 0 0 -65 108.3 65.2
 * Inner Cryostat Inside
-SPH i_cryo_i   0.0 0.0 0.0 167.8
+SPH i_cryo_i   0.0 0.0 0.0 169.5
 * Inner Cryostat Outside
-SPH i_cryo_o   0.0 0.0 0.0 169.71
+SPH i_cryo_o   0.0 0.0 0.0 170
 * Inner Cryostat Support Cone Attached to inside of Outer Cryostat
-TRC ic_con_o   0 0 205.5 0 0 -72.5 155 110
-TRC ic_con_i   0 0 205.50001 0 0 -72.50002 151 106
+TRC ic_con_o   0 0 201.5 0 0 -68.5 155.5 110
+TRC ic_con_i   0 0 201.50001 0 0 -68.50002 151 106
 * Outer Cryostat Outside
-SPH o_cryo_o   0.0 0.0 40.0 229.28
+SPH o_cryo_o   0.0 0.0 40.0 225.00
 * Outer Cryostat Inside
-SPH o_cryo_i   0.0 0.0 40.0 227.33
+SPH o_cryo_i   0.0 0.0 40.0 224.00
 * The conic section attaching the Outer Cryostat to the Support Structure
 TRC oc_con_o   0 0 327 0 0 -107.5 221.4 145
 TRC oc_con_i   0 0 327.0001 0 0 -107.5002 218 143
