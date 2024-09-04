@@ -305,7 +305,7 @@ def make_phase_space_file():
     with open(filename, 'w') as phase_space_file:
         for row in phase_space:
             # Use string substitution with format specifications
-            formatted_row = '%d %.12f %.12f %.12f %.12f %.12f %.12f %.12f %d' % row
+            formatted_row = '{:d} {:.12f} {:.12f} {:.12f} {:.12f} {:.12f} {:.12f} {:.12f} {:d}'.format(*row)
             phase_space_file.write(formatted_row + '\n')
 
             
