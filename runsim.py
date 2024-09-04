@@ -18,7 +18,7 @@ filemanip.make_output_directory()
 sleep(1)
 
 # 3. Make the muon phase space file. Here we retain the time passed and the complete list of the muons for further analysis later on.
-muon_list, hours = muons.make_phase_space_file()
+muons.make_phase_space_file()
 
 sleep(1)
 
