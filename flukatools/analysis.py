@@ -103,6 +103,9 @@ def plot_resnuclei_table_of_nuclides(nuclide_table : np.ndarray, title = 'Residu
                     '<b>Count:</b> %{z}<br>' +
                     '<extra></extra>')
     
+    fig.update_layout(
+        xaxis=dict(showgrid=True),
+        yaxis=dict(showgrid=True))
     fig.update_layout(coloraxis_colorbar = dict(title = 'Total Count ' + time, titleside = 'right', len = 0.6))
     fig.show()
 
