@@ -299,8 +299,6 @@ def make_phase_space_file():
     cos_x = np.sin(zenith_angles)*np.cos(azimuths)
     cos_y = np.sin(zenith_angles)*np.sin(azimuths)
 
-    phase_space = np.column_stack((pos_neg, energies, init_x, init_y, init_z, cos_x, cos_y, cos_z, weights))
-
     with open(filename, 'w') as phase_space_file:
         for i in range(how_many):
             # Use string substitution with format specifications
