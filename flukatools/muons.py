@@ -302,7 +302,11 @@ def make_phase_space_file():
 
     phase_space = np.column_stack((pos_neg, energies, init_x, init_y, init_z, cos_x, cos_y, cos_z, weights))
 
-    np.savetxt(filename, phase_space)
+    with open(filename, 'w') as phase_space_file:
+        for row in phase_space:
+            # Use string substitution with format specifications
+            formatted_row = '%d %.12f %.12f %.12f %.12f %.12f %.12f %.12f %d' % row
+            phase_space_file.write(formatted_row + '\n')
 
             
 
