@@ -295,7 +295,7 @@ def make_phase_space_file():
 
     # pos_neg, energy, init_x, init_y, init_z, cos_x, cos_y, -cos_z, weight
 
-    cos_z = np.cos(zenith_angles)
+    cos_z = -np.cos(zenith_angles) # Negative so the muons go downward.
     cos_x = np.sin(zenith_angles)*np.cos(azimuths)
     cos_y = np.sin(zenith_angles)*np.sin(azimuths)
 
