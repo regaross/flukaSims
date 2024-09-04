@@ -298,14 +298,13 @@ def make_phase_space_file():
     cos_z = np.cos(zenith_angles)
     cos_x = np.sin(zenith_angles)*np.cos(azimuths)
     cos_y = np.sin(zenith_angles)*np.sin(azimuths)
-    weights = np.ones(how_many)
 
     phase_space = np.column_stack((pos_neg, energies, init_x, init_y, init_z, cos_x, cos_y, cos_z, weights))
 
     with open(filename, 'w') as phase_space_file:
-        for row in phase_space:
+        for i in range(how_many):
             # Use string substitution with format specifications
-            formatted_row = '{:d} {:.12f} {:.12f} {:.12f} {:.12f} {:.12f} {:.12f} {:.12f} {:d}'.format(*row)
+            formatted_row = '{} {} {} {} {} {} {} {} {}'.format(pos_neg[i], energies[i], init_x[i], init_y[i], init_z[i], cos_x[i], cos_y[i], cos_z[i], 1)
             phase_space_file.write(formatted_row + '\n')
 
             
