@@ -247,7 +247,7 @@ def make_phase_space_file():
     max_y = mei_hime_energy_intensity(0,0)
     energies = np.ones(how_many)*-1
     init_x, init_y  = np.empty(how_many), np.empty(how_many)
-    init_z = np.ones(how_many)*(GEN_OFFSET + OD_HEIGHT/2) # Required because the OD is centred on (0,0,0)
+    init_z = np.ones(how_many)*(GEN_OFFSET + ROI_HEIGHT/2) # Required because the OD is centred on (0,0,0)
     azimuths = np.random.random(how_many)*np.pi*2
 
 
@@ -295,14 +295,14 @@ def make_phase_space_file():
 
     # pos_neg, energy, init_x, init_y, init_z, cos_x, cos_y, -cos_z, weight
 
-    cos_z = -np.cos(zenith_angles) # Negative so the muons go downward.
+    cos_z = np.cos(zenith_angles) # Negative so the muons go downward.
     cos_x = np.sin(zenith_angles)*np.cos(azimuths)
     cos_y = np.sin(zenith_angles)*np.sin(azimuths)
 
     with open(filename, 'w') as phase_space_file:
         for i in range(how_many):
             # Use string substitution with format specifications
-            formatted_row = '{} {} {} {} {} {} {} {} {}'.format(pos_neg[i], energies[i], init_x[i], init_y[i], init_z[i], cos_x[i], cos_y[i], cos_z[i], 1)
+            formatted_row = '{} {} {} {} {} {} {} {} {}'.format(pos_neg[i], energies[i], init_x[i], init_y[i], init_z[i], cos_x[i], cos_y[i], -cos_z[i], 1)
             phase_space_file.write(formatted_row + '\n')
 
             
