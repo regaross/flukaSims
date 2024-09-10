@@ -134,11 +134,11 @@ def intersection_points(vec, labels = False, tolerance = 0.001):
     detHeight = OD_HEIGHT + 4 #YAML_PARAMS['roi_height']
     #det_z_translation = detector.position[2]
 
-    #We can parametrize the muon for simplicity:
+    #We can parametrize the muon for simplicity into its direction cosines:
     zenith, azimuth = vec['zenith'], vec['azimuth']
     mx = np.sin(zenith)*np.cos(azimuth)
     my = np.sin(zenith)*np.sin(azimuth)
-    mz = -np.cos(zenith)        # Does this need to be negative?
+    mz = -np.cos(zenith)
 
     x0, y0, z0 = vec['init_x'], vec['init_y'], vec['init_z'] 
 
@@ -247,7 +247,7 @@ def make_phase_space_file():
     max_y = mei_hime_energy_intensity(0,0)
     energies = np.ones(how_many)*-1
     init_x, init_y  = np.empty(how_many), np.empty(how_many)
-    init_z = np.ones(how_many)*(GEN_OFFSET + ROI_HEIGHT/2) # Required because the OD is centred on (0,0,0)
+    init_z = (GEN_OFFSET + ROI_HEIGHT/2) # Required because the OD is centred on (0,0,0)
     azimuths = np.random.random(how_many)*np.pi*2
 
 
@@ -284,9 +284,9 @@ def make_phase_space_file():
                    'azimuth': azimuths[i], 
                    'init_x' : initial_x, 
                    'init_y' : initial_y,
-                   'init_z' : init_z[i]}
+                   'init_z' : init_z}
             
-            if type(intersection_points(vec) is not bool):
+            if type(intersection_points(vec)) is not bool:
                 intersection = True
         
         init_x[i]   = initial_x
@@ -302,7 +302,7 @@ def make_phase_space_file():
     with open(filename, 'w') as phase_space_file:
         for i in range(how_many):
             # Use string substitution with format specifications
-            formatted_row = '{} {} {} {} {} {} {} {} {}'.format(pos_neg[i], energies[i], init_x[i], init_y[i], init_z[i], cos_x[i], cos_y[i], -cos_z[i], 1)
+            formatted_row = '{} {} {} {} {} {} {} {} {}'.format(pos_neg[i], energies[i], init_x[i], init_y[i], init_z, cos_x[i], cos_y[i], -cos_z[i], 1)
             phase_space_file.write(formatted_row + '\n')
 
             
