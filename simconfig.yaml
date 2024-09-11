@@ -3,16 +3,7 @@
 ########################################################
 
 Simulation:
-  Muons: 5790                   # Number of muons to run for simulation equivalent to about 2 months
-  Intersecting : True         ### MUST BE SET TO TRUE FOR MUONS HITTING ROI
-  MakeNewFile: True           # Generate a new batch of muons for the sim? False -> Use the previous batch
-  ROI_Radius:  2              # How many meters larger than the OD radius?
-  ROI_Height:  4              # How many meters larger than the OD height?
-
-Output:
-  OutputDir: './May7_out/'     # Where should the output files be placed?
-  NeutronFile: 'fluka_data'   # How should the neutron hdf5 files be named? This is only the prefix.
-  ProgressOut: 'fluka_sim_sum.txt'    # Where should compile and other output be copied?
+  Muons: 5461                  # Number of muons to run for simulation equivalent to about 2 months
 
 Input:                              # Not likely to require changing
   SIFPath: '/sdf/home/r/rross/nEXO/flukaSims/'
