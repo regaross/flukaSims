@@ -20,6 +20,34 @@ from scipy.constants import physical_constants
 # This is a nicely formatted date-time string that is used for labelling output directories
 TODAY = datetime.now().strftime("%B%d-%Hh%M").lower()
 
+#### nEXO Specific Constants ####
+
+# # nEXO OUTER DETECTOR PARAMETERS
+OD_RADIUS = 6.1722      # m
+OD_HEIGHT = 12.800      # m
+OD_CENTER = (0,0,0)     # m         defines coordinate system with respect to literal centre of OD
+OC_RADIUS = 2.270       # m
+ROI_RADIUS = OD_RADIUS + 2 # m
+ROI_HEIGHT = OD_HEIGHT + 4 # m
+GEN_OFFSET = OD_HEIGHT
+GEN_RADIUS = np.tan(1)*(OD_HEIGHT + GEN_OFFSET) + OD_RADIUS
+
+# OC_POSITION = (0,0,0.40) # m         positions OC with respect to OD centre
+# TPC_RADIUS = 0.575      # m         from the pre-conceptual design report
+# TPC_HEIGHT = 0.625      # m
+
+# MUON FLUX PARAMETERS AT SNOLAB
+SNOLAB_MU_FLUX = 3.31e-10       # \pm (0.01 (stat) \pm 0.09 (sys))e-10 mu/cm^2/s # arXiv:0902.2776v1
+SNOLAB_MU_E_AVG = 363.0         # \pm 1.2 GeV # arXiv:1909.11728v1
+SNOLAB_DEPTH = 5.890    #km.w.e        # \pm 94 km.w.e.  # arXiv:1909.11728v1
+
+MIN_ENERGY = 0      #GeV
+MAX_ENERGY = 25e3   #GeV
+
+
+
+
+
 # This is used to seed the random number generator and also to name files. Each simulation
 # run will get its own seed value as defined on the system that will be appended to file
 # names. It is unlikely that there will be an overlap... but it's possible
@@ -367,12 +395,12 @@ NEXO_FLUKA_REGIONS = {
                 9:     'oc_con',
                 10:    'oc_sup',
                 11:    'od_in',
-                12:    'od',
-                13:    'cpit',
-                14:    'rock',
-                15:    'blkhole'
+                12:    'cov_gas',
+                13:    'od',
+                14:    'cpit',
+                15:    'rock',
+                16:    'blkhole'
                  }
-
 
 # For various plotting tools (not super important)
 PARTICLE_COLOUR_DICTIONARY = {
