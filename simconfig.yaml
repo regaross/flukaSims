@@ -11,7 +11,8 @@ Input:                              # Not likely to require changing
   # Define the paths below with respect to this path!^^
   InputFile: 'nEXO_2024.inp'              # Not likely to require changing
   SourceFile: 'muon_from_file.f'        # Not likely to require changing
-  MGDrawFile: 'mgdraw_neutron_count.f'  # Not likely to require changing
+  MGDrawFile: 'mgdraw_resnuc.f'  # Not likely to require changing
+  ResnucleiFile:  'usrrnc.f'
 
 Source: # (DON'T CHANGE -unless running locally) For FLUKA binaries in the singularity image 
   FlukaPath: '/usr/local/fluka/bin/'
