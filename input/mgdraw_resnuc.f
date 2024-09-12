@@ -60,7 +60,7 @@
          ELSE
             FILNAM = CFDRAW
          END IF
-         OPEN ( UNIT = 96, FILE = 'ISOTOPE', STATUS = 'UNKNOWN', FORM =
+         OPEN ( UNIT = 96, STATUS = 'UNKNOWN', FORM =
      &          'FORMATTED')
       END IF
       RETURN
@@ -185,7 +185,7 @@
          ELSE
             FILNAM = CFDRAW
          END IF
-         OPEN ( UNIT = 96, FILE = 'ISOTOPE', STATUS = 'UNKNOWN', FORM =
+         OPEN ( UNIT = 96, STATUS = 'UNKNOWN', FORM =
      &          'FORMATTED')
       END IF
 
