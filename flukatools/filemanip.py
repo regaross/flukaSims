@@ -51,15 +51,12 @@ def read_in_config_yaml(yaml_filename : str) -> None :
 
         # Simulation Parameters
         YAML_PARAMS['num_muons']     =  Simulation.get('Muons')
-        YAML_PARAMS['intersecting']  =  Simulation.get('Intersecting')
-        YAML_PARAMS['make_new']      =  Simulation.get('MakeNewFile')
-        YAML_PARAMS['roi_radius']    =  Simulation.get('ROI_Radius')
-        YAML_PARAMS['roi_height']    =  Simulation.get('ROI_Height')
 
         # Input Parameters
         YAML_PARAMS['input_file']        =  Input.get('InputFile')
         YAML_PARAMS['source_routine']    =  Input.get('SourceFile')
         YAML_PARAMS['mgdraw_file']       =  Input.get('MGDrawFile')
+        YAML_PARAMS['resnuc_file']       =  Input.get('ResnucleiFile')
 
         # Source Parameters
         YAML_PARAMS['source_path'] =  input_yaml.get('Source').get('FlukaPath')
@@ -68,6 +65,7 @@ def read_in_config_yaml(yaml_filename : str) -> None :
     FLUKA_FILES['input'] = YAML_PARAMS['input_file']
     FLUKA_FILES['source_routine'] = YAML_PARAMS['source_routine']
     FLUKA_FILES['mgdraw'] = YAML_PARAMS['mgdraw_file']
+    FLUKA_FILES['resnuc']  = YAML_PARAMS['resnuc_file']
 
 def copy_input_to_workdir() -> None:
     '''This function makes copies of the input files that are required to run each 

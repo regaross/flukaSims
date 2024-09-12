@@ -90,6 +90,7 @@ FLUKA_OUTPUT_CHANNELS = {
     23  : 'resnucCryo',
     70  : 'neutronsOD',
     72  : 'neutronsTPC',
+    96  : 'new_resnuclei_tpc'
 }
 
 FLUKA_FILES = {
@@ -105,6 +106,7 @@ FLUKA_JOB_FILES = { # This dictionary will be populated with files that are only
     'input'             : '',
     'source_routine'    : '',
     'mgdraw'            : '',
+    'resnuc'            : '',
     
 }
 
