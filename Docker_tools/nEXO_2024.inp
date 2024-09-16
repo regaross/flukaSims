@@ -61,8 +61,8 @@ SPH i_cryo_i   0.0 0.0 0.0 169.5
 * Inner Cryostat Outside
 SPH i_cryo_o   0.0 0.0 0.0 170
 * Inner Cryostat Support Cone Attached to inside of Outer Cryostat
-TRC ic_con_o   0 0 201.5 0 0 -68.5 155.5 110
-TRC ic_con_i   0 0 201.50001 0 0 -68.50002 151 106
+TRC ic_con_o   0 0 200.5 0 0 -67.5 155.5 110
+TRC ic_con_i   0 0 200.50001 0 0 -67.50002 151 106
 * Outer Cryostat Outside
 SPH o_cryo_o   0.0 0.0 40.0 225.00
 * Outer Cryostat Inside
