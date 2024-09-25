@@ -94,6 +94,19 @@ class Muon:
     def add_event(self, event):
         '''adds an event to the event list of a muon'''
         self.events.append(event)
+    
+    def phase_space_to_attrs(self, phase_space_array: np.ndarray):
+        '''Takes the values in the numpy array and makes them the attributes of the current muon instance'''
+        # pos_neg, energy, init_x, init_y, init_z, cos_x, cos_y, -cos_z, weight
+
+        self.posneg = phase_space_array[0]
+        self.energy = phase_space_array[1]
+        self.init_pos = phase_space_array[2:5]
+        self.cosines = phase_space_array[5:8]
+
+    def __str__(self) -> str:
+        muon = 'Muon:\n' + 'Seed:\t' + str(self.seed) + '\nEnergy:\t' + str(self.energy)[:5] + ' GeV'
+        return muon
 
 
 def mei_and_hime_eq3(zenith, vert_depth = SNOLAB_DEPTH, return_bounds = False):

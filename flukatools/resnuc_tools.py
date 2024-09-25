@@ -18,6 +18,8 @@ Tools for reading in and correlating events between the primary muon and the res
 # Need to import muons so that we can use the muon class
 from .muons import Muon
 import re
+import numpy as np
+from os import listdir
 
 
 class RNevent:
@@ -49,7 +51,7 @@ class RNevent:
         self.secondaries    = event_dict['secondaries']
         self.frags          = event_dict['frags']
         self.mgrnc          = event_dict['mgrnc']
-        self.rncresidual    = event_dict['rncresidual']
+        self.usrrnc         = event_dict['usrrnc']
         self.muon           = muon
 
 
@@ -121,6 +123,7 @@ def parse_rnc_file(filepath : str, muon_filepath :str, only_residuals = True) ->
             
             # Read in the sequence and retrieve the information for the event
             event_dict = read_rn_event_sequence(sequence)
+            event_dict['seed'] = seed
 
             if only_residuals and event_dict['usrrnc'][1] == 0 and event_dict['mgrnc'][1] == 0:
                 continue
@@ -139,7 +142,52 @@ def parse_rnc_file(filepath : str, muon_filepath :str, only_residuals = True) ->
             events.append(this_event)
 
 
+    # Now we also have to get the remaining muon data
+
+    phase_space = np.loadtxt(muon_filepath)
+
+    for muon in muons:
+        index = muon.prim
+        muon.phase_space_to_attrs(phase_space[index - 1])
+
+
     return (muons, events)
+
+
+
+def parse_rnc_dir(path_to_rnc_dir, path_to_muon_dir, only_residuals = True) -> tuple:
+
+
+    muons, events = [], []
+    error_seeds = []
+
+    muon_files = listdir(path_to_muon_dir)
+    seeds = [int(re.search(r'(\d*)(?=\.)', muon_file).group(0)) for muon_file in muon_files]
+
+    for seed in seeds:
+        muon_filename = path_to_muon_dir + 'muons' + str(seed) + '.txt'
+        resnuc_filename = path_to_rnc_dir + 'new_resnuclei_tpc' + str(seed) + '.asc'
+
+
+        try:
+            temp_muons, temp_events = parse_rnc_file(resnuc_filename, muon_filename, only_residuals)
+        except:
+            print('Error. Could not parse the following:')
+            print(resnuc_filename)
+            print(muon_filename + '\n')
+            error_seeds.append(seed)
+            continue
+
+        events.extend(temp_events)
+        muons.extend(temp_muons)
+
+
+
+    return muons, events, error_seeds
+
+
+    
+
 
 
 
