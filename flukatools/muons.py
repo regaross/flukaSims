@@ -81,6 +81,7 @@ class Muon:
         
         self.seed = seed
         self.prim = prim
+        self.key  =  str(seed) + '-' + str(prim)
         self.events = []
 
     def set_phase_space(self, fnumber : int, energy : float, init_pos : tuple, cosines : tuple):

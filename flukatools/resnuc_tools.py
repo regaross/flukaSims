@@ -22,37 +22,37 @@ import numpy as np
 from os import listdir
 
 
-class RNevent:
-    '''Residual Nucleus event : A class for storing the event information output by the mgdraw.f and usrrnc.f files and relating 
-    them to the primary muon'''
+# class RNevent:
+#     '''Residual Nucleus event : A class for storing the event information output by the mgdraw.f and usrrnc.f files and relating 
+#     them to the primary muon'''
 
-    def __init__(self, seed : int, icode : int, region : int, jtrack : int, ltrack : int, secondaries : tuple, frags : tuple, mgrnc : tuple, usrrnc : tuple, muon : Muon):
-        '''Defines an instance of a Residual Nucleus event with all the attributes that are saved to the output files from mgdraw.f and usrrnc.f '''
+#     def __init__(self, seed : int, icode : int, region : int, jtrack : int, ltrack : int, secondaries : tuple, frags : tuple, mgrnc : tuple, usrrnc : tuple, muon : Muon):
+#         '''Defines an instance of a Residual Nucleus event with all the attributes that are saved to the output files from mgdraw.f and usrrnc.f '''
 
-        self.seed           = seed
-        self.icode          = icode
-        self.region         = region
-        self.jtrack         = jtrack
-        self.ltrack         = ltrack
-        self.secondaries    = secondaries
-        self.frags          = frags
-        self.mgrnc          = mgrnc
-        self.usrrnc         = usrrnc
-        self.muon           = muon
+#         self.seed           = seed
+#         self.icode          = icode
+#         self.region         = region
+#         self.jtrack         = jtrack
+#         self.ltrack         = ltrack
+#         self.secondaries    = secondaries
+#         self.frags          = frags
+#         self.mgrnc          = mgrnc
+#         self.usrrnc         = usrrnc
+#         self.muon           = muon
 
-    def __init__(self, event_dict : dict, muon : 'Muon'):
-        '''Defines an instance of a Residual Nucleus event with all the attributes that are saved to the output files from mgdraw.f and usrrnc.f '''
+#     def __init__(self, event_dict : dict, muon : 'Muon'):
+#         '''Defines an instance of a Residual Nucleus event with all the attributes that are saved to the output files from mgdraw.f and usrrnc.f '''
 
-        self.seed           = event_dict['seed']
-        self.icode          = event_dict['icode']
-        self.region         = event_dict['region']
-        self.jtrack         = event_dict['jtrack']
-        self.ltrack         = event_dict['ltrack']
-        self.secondaries    = event_dict['secondaries']
-        self.frags          = event_dict['frags']
-        self.mgrnc          = event_dict['mgrnc']
-        self.usrrnc         = event_dict['usrrnc']
-        self.muon           = muon
+#         self.seed           = event_dict['seed']
+#         self.icode          = event_dict['icode']
+#         self.region         = event_dict['region']
+#         self.jtrack         = event_dict['jtrack']
+#         self.ltrack         = event_dict['ltrack']
+#         self.secondaries    = event_dict['secondaries']
+#         self.frags          = event_dict['frags']
+#         self.mgrnc          = event_dict['mgrnc']
+#         self.usrrnc         = event_dict['usrrnc']
+#         self.muon           = muon
 
 
 def read_rn_event_sequence(sequence : str) -> dict:
@@ -64,7 +64,7 @@ def read_rn_event_sequence(sequence : str) -> dict:
     region = int(re.search(r'region\s*(\d+)', sequence).group(1))
     jtrack = int(re.search(r'LTRACK:\s+(\d\d?)\s+(\d\d?)', sequence).group(1))
     ltrack = int(re.search(r'LTRACK:\s+(\d\d?)\s+(\d\d?)', sequence).group(2))
-    secondaries = tuple(re.search(r'(?<=ID:)\s*(\d\d?\s*)*', sequence).group(0).split())
+    secondaries = np.array(re.search(r'(?<=ID:)\s*(\d\d?\s*)*', sequence).group(0).split())
     n_fragments = int(re.search(r'\d(?=\sfragments)', sequence).group(0))
 
     masses = re.findall(r'(?<=A = )\s*\d*', sequence)
@@ -103,16 +103,13 @@ def read_rn_event_sequence(sequence : str) -> dict:
             'usrrnc'        : usrrnc}
 
 
-def parse_rnc_file(filepath : str, muon_filepath :str, only_residuals = True) -> list:
+def parse_rnc_file(filepath : str, only_residuals = True) -> list:
     '''Parses the given residual nuclei file and makes RNevents out of each entry
     Returns a list of these events pointing to their respective muon
     if only_residuals, then only the events that produce residual nuclei will be counted'''
 
     events = []
-    muons = []
     seed = int(re.search(r'(\d*)(?=\.)', filepath).group(0))
-    prim = 0
-    this_muon = Muon(seed, prim)
 
     with open(filepath, 'r') as file:
         content = file.read()
@@ -124,66 +121,80 @@ def parse_rnc_file(filepath : str, muon_filepath :str, only_residuals = True) ->
             # Read in the sequence and retrieve the information for the event
             event_dict = read_rn_event_sequence(sequence)
             event_dict['seed'] = seed
+            event_dict['muon_id'] = int(100000 * seed) + event_dict['primary']
 
-            if only_residuals and event_dict['usrrnc'][1] == 0 and event_dict['mgrnc'][1] == 0:
+            if only_residuals and event_dict['usrrnc'][1] == 0 and event_dict['mgrnc'][1] == 0 and event_dict['n_fragments'] == 0:
                 continue
 
-            # determine whether or not we have to instantiate a new muon
-            # if we do, instantiate one and add it to the list.
-            if event_dict['primary'] != prim:
-                prim = event_dict['primary']
+            events.append(event_dict)
 
-                this_muon = Muon(seed, prim)
-                
-                muons.append(this_muon)
-
-            this_event = RNevent(event_dict, this_muon)
-            this_muon.add_event(this_event)
-            events.append(this_event)
+    return events
 
 
-    # Now we also have to get the remaining muon data
-
-    phase_space = np.loadtxt(muon_filepath)
-
-    for muon in muons:
-        index = muon.prim
-        muon.phase_space_to_attrs(phase_space[index - 1])
+def parse_rnc_dir(path_to_rnc_dir, only_residuals = True) -> tuple:
 
 
-    return (muons, events)
-
-
-
-def parse_rnc_dir(path_to_rnc_dir, path_to_muon_dir, only_residuals = True) -> tuple:
-
-
-    muons, events = [], []
+    events = []
     error_seeds = []
 
-    muon_files = listdir(path_to_muon_dir)
-    seeds = [int(re.search(r'(\d*)(?=\.)', muon_file).group(0)) for muon_file in muon_files]
+    event_files = listdir(path_to_rnc_dir)
+    seeds = [int(re.search(r'(\d*)(?=\.)', event_file).group(0)) for event_file in event_files]
 
     for seed in seeds:
-        muon_filename = path_to_muon_dir + 'muons' + str(seed) + '.txt'
         resnuc_filename = path_to_rnc_dir + 'new_resnuclei_tpc' + str(seed) + '.asc'
 
-
         try:
-            temp_muons, temp_events = parse_rnc_file(resnuc_filename, muon_filename, only_residuals)
+            temp_events = parse_rnc_file(resnuc_filename, only_residuals)
+            events.extend(temp_events)
         except:
             print('Error. Could not parse the following:')
             print(resnuc_filename)
-            print(muon_filename + '\n')
             error_seeds.append(seed)
             continue
 
-        events.extend(temp_events)
-        muons.extend(temp_muons)
+    return events, error_seeds
 
 
+def get_muons_from_file(muon_file) -> list:
+    '''Returns the list of muon objects from a particular muon file'''
 
-    return muons, events, error_seeds
+    muarray = np.loadtxt(muon_file)
+    muons = {}
+    seed = int(re.search(r'(\d*)(?=\.)', muon_file).group(0))
+
+    for i in range(len(muarray)):
+        id = int(100000 * seed) + i + 1
+        this_muon = {'pos_neg'      :   int(muarray[i][0]),
+                     'energy'       :   muarray[i][1],
+                     'init_pos'     :   muarray[i][2:5],
+                     'cosines'      :   muarray[i][5:8],
+                     'xe137'         :   0,
+                     'cu62'         :   0,
+                     'cu64'         :   0,
+                     'cu66'         :   0,
+                     'i130'         :   0,
+                     'i132'         :   0,
+                     'i134'         :   0,
+                     'i135'         :   0,
+                     'i136'         :   0,
+                     'i137'         :   0,
+
+                    }
+        muons.update({id : this_muon})
+
+    return muons
+
+def get_muons_from_dir(path_to_muon_dir):
+
+    muons = {}
+
+    muon_files = listdir(path_to_muon_dir)
+
+    for file in muon_files:
+        muons.update(get_muons_from_file(path_to_muon_dir + file))
+
+    return muons
+
 
 
     
