@@ -1,0 +1,58 @@
+\section{Prerequisites}
+ \paragraph{}
+ Hello, new user. My goal is to make your job of running this (hopefully not old) code as easy as possible for you to run. We'll get through this together. First, though, there are a few things you'll need. There are a few quirks that will arise. If you're a Mac or Windows user (a regular person), there is an extra step in store for making the right container to hold the dependencies. Follow along closely.
+
+ \subsection{Dependencies and Preparation}
+ \label{sec:dependencies}
+ \subsubsection{Dependencies}
+    \paragraph{}
+    The first order of business is to install the necessary software. Then we'll go over how to use it. Your shopping cart should include:
+    \begin{itemize}
+        \item{\textbf{\href{https://fluka.cern/download/licences}{FLUKA License}}} — In order to use FLUKA, you'll need at least an individual license. FLUKA is not open-source, but if you apply from an academic institution for academic purposes, you shouldn't have an issue. You'll then have access to the binaries, but not the source code.
+        \item{\textbf{\href{https://www.docker.com/}{Docker}}} — The Docker container aleviates a lot of headache. It will be assembled containing much of what you need— including \textit{Flair} and Singularity. It contains the tools necessary to build the Singularity container and edit/make the input files for the simulation. Ideally you don't have to worry about the dependencies for \href{https://flair.web.cern.ch/flair/}{Flair}.
+        \item{\textbf{X11}} — You need a program that will permit graphics forwarding from the Docker container. On Mac, I use \href{https://www.xquartz.org/}{XQuartz}. I'm told that on Windows, you could use \href{http://www.straightrunning.com/XmingNotes/}{Xming}. Though I really have no clue whether this would work. Certainly there is a way, but if you're a Windows user, I apologize. This is probably the only problem you'll have to solve on your own here (kidding, there will be more but not related to OS).
+        \item{\textbf{A cluster}} — If you want to run large simulations like those done here, you'll want access to a cluster where you can submit jobs. For this work, the code was deployed on \href{https://s3df.slac.stanford.edu}{S3DF}. You could probably also use something like \href{https://alliancecan.ca/en}{DRAC} (or what was once called ``Compute Canada'' and makes more sense in my opinion).
+        \item{\href{https://www.python.org}{\textbf{Python}}} — While you don't technically need to install Python to run the code on the cluster (the dependencies will be in the container), you should have it installed anyway locally to use some of the analysis tools. You'll also want \href{https://www.numpy.org}{numpy}, \href{https://www.scipy.org}{scipy}, \href{https://matplotlib.org}{matplotlib}, \href{https://root.cern/manual/python/}{pyROOT}, and \href{https://pandas.pydata.org/}{pandas}. You may also want \href{https://plotly.com/python/}{plotly}.
+    \end{itemize}
+
+ \subsubsection{Recommendations}
+    \paragraph{}
+    You shouldn't strictly *have* to do the following, but these are suggestions for you. If you're going to commit to a project using this work, this advice may help.
+    \begin{itemize}
+        \item{\href{https://fluka-forum.web.cern.ch/}{\textbf{FLUKA Forum}}} — Create a FLUKA User Forum account. You will likely end up searching for advice here should you have to deviate from *ordinary* functionality of FLUKA.
+        \item{\textbf{Version Control}} — Be mindful of version control. If you're going to make regular changes to the simulation inputs, you need to be well sure of which outputs correspond to particular inputs. It's probably a good idea to use git/\href{https://www.github.com}{github}.
+        \item{\textbf{Bookmarks}} — Bookmark the following sites for future convenience: \href{https://flukafiles.web.cern.ch/manual/index.html}{FLUKA Manual}, \href{http://www.fluka.org/fluka.php?id=manuals&mm2=3}{Older FLUKA Manual}, \href{https://indico.cern.ch/event/1200922/timetable/#20230605}{FLUKA 2023 Course}.
+    \end{itemize}
+
+\subsection{Building the Tools}
+\paragraph{}
+In this section, it's our endeavour to get the Docker container running and make sure graphics are being properly forwarded, then we can edit FLUKA input files, and we can build the Singularity container. This process is definitely technical and uninteresting, but we'll get through it. Before we begin though, make sure that you have installed the dependencies outlined in section \ref{sec:dependencies}.
+
+    \subsubsection{Building the Docker Container}
+    \paragraph{}
+    Navigate to the \texttt{Docker\_tools/} directory where you will find the \texttt{Dockerfile}. This is a text file that contains within it the pieces necessary for building the Docker container. You don't have to do much work here. Simply run:
+
+    \[ \texttt{docker build -t <name> .} \]
+
+    where \texttt{<name>} is something you replace with a judicious choice like ``flair\_singularity\_image'' as that's exactly what you'd expect to find in that Docker container. The container will be created. Before you can use \textit{Flair}, you'll need to make sure that graphics forwarding is set up. This might be a bit tricky for you if you're not a Mac user. But if you \textit{are} one, there is a script also in \texttt{Docker\_tools} that contains what you need. It is called \texttt{boot\_flair\_and\_singularity\_container.sh}. Have a look inside of it as you may need to modify some things to have it work for you.
+
+    \paragraph{}
+    If the script works for you, and graphics forwarding works, you should be able to use \textit{Flair} to modify or create an input file. In our case, there is a copy of the input file in the \texttt{Docker\_tools} directory. Try running:
+    
+    \[\texttt{flair nEXO\_2024.inp}\]
+
+    \subsubsection{Building the \href{https://sylabs.io/singularity/}{Singularity} Container}
+    \paragraph{}
+    Yeah yeah yeah there are a lot of ``containers'' flying around. Let's get this straight: you cannot run FLUKA on your server without putting it first into its own mini isolated environment, so you put it in a \textit{Singularity} container. Now, you unfortunately cannot make such a container outside of a Linux environment (which you don't have), so you make a fake one inside a Docker container that you can use on your own computer. Conveniently, you can also launch \textit{Flair} from this local container. So first you need to make sure you have the necessary FLUKA files, then you need to compile Singularity within the Docker container.
+
+    \paragraph{}
+    Moving on, you will now create the Singularity container (image) that will be copied onto your remote working directory. How do you do this you ask? Good question. First, make sure you have access to the FLUKA binaries. Once you've been granted access by CERN, you should be able to navigate \href{https://fluka.cern/download/latest-fluka-release}{here} to download them. If you can't do this yet, you should wait until you can. You need an account. Follow the instructions on the site. OKAY, if you can access the binaries (namely, if you can download them legally\footnote{There may be many dubious parts in this project, but this doesn't have to be}), then you should go ahead and download them. You probably want the most up-to-date version. You definitely want one that will be compiled using a compiler in your Docker image. For instance, the download at the time of writing is: \texttt{fluka\_4-4.0.x86-Linux-gfor9\_amd64.deb}. That is, you want the 64-bit Debian version with gfortran9 compiler. Make sure that the version you download as a \texttt{.deb} file is the same as referenced in the singularity definition file. Here it's called \texttt{FLUKA.def}. 
+
+    \paragraph{}
+    Okay great. Now you have the right FLUKA binary files. You'll also want to download the cross-section libraries. What are these? These are data about neutron propagation and interactions compiled into a handy little package you can download and deploy in your simulation. The one to use is created by \href{https://www.oecd-nea.org/dbdata/jeff/jeff33/}{JEFF} (not a dude). But the download for FLUKA that you want is \href{https://fluka.cern/download/neutron-data-libraries}{here}. Download those and put 'em with your FLUKA distribution.
+
+    \paragraph{}
+    Now we can build the Singularity container. This is an easy process. First, compile the Singularity source within the Docker container. Hint: use the script I've included called \texttt{compile\_singularity.sh}. Run this script from within your Docker container. Great. Singularity is compiled within the Docker container. Now it's an easy process to build the Singularity container:
+
+    \[\texttt{singularity build FLUKA.sif FLUKA.def}\]
+
