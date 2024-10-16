@@ -14,4 +14,4 @@ This is a custom scoring file. It uses a few routines to print to an output file
 This is a user routine that scores activation products or residual nuclei (but not really). It works in conjunction with the next file `usrrnc.f` to print out specific kinds of events— particularly inelastic scattering events. Those that produce "residual nuclei" are handled with...
 
 ### `usrrnc.f`
-This is the FLUKA routine that handles so-called "residual nuclei". This is how we are able to score activation and relate activated nuclei to their parent muon.
+This is the FLUKA routine that handles so-called "residual nuclei". This is how we are able to score activation and relate activated nuclei to their parent muon. This routine is what is called by the residual nuclei card in the input files as well. The data are almost the same; this custom routine can give information on an event by event basis, whereas the builtin residual nuclei scoring bins things per run.
