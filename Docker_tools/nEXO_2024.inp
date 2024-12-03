@@ -86,6 +86,9 @@ XYP wtrsurf    607
 ZCC od_ocol    0 0 618.5
 XYP od_obot    -640.95
 XYP od_otop    641.27
+*Cryopit Domed Ceiling
+SPH cpitDome   0 0 410 793.5
+ZCC domcut     0 0 720.001
 *Cryopit Cylinder
 ZCC cpit_col   0 0 720.0
 XYP cpit_bot   -643.0
@@ -113,8 +116,8 @@ od_in        5 (od_icol + wtrsurf - od_ibot) - o_cryo_o -  (oc_con_o - oc_con_i)
 cov_gas      5 (od_icol + od_itop - wtrsurf) - o_cryo_o -  (oc_con_o - oc_con_i) - ((sup_ocol + sup_top - sup_bot
                ) - (sup_icol + sup_itop - sup_ibot))
 od           5 (od_ocol + od_otop - od_obot) - (od_icol + od_itop - od_ibot)
-cpit         5 (cpit_col + cpit_top - cpit_bot) - (od_ocol + od_otop - od_obot)
-rock         5 (rock_col + rock_top - rock_bot) - (cpit_col + cpit_top - cpit_bot)
+cpit         5 ((cpit_col + cpit_top - cpit_bot) | cpitDome + domcut) - (od_ocol + od_otop - od_obot)
+rock         5 (rock_col + rock_top - rock_bot) - (cpit_col + cpit_top - cpit_bot)  - (cpitDome + domcut)
 blkhole      5 blkhole - (rock_col + rock_top - rock_bot)
 END
 GEOEND
