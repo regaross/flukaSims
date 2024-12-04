@@ -48,22 +48,22 @@ PHYSICS          202                        PROTON     MUON-          DECAYS
 GEOBEGIN                                                              COMBNAME
     0    0          nEXO, Simplified.
 * TPC Geometry— inside and outside columns, inside and outside planes
-ZCC tpc_icol   0 0 63.84
+ZCC tpc_icol   0 0 64.86
 XYP tpc_ibot   -63.9
 XYP tpc_itop   63.9
-ZCC tpc_ocol   0 0 64.24
+ZCC tpc_ocol   0 0 65.40
 XYP tpc_obot   -65.
 XYP tpc_otop   65.67
 *Copper TPC support conic section
-TRC tpc_coni   0 0 120.0001 0 0 -65.0002 108 65
-TRC tpc_cono   0 0 120 0 0 -65 108.3 65.2
+TRC tpc_coni   0 0 128.0001 0 0 -65.0002 108 65.41
+TRC tpc_cono   0 0 128 0 0 -65 108.28 65.68
 * Inner Cryostat Inside
-SPH i_cryo_i   0.0 0.0 0.0 169.5
+SPH i_cryo_i   0.0 0.0 0.0 168.59
 * Inner Cryostat Outside
-SPH i_cryo_o   0.0 0.0 0.0 170
+SPH i_cryo_o   0.0 0.0 0.0 169.39
 * Inner Cryostat Support Cone Attached to inside of Outer Cryostat
-TRC ic_con_o   0 0 200.5 0 0 -67.5 155.5 110
-TRC ic_con_i   0 0 200.50001 0 0 -67.50002 151 106
+TRC ic_con_o   0 0 200.5 0 0 -71 155.5 116
+TRC ic_con_i   0 0 200.50001 0 0 -71.0002 151 112
 * Outer Cryostat Outside
 SPH o_cryo_o   0.0 0.0 40.0 225.00
 * Outer Cryostat Inside
@@ -87,12 +87,12 @@ ZCC od_ocol    0 0 618.5
 XYP od_obot    -640.95
 XYP od_otop    641.27
 *Cryopit Domed Ceiling
-SPH cpitDome   0 0 339 862.8
+SPH cpitDome   0 0 480 862.8
 ZCC domcut     0 0 763.001
 *Cryopit Cylinder
 ZCC cpit_col   0 0 763.0
 XYP cpit_bot   -643.0
-XYP cpit_top   742.0
+XYP cpit_top   883.0
 * ROCK Geometry— inside and outside columns, inside and outside planes
 ZCC rock_col   0 0 2617.22
 XYP rock_bot   -1000.0
