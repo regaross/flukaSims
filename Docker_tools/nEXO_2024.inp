@@ -77,7 +77,12 @@ XYP sup_top    639
 XYP sup_bot    329
 XYP sup_itop   639.0001
 XYP sup_ibot   328
-ZCC sup_ocol   0 0 218.66
+ZCC sup_ocol   0 0 218.55
+*Dummy Feedthrough Column Containing Steel Mass
+ZCC ft_col_i   0 0 35
+XYP ft_top     600
+XYP ft_bot     265
+ZCC ft_col_o   0 0 38.45
 * OD Geometry— inside and outside columns, inside and outside planes
 ZCC od_icol    0 0 617.22
 XYP od_ibot    -640
@@ -111,8 +116,10 @@ ocryo_in     5 o_cryo_i - i_cryo_o - (ic_con_o - ic_con_i)
 ocryo        5 o_cryo_o - o_cryo_i
 oc_con       5 (oc_con_o - oc_con_i)
 oc_sup       5 (sup_ocol + sup_top - sup_bot) - (sup_icol + sup_itop - sup_ibot)
+fdthroo      5 (ft_col_o + ft_top - ft_bot) - (ft_col_i + ft_top - ft_bot)
 od_in        5 (od_icol + wtrsurf - od_ibot) - o_cryo_o -  (oc_con_o - oc_con_i) - ((sup_ocol + sup_top - sup_bot
-               ) - (sup_icol + sup_itop - sup_ibot))
+               ) - (sup_icol + sup_itop - sup_ibot)) - ((ft_col_o + ft_top - ft_bot) - (ft_col_i + ft_top - ft_bot
+               ))
 cov_gas      5 (od_icol + od_itop - wtrsurf) - o_cryo_o -  (oc_con_o - oc_con_i) - ((sup_ocol + sup_top - sup_bot
                ) - (sup_icol + sup_itop - sup_ibot))
 od           5 (od_ocol + od_otop - od_obot) - (od_icol + od_itop - od_ibot)
@@ -153,6 +160,7 @@ ASSIGNMA    NITROGEN   cov_gas
 ASSIGNMA      NICKEL     ocryo
 ASSIGNMA      VACUUM  ocryo_in
 ASSIGNMA      NICKEL    oc_con
+ASSIGNMA     STNLESS   fdthroo
 ASSIGNMA     STNLESS    oc_sup
 ASSIGNMA      NICKEL    ic_con
 ASSIGNMA      NICKEL     icryo
