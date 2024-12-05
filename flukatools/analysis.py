@@ -35,7 +35,7 @@ from collections import Counter
 ################################################################################
 
 def clean_resnuclei_data(resnuc_dict)-> None:
-    '''Given a residual nuclei dictionary, this function sorts the data into a 3-column format: Z, A, and counts. It creates a new dictionary entry 'data' which will hold the newly sorted array. This can be used on residual nuclei dictionaries that have already been added together, OR individual ones.'''
+    '''Given a residual nuclei dictionary, this function sorts the data into a 3-column format: Z, A, and counts. It creates a new dictionary entry 'table' which will hold the newly sorted array. This can be used on residual nuclei dictionaries that have already been added together, OR individual ones.'''
 
     raw = resnuc_dict['raw']
     max_z = resnuc_dict['max_z']

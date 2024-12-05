@@ -337,11 +337,13 @@ def add_resnuclei_dicts(resnuclei_dicts : list, check_seeds_and_regions = True) 
             'max_z'     : resnuclei_dicts[0]['max_z']
         }
 
-    return new_resnuc    
+    return new_resnuc
+
 
 ################################################################################
 #                    PHASE SPACE FILE & NEUTRON OUTPUT                         #
 ################################################################################
+
 
 def read_muon_phase_space_file(filepath, pandas = False):
     ''' The customized muon source for these FLUKA simulations requires producing 

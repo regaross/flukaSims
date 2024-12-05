@@ -59,6 +59,56 @@ from scipy.optimize import minimize_scalar
 # MAX_ENERGY = 25e3   #GeV
 
 
+class Muon:
+    '''A class that holds the basic attributes of a muon; only those that 
+    are relevant for the Fluka simulation.
+
+    These are: 
+
+    seed (provides the right file)
+    prim (provides the particle number in the file)
+
+    fnumber, energy, init_x, init_y, init_z, cos_x, cos_y, -cos_z, weight 
+    
+    But weight is assumed to be 1. '''
+
+    # Maybe useful
+    rest_mass_MeV = 105.66      # [MeV]
+
+    def __init__(self, seed : int, prim : int)-> 'Muon':
+        '''Instantiates a instance of the Muon class with the seed and particle number it 
+        had in the simulation allowing one to point to the proper muon in the file'''
+        
+        self.seed = seed
+        self.prim = prim
+        self.key  =  str(seed) + '-' + str(prim)
+        self.events = []
+
+    def set_phase_space(self, fnumber : int, energy : float, init_pos : tuple, cosines : tuple):
+        '''Sets the remaining phase space attributes of the muon.'''
+        self.pos_neg = fnumber
+        self.energy = energy
+        self.init_pos = init_pos
+        self.cosines = cosines
+        self.events = []
+
+    def add_event(self, event):
+        '''adds an event to the event list of a muon'''
+        self.events.append(event)
+    
+    def phase_space_to_attrs(self, phase_space_array: np.ndarray):
+        '''Takes the values in the numpy array and makes them the attributes of the current muon instance'''
+        # pos_neg, energy, init_x, init_y, init_z, cos_x, cos_y, -cos_z, weight
+
+        self.posneg = phase_space_array[0]
+        self.energy = phase_space_array[1]
+        self.init_pos = phase_space_array[2:5]
+        self.cosines = phase_space_array[5:8]
+
+    def __str__(self) -> str:
+        muon = 'Muon:\n' + 'Seed:\t' + str(self.seed) + '\nEnergy:\t' + str(self.energy)[:5] + ' GeV'
+        return muon
+
 
 def mei_and_hime_eq3(zenith, vert_depth = SNOLAB_DEPTH, return_bounds = False):
     '''Literally just Mei and Hime's equation three.'''
