@@ -153,7 +153,7 @@ MATERIAL          54                2.94        35                 134XE134
 MATERIAL                            2.94        36                    LXe
 COMPOUND         0.9     XE136       0.1     XE134                    LXe
 ASSIGNMA    BLCKHOLE   blkhole
-ASSIGNMA     STNLESS        od
+ASSIGNMA         AIR        od
 ASSIGNMA      NORITE      rock
 ASSIGNMA       WATER     od_in
 ASSIGNMA    NITROGEN   cov_gas
