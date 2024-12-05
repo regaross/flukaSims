@@ -30,8 +30,8 @@ OD_CENTER = (0,0,0)     # m         defines coordinate system with respect to li
 OC_RADIUS = 2.270       # m
 ROI_RADIUS = OD_RADIUS + 2 # m
 ROI_HEIGHT = OD_HEIGHT + 4 # m
-GEN_OFFSET = OD_HEIGHT
-GEN_RADIUS = np.tan(1)*(OD_HEIGHT + GEN_OFFSET) + OD_RADIUS
+GEN_OFFSET = 10 + 4.6 + 0.43 # How far above the top of the targetting region?
+GEN_RADIUS = np.tan(1)*(ROI_HEIGHT + GEN_OFFSET) + ROI_RADIUS # Approximately 60 m
 
 # OC_POSITION = (0,0,0.40) # m         positions OC with respect to OD centre
 # TPC_RADIUS = 0.575      # m         from the pre-conceptual design report
