@@ -1,6 +1,6 @@
 * ..+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
 TITLE
-Most Recent Update: August 5, 2024
+Most Recent Update: December 5, 2024
 * Setting default precision
 DEFAULTS                                                              PRECISIO
 RANDOMIZ                    93
@@ -104,7 +104,6 @@ XYP rock_bot   -1000.0
 XYP rock_top   5642
 * BLACK HOLE SPHERE
 SPH blkhole    0 0 0 8000
-YZP body1      -780.0
 END
 tpc_in       5 (tpc_icol + tpc_itop - tpc_ibot)
 tpc          5 (tpc_ocol + tpc_otop - tpc_obot) - (tpc_icol + tpc_itop - tpc_ibot)
