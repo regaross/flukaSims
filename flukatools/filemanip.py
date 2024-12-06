@@ -187,7 +187,7 @@ def manage_output_files() -> None:
     
     # Step TWO
     # Copy the muon file from .temp 
-    system('mv ' + FLUKA_JOB_FILES['muons'] + ' ' + output + 'muons' + str(SEED) + '.txt')
+    system('cp ' + FLUKA_JOB_FILES['muons'] + ' ' + output + 'muons' + str(SEED) + '.txt')
 
     # Step THREE
     # Produce a concatenated std error, std output and log files
@@ -206,7 +206,7 @@ def manage_output_files() -> None:
     system('cat ' + input_prefix + '001.err >> ' + output + fluka_output_filename + ' && rm ' + PATHS['SIF'] + input_prefix + '001.err')
 
     # Step FOUR: remove what remains
-    system('rm .temp/*' + str(SEED) + '* *' + str(SEED) + '*')
+    #system('rm .temp/*' + str(SEED) + '* *' + str(SEED) + '*')
 
 ################################################################################
 #                                                                              #
