@@ -3,7 +3,7 @@
 ########################################################
 
 Simulation:
-  Muons: 5461                  # Number of muons to run for simulation equivalent to about 2 months
+  Muons: 20 #5461                  # Number of muons to run for simulation equivalent to about 2 months
 
 Input:                              # Not likely to require changing
   SIFPath: '/sdf/home/r/rross/nEXO/flukaSims/'
