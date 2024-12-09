@@ -88,9 +88,9 @@ ZCC od_icol    0 0 617.22
 XYP od_ibot    -640
 XYP od_itop    640
 XYP wtrsurf    607
-ZCC od_ocol    0 0 618.5
-XYP od_obot    -640.95
-XYP od_otop    641.27
+ZCC od_ocol    0 0 618.49
+XYP od_obot    -640.99
+XYP od_otop    641.2
 *Cryopit Domed Ceiling
 SPH cpitDome   0 0 480 862.8
 ZCC domcut     0 0 763.001
