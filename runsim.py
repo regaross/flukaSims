@@ -17,8 +17,14 @@ filemanip.make_output_directory()
 
 sleep(1)
 
-# 3. Make the muon phase space file. Here we retain the time passed and the complete list of the muons for further analysis later on.
+# 3. Make the muon phase space file.
 muons.make_phase_space_file()
+
+sleep(1)
+
+# Copy the muon file to the output directory
+filemanip.copy_muon_file()
+
 
 sleep(1)
 
