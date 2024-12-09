@@ -164,6 +164,16 @@ def make_output_directory() -> None:
     system('mkdir ' + output_dir)
     system('cp ' + FLUKA_FILES['input']  + ' ' + output_dir + FLUKA_FILES['input'])
 
+
+def copy_muon_file():
+
+    output = PATHS['output']
+
+    # Copy the muon file from .temp 
+    system('mkdir ' + output)
+    system('cp ' + FLUKA_JOB_FILES['muons'] + ' ' + output + 'muons' + str(SEED) + '.txt')
+
+
 def manage_output_files() -> None:
     '''This function is meant to move the relevant and useful output files to a particular directory.
     It should also remove the files that are no longer relevant: the copies of input files, the compiled binaries
@@ -187,7 +197,9 @@ def manage_output_files() -> None:
     
     # Step TWO
     # Copy the muon file from .temp 
-    system('cp ' + FLUKA_JOB_FILES['muons'] + ' ' + output + 'muons' + str(SEED) + '.txt')
+    # system('mkdir ' + output)
+    # system('cp ' + FLUKA_JOB_FILES['muons'] + ' ' + output + 'muons' + str(SEED) + '.txt')
+    copy_muon_file()
 
     # Step THREE
     # Produce a concatenated std error, std output and log files
@@ -206,7 +218,7 @@ def manage_output_files() -> None:
     system('cat ' + input_prefix + '001.err >> ' + output + fluka_output_filename + ' && rm ' + PATHS['SIF'] + input_prefix + '001.err')
 
     # Step FOUR: remove what remains
-    #system('rm .temp/*' + str(SEED) + '* *' + str(SEED) + '*')
+    system('rm .temp/*' + str(SEED) + '* *' + str(SEED) + '*')
 
 ################################################################################
 #                                                                              #
