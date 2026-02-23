@@ -22,7 +22,7 @@ from flukatools.constants import (
     jtrack_labels, fluka_nEXO_regions,
 )
 
-# Lowercase aliases used locally
+# Colour dictionaries are defined locally as they are not part of flukatools.constants
 particle_colour_dictionary = {
     None:   None,
     -6:     'darkorange',   #Alpha

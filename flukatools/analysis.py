@@ -607,7 +607,7 @@ def check_all_runs_equal(file_paths) -> bool:
     
 def merge_hdf5_files(file_paths, output_path):
 
-    if not check_all_runs_equal:
+    if not check_all_runs_equal(file_paths):
         return
 
     output_path = initialize_h5_file(output_path)
