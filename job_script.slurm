@@ -22,7 +22,7 @@
 #SBATCH --time=03:30:00                         # total run time limit (HH:MM:SS)
 #SBATCH --array=0-5                             # job array with index values 0, 1, 2, 3, 4, 5 (about a year of data)
 #SBATCH --mail-type=all                         # send email on job start, end and fault
-#SBATCH --mail-user=regan.ross@mail.mcgill.ca   # This feature does work!
+##SBATCH --mail-user=regan.ross@mail.mcgill.ca   # This feature does work!
 
 
 sleep $((SLURM_ARRAY_TASK_ID*5))
