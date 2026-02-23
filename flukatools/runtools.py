@@ -1,6 +1,6 @@
 # Import all the constants and dictionaries from the __init__ file
 from . import *
-from os import system
+import subprocess
 
 
 def link_and_compile():
@@ -14,13 +14,13 @@ def link_and_compile():
     
     compile_string = path_to_fluka + 'fff'
 
-    system(compile_string + ' ' + FLUKA_JOB_FILES['mgdraw'] )
-    system(compile_string + ' ' + FLUKA_JOB_FILES['source_routine']  )
+    subprocess.run(compile_string + ' ' + FLUKA_JOB_FILES['mgdraw'], check=True, shell=True)
+    subprocess.run(compile_string + ' ' + FLUKA_JOB_FILES['source_routine'], check=True, shell=True)
 
     # If we have a residual nuclei file, compile it too
     resnuc_compd = ''
     if FLUKA_JOB_FILES['resnuc'] != '':
-        system(compile_string + ' ' + FLUKA_JOB_FILES['resnuc'] )
+        subprocess.run(compile_string + ' ' + FLUKA_JOB_FILES['resnuc'], check=True, shell=True)
         resnuc_compd = FLUKA_JOB_FILES['resnuc'][:-2] + '.o'
 
     FLUKA_JOB_FILES['executable'] = PATHS['workdir'] +'execute' + str(SEED) + '.exe'
@@ -29,13 +29,13 @@ def link_and_compile():
     link_string = path_to_fluka + 'ldpmqmd -m fluka -o ' + FLUKA_JOB_FILES['executable'] + ' '
     mgd_compd = FLUKA_JOB_FILES['mgdraw'][:-2] + '.o'
     source_compd = FLUKA_JOB_FILES['source_routine'][:-2] + '.o'
-    system(link_string + mgd_compd + ' ' + resnuc_compd + ' ' + source_compd )
+    subprocess.run(link_string + mgd_compd + ' ' + resnuc_compd + ' ' + source_compd, check=True, shell=True)
 
     # Move the .o and .mod files...
-    system('mv ' + PATHS['SIF'] + '*.o' + ' ' + PATHS['SIF'] + PATHS['workdir'])
-    system('mv ' + PATHS['SIF'] + '*.mod' + ' ' + PATHS['SIF'] + PATHS['workdir'])
-    system('chmod +x ' + PATHS['SIF'] + '*.exe')
-    system('mv ' + PATHS['SIF'] + '*.exe' + ' ' + PATHS['SIF'] + PATHS['workdir'])
+    subprocess.run('mv ' + PATHS['SIF'] + '*.o' + ' ' + PATHS['SIF'] + PATHS['workdir'], check=True, shell=True)
+    subprocess.run('mv ' + PATHS['SIF'] + '*.mod' + ' ' + PATHS['SIF'] + PATHS['workdir'], check=True, shell=True)
+    subprocess.run('chmod +x ' + PATHS['SIF'] + '*.exe', check=True, shell=True)
+    subprocess.run('mv ' + PATHS['SIF'] + '*.exe' + ' ' + PATHS['SIF'] + PATHS['workdir'], check=True, shell=True)
 
 
 def run_fluka():
@@ -43,5 +43,5 @@ def run_fluka():
     source_path = YAML_PARAMS['source_path']
 
     run_string = source_path + 'rfluka -M 1 -e ./' + FLUKA_JOB_FILES['executable'] + ' ' + FLUKA_JOB_FILES['input']
-    system(run_string)
+    subprocess.run(run_string, check=True, shell=True)
 
